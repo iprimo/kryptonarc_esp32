@@ -16,10 +16,10 @@ String boxValue = "0";
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
 
-#define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define SERVICE_UUID "5e6df2dd-e7c5-4ce3-aa8d-6c7a5871fc51"
 
-#define MESSAGE_CHARACTERISTIC_UUID "6d68efe5-04b6-4a85-abc4-c2670b7bf7fd"
-#define BOX_CHARACTERISTIC_UUID "f27b53ad-c63d-49a0-8c0f-9f297e6cc520"
+#define MESSAGE_CHARACTERISTIC_UUID "6ec0962b-fd7c-4a91-9d21-bdf4c1266136"
+#define BOX_CHARACTERISTIC_UUID "e3badad0-ebba-4059-9b2e-b8a959d95781"
 
 class MyServerCallbacks : public BLEServerCallbacks
 {
