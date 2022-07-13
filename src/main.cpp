@@ -5,6 +5,9 @@
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
+#include "modules/hardware_uuid.h"
+#include "modules/e2prom_read_write.h"
+#include "modules/e2prom_read_write_basic.h"
 
 // BLE SECTION
 BLEServer *pServer = NULL;
@@ -52,6 +55,7 @@ class CharacteristicsCallbacks : public BLECharacteristicCallbacks
 
 void setup()
 {
+  
     Serial.begin(115200);
     Serial.println("Test___111111");
     // Create the BLE Device
@@ -91,19 +95,67 @@ void setup()
     box_characteristic->setCallbacks(new CharacteristicsCallbacks());
 
     Serial.println("Waiting for a client connection to notify...");
+    Serial.println(getMacAddress());
 }
 
 void loop()
 {
-    message_characteristic->setValue("Message one");
-    message_characteristic->notify();
 
-    Serial.println("Message one - Sent");
-    delay(1000);
+    e2promInitiate();
 
-    message_characteristic->setValue("Message Two");
-    message_characteristic->notify();
+    Serial.println( "   =====   padlock   =====   11111" ) ; 
+    e2promWriteWorks("padlock", "padlock_____1111111111222222222233333333334444444448_____padlock" );
+    e2promReadWorks("padlock");
+    Serial.println();
+
+    Serial.println( "   =====   tenant   =====    11111") ; 
+    // e2promWriteWorks("tenant", "tenant_____22222222223333333333444444444455111111111_____tenant");
+    e2promWriteWorks("tenant", "tenant_____ABC_____tenant");
+    e2promReadWorks("tenant");
+    Serial.println();
+
+    // Serial.println( "   =====   aes_01   =====    11111" ) ; 
+    // e2promWriteWorks("aes_01", "aes_01_____iiiiiiiii11111111112222222222iii444444444_____aes_01" );
+    // e2promReadWorks("aes_01");
+    // Serial.println();
+
+    Serial.println( "   =====   aes_02   =====    11111" ) ; 
+    e2promWriteWorks("aes_02", "aes_02_____444444444iiiiiiiii11111111112222222222iii8_____aes_02??????????" );
+    e2promReadWorks("aes_02");
+    Serial.println();
+
+    Serial.println( "   =====   padlock   =====    22222" ) ; 
+    e2promReadWorks("padlock");
+    Serial.println();
+
+    Serial.println( "   =====   tenant   =====    22222" ) ; 
+    e2promReadWorks("tenant");
+    Serial.println();
+
+    Serial.println( "   =====   aes_01   =====    22222" ) ; 
+    e2promReadWorks("aes_01");
+    Serial.println();
     
-    Serial.println("Message Two - Sent");
-    delay(1000);
+    Serial.println( "   =====   aes_02   =====    22222" ) ; 
+    e2promReadWorks("aes_02");
+    Serial.println();
+
+     
+
+    while ( true ) {
+
+        message_characteristic->setValue("Message one");
+        message_characteristic->notify();
+
+        Serial.println("Message one - Sent");
+        Serial.println(addx(100, -80));
+        delay(1000);
+
+        message_characteristic->setValue("Message Two");
+        message_characteristic->notify();
+        
+        Serial.println("Message Two - Sent");
+        Serial.println(getMacAddress());
+        delay(1000);
+    }
 }
