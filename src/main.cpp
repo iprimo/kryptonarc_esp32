@@ -7,7 +7,6 @@
 #include <BLEUtils.h>
 #include "modules/hardware_uuid.h"
 #include "modules/e2prom_read_write.h"
-#include "modules/e2prom_read_write_basic.h"
 
 // BLE SECTION
 BLEServer *pServer = NULL;
@@ -57,7 +56,7 @@ void setup()
 {
   
     Serial.begin(115200);
-    Serial.println("Test___111111");
+    Serial.println("Test___000001");
     // Create the BLE Device
     BLEDevice::init("BLEExample");
     // Create the BLE Server
@@ -102,44 +101,82 @@ void loop()
 {
 
     e2promInitiate();
+    e2promWriteWorks("padlock_addr", "padlock_____0000000000000000002233333333334444444448_____padlock" );
+    // Serial.println( "padlock_addr");
+    // Serial.println( e2promReadWorks("padlock_addr")   );
+    // Serial.println( ">>>    >>> ");
 
-    Serial.println( "   =====   padlock   =====   11111" ) ; 
-    e2promWriteWorks("padlock", "padlock_____1111111111222222222233333333334444444448_____padlock" );
-    e2promReadWorks("padlock");
-    Serial.println();
-
-    Serial.println( "   =====   tenant   =====    11111") ; 
-    // e2promWriteWorks("tenant", "tenant_____22222222223333333333444444444455111111111_____tenant");
-    e2promWriteWorks("tenant", "tenant_____ABC_____tenant");
-    e2promReadWorks("tenant");
-    Serial.println();
-
-    // Serial.println( "   =====   aes_01   =====    11111" ) ; 
-    // e2promWriteWorks("aes_01", "aes_01_____iiiiiiiii11111111112222222222iii444444444_____aes_01" );
-    // e2promReadWorks("aes_01");
-    // Serial.println();
-
-    Serial.println( "   =====   aes_02   =====    11111" ) ; 
-    e2promWriteWorks("aes_02", "aes_02_____444444444iiiiiiiii11111111112222222222iii8_____aes_02??????????" );
-    e2promReadWorks("aes_02");
-    Serial.println();
-
-    Serial.println( "   =====   padlock   =====    22222" ) ; 
-    e2promReadWorks("padlock");
-    Serial.println();
-
-    Serial.println( "   =====   tenant   =====    22222" ) ; 
-    e2promReadWorks("tenant");
-    Serial.println();
-
-    Serial.println( "   =====   aes_01   =====    22222" ) ; 
-    e2promReadWorks("aes_01");
-    Serial.println();
+    e2promWriteWorks("tenant_addr", "tenant_____00000000223333333333444444444455000001111_____tenant");
+    // Serial.println( "tenant_addr");
+    // Serial.println( e2promReadWorks("tenant_addr")   );
+    // Serial.println( ">>>    >>> ");
     
-    Serial.println( "   =====   aes_02   =====    22222" ) ; 
-    e2promReadWorks("aes_02");
-    Serial.println();
+    
+    e2promWriteWorks("aes_01_code_addr", "aes_01_____iiiiiiiii00000000000000000022iii444444444_____aes_01" );
+    // Serial.println( "aes_01_code_addr");
+    // Serial.println( e2promReadWorks("aes_01_code_addr")   );
+    // Serial.println( ">>>    >>> ");
+    
+    
+    e2promWriteWorks("aes_02_code_addr", "aes_02_____444444444iiiiiiiii00000000000000000022iii8_____aes_02" );
+    // Serial.println( "aes_02_code_addr");
+    // Serial.println( e2promReadWorks("aes_02_code_addr")   );
+    // Serial.println( ">>>    >>> ");
+    
+    
+    // e2promWriteWorks("aes_03_code_addr", "aes_03_____444444444iiiiiiiii00000000000000000022iii8_____aes_03" );
+    e2promWriteWorks("aes_03_code_addr", "aes_03_____**********_____aes_03" );
+    // Serial.println( "aes_03_code_addr");
+    // Serial.println( e2promReadWorks("aes_03_code_addr")   );
+    // Serial.println( ">>>    >>> ");
+    
+    
+    // e2promWriteWorks("locksmith_01_lock_verification", "locksmith_01_lock_verification_00_locksmith_01_lock_verification" );
+    // Serial.println( "locksmith_01_lock_verification");
+    // Serial.println( e2promReadWorks("locksmith_01_lock_verification")   );
+    // Serial.println( ">>>    >>> ");
+    
+    
+    // e2promWriteWorks("locksmith_02_lock_verification", "locksmith_02_lock_verification_00_locksmith_02_lock_verification" );
+    // Serial.println( "locksmith_02_lock_verification");
+    // Serial.println( e2promReadWorks("locksmith_02_lock_verification")   );
+    // Serial.println( ">>>    >>> ");
+    
+    
+    // e2promWriteWorks("locksmith_03_lock_verification", "locksmith_03_lock_verification_00_locksmith_03_lock_verification" );
+    e2promWriteWorks("locksmith_03_lock_verification", "locksmith_03_lock_verification_00_locksmith_03_lock_verification???????" );
+    // Serial.println( "locksmith_03_lock_verification");
+    // Serial.println( e2promReadWorks("locksmith_03_lock_verification")   );
+    // Serial.println( ">>>    >>> ");
+    
+    
+    // e2promWriteWorks("placeholder_01", "placeholder_01_____iiiiiiiii00000111444444444_____placeholder_01" );
+    e2promWriteWorks("placeholder_01", "placeholder_01_____*******_____placeholder_01" );
+    // Serial.println( "placeholder_01");
+    // Serial.println( e2promReadWorks("placeholder_01")   );
+    // Serial.println( ">>>    >>> ");
+    
+    
+    e2promWriteWorks("placeholder_02", "placeholder_02_____iiiiiiiii00000111444444444_____placeholder_02" );
+    // Serial.println( "placeholder_02");
+    // Serial.println( e2promReadWorks("placeholder_02")   );
+    // Serial.println( ">>>    >>> ");
+    
+    
 
+
+    Serial.println( "   =====   Read   =====    22222" ) ; 
+
+    Serial.println( e2promReadWorks("padlock_addr")     );
+    Serial.println( e2promReadWorks("tenant_addr")     );
+    Serial.println( e2promReadWorks("aes_01_code_addr")     );
+    Serial.println( e2promReadWorks("aes_02_code_addr")     );
+    Serial.println( e2promReadWorks("aes_03_code_addr")     );
+    Serial.println( e2promReadWorks("locksmith_01_lock_verification")     );
+    Serial.println( e2promReadWorks("locksmith_02_lock_verification")     );
+    Serial.println( e2promReadWorks("locksmith_03_lock_verification")     );
+    Serial.println( e2promReadWorks("placeholder_01")     );
+    Serial.println( e2promReadWorks("placeholder_02")     );
      
 
     while ( true ) {
