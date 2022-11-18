@@ -1,11 +1,5 @@
 #include <Arduino.h>
+#include "esp_system.h"
+#include "system_structs.cpp"
 
-typedef struct {
-    String first_name;
-    String last_name;
-    long age;
-} person;
-
-String getMacAddress();
-
-long addx(int a, int b);
+DEVICE_HARDWARE_INFO getMacAddress();

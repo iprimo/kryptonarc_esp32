@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../../Volumes/Ali_Macintosh HD — Data/projects/blue_tongued_lock__react_native"
+		},
+		{
+			"name": "kryptonarc_esp32",
+			"path": "."
+		},
+		{
+			"name": "HomeAutomatedLightMgmt",
+			"path": "../HomeAutomatedLightMgmt"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"random": "cpp",
+			"algorithm": "cpp",
+			"regex": "cpp",
+			"sstream": "cpp",
+			"strstream": "cpp",
+			"*.ipp": "cpp",
+			"string": "cpp",
+			"filesystem": "cpp",
+			"iosfwd": "cpp"
+		}
+	}
+}

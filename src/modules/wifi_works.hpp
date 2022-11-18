@@ -1,0 +1,173 @@
+//  https://randomnerdtutorials.com/esp32-useful-wi-fi-functions-arduino/
+#include "Arduino.h"
+#include "WiFi.h"
+#include "system_structs.cpp"
+
+extern  TENANT_GLOBAL_VAR tenant_global_variables;  
+    // Serial.print( "tenant_global_variables.cTenant       >>>> s");
+    // Serial.println(tenant_global_variables.cTenant);
+
+    // Serial.print( "tenant_global_variables.cProfile       >>>> s");
+    // Serial.println(tenant_global_variables.cProfile);
+
+    // Serial.print( "tenant_global_variables.cHardware       >>>> s");
+    // Serial.println(tenant_global_variables.cHardware);
+
+const char* ENC_TYPE[] = {
+                            "Open",
+                            "WEP",
+                            "WPA_PSK",
+                            "WPA2_PSK",
+                            "WPA_WPA2_PSK",
+                            "WPA2_ENTERPRISE",
+                            "MAX"
+                        };
+
+struct WiFiInfo {
+                    bool found;
+                    int32_t channel;
+                    int32_t rssi;
+                    wifi_auth_mode_t auth_mode;
+                    } wifi_info;
+
+void findWiFi(const char *ssid, WiFiInfo *info) {
+    info->found = false;
+    int16_t n = WiFi.scanNetworks();
+    for (uint8_t i=0; i<n; ++i) {
+        if (strcmp(WiFi.SSID(i).c_str(), ssid) == 0) {
+            info->found = true;
+            info->channel = WiFi.channel(i);
+            info->rssi = WiFi.RSSI(i);
+            info->auth_mode = WiFi.encryptionType(i);
+            return;
+        }
+    }
+}
+
+PassingDataStruct wifiTargetedNetworkScan(const char *SPECIFIC_SSID) {
+    const char* funcID = "692777";
+    const char* funcName = "wifiTargetedNetworkScan";
+
+    PassingDataStruct returning_data;
+    findWiFi(SPECIFIC_SSID, &wifi_info);
+    // Serial.printf(wifi_info.found
+    //             ? "SSID: %s, channel: %i, RSSI: %i dBm, encryption: %s\n"
+    //             : "SSID: %s ... could not be found\n",
+    //         SPECIFIC_SSID,
+    //         wifi_info.channel,
+    //         wifi_info.rssi,
+    //         ENC_TYPE[ wifi_info.auth_mode ]
+    //     );
+
+    char *combined_variables;
+    if ( wifi_info.found ){
+        // Wifi detected
+        int formattedStrResult = asprintf(&combined_variables, "SSID: %s, channel: %i, RSSI: %idBm, encryption: %s" , SPECIFIC_SSID, wifi_info.channel, wifi_info.rssi, ENC_TYPE[ wifi_info.auth_mode ] );
+        if(formattedStrResult > 0){
+            // do what you want for formatted string: combined_variables
+            returning_data.cMessage = combined_variables;
+            free(combined_variables);
+        } else {
+            returning_data.cMessage = "NA";
+        }
+
+        returning_data.bOperationLogic = true;
+        return returning_data;
+    } else {
+        // Wifi Not detected
+        int formattedStrResult = asprintf(&combined_variables, "SSID: %s, channel: NA, RSSI: NA, encryption: NA" , SPECIFIC_SSID);
+        if(formattedStrResult > 0){
+            // do what you want for formatted string: combined_variables
+            returning_data.cMessage = combined_variables;
+            free(combined_variables);
+        } else {
+            returning_data.cMessage = "NA";
+        }
+
+        returning_data.bOperationLogic = false;
+        return returning_data;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+void wifiModeSetup() {
+        // Set WiFi to station mode
+        WiFi.mode(WIFI_STA);
+        Serial.println(" WiFi Module: Setup done");
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void wifiDisconnectFromAP() {
+        
+        // WiFi disconnect from an AP if it was previously connected
+        WiFi.disconnect();
+        Serial.println(" WiFi Module: Disconnected From All APs");
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void wifiScanNetworks() {
+        Serial.println(" WiFi Module: scan start");
+
+        // WiFi.scanNetworks will return the number of networks found
+        int n = WiFi.scanNetworks();
+        Serial.println(" WiFi Module: scan done");
+        if (n == 0) {
+            Serial.println(" WiFi Module: no networks found");
+        } else {
+            Serial.print(n);
+            Serial.println(" WiFi Module:  networks found");
+            for (int i = 0; i < n; ++i) {
+            // Print SSID and RSSI for each network found
+            Serial.print(i + 1);
+            Serial.print(": ");
+            Serial.print(WiFi.SSID(i));
+            Serial.print(" (");
+            Serial.print(WiFi.RSSI(i));
+            Serial.print(")");
+            Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
+            delay(10);
+            }
+        }
+        Serial.println(" WiFi Module: End of scalling");
+
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+PassingDataStruct initWiFi(const char* ssid, const char* password) {
+    PassingDataStruct wifiConnectBooleanResult ;
+    int repeat_wifi_connection = 0; // incase of wifi detection failure it tries 3 more times
+    WiFi.begin(ssid, password);
+    Serial.print("Connecting to WiFi ..");
+    
+    while (WiFi.status() != WL_CONNECTED && repeat_wifi_connection <= 5 ) {
+        Serial.print('.');
+        delay(1000);
+        repeat_wifi_connection++;
+    }
+    
+    if ( WiFi.status() != WL_CONNECTED ){
+        // Problem with WiFi connection
+        wifiConnectBooleanResult.bOperationLogic = false;
+        return wifiConnectBooleanResult ;
+    }
+    
+    // Wifi Connected and return True
+    // WiFi.localIP().toString();
+    Serial.print( "Device local IP: " ); Serial.println( WiFi.localIP() );
+
+    // WiFi.subnetMask().toString()
+    Serial.print("Subnet Mask: "); Serial.println(WiFi.subnetMask());
+
+    // WiFi.gatewayIP().toString()
+    Serial.print("Gateway IP: "); Serial.println(WiFi.gatewayIP());
+
+    // WiFi.dnsIP().toString()
+    Serial.print("DNS 1: "); Serial.println(WiFi.dnsIP(0));
+    Serial.print("DNS 2: "); Serial.println(WiFi.dnsIP(1));
+    wifiConnectBooleanResult.bOperationLogic = true;
+    
+    return wifiConnectBooleanResult ;
+}
+
+
+

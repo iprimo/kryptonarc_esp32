@@ -1,6 +1,12 @@
 # gitignore template for esp-idf, the official development framework for ESP32
 # https://github.com/espressif/esp-idf
 
+.pioenvs
+.piolibdeps
+.clang_complete
+.gcc-flags.json
+.pio
+
 build/
 sdkconfig
 sdkconfig.old
