@@ -10,6 +10,10 @@
 		{
 			"name": "HomeAutomatedLightMgmt",
 			"path": "../HomeAutomatedLightMgmt"
+		},
+		{
+			"name": "KC_Initial_Conif_LED_Buzzer_OTAF",
+			"path": "../../../Documents/PlatformIO/Projects/KC_Initial_Conif_LED_Buzzer_OTAF"
 		}
 	],
 	"settings": {

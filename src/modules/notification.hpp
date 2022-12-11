@@ -17,7 +17,7 @@ void notification_reset_all( ) {
 void notification_sound( const char *cNotificationSelector , int sound_repeat ) {
     notification_reset_all();
     if ( cNotificationSelector == "Error_Triple" ){
-        int sound_state = LOW; // Local variable
+        int sound_state = LOW; // Helper Local variable
         for (int i = 0; i < (sound_repeat *2 ) ; i++)
         {
             if ( sound_state ){

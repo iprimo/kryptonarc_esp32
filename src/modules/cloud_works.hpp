@@ -5,6 +5,7 @@
 #include "HTTPClient.h"
 #include "system_structs.cpp"
 #include "ESP32Ping.h"
+#include "ArduinoJson.h"
 
 extern SYSTEM_GLOBAL_VAR system_global_variables;
 extern TENANT_GLOBAL_VAR tenant_global_variables;
@@ -23,251 +24,347 @@ extern TENANT_GLOBAL_VAR tenant_global_variables;
 const char* host_domain_subdomain = "hw_direct.dev.kryptonarc.com"; // Server from which data is to be fetched
 const int httpsPort = 443; // Default port for HTTPS 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void check_Lock_Assignment_2_Any_Tenant() {
 
+// # https://stackoverflow.com/questions/68568043/esp32-https-post-json-to-aws
+// # https://stackoverflow.com/questions/68568043/esp32-https-post-json-to-aws
+void postToAmazonSecure(String jsonToSend){
     WiFiClientSecure client;
-
     
-//    http.begin("http://jsonplaceholder.typicode.com/posts");  //Specify destination for HTTP request
-//    http.addHeader("Content-Type", "text/plain");             //Specify content-type header
+    const char* emonDataAPI = system_global_variables.server_hardware_direct_ca_domain;
+    const char* emonDataAPIPath = system_global_variables.server_hardware_direct_ca_path;
+    const char* certificate_root_ca = system_global_variables.server_hardware_direct_ca_certificate ;
+    Serial.print("connecting to : '");
+    Serial.print(emonDataAPI);
+    Serial.println("'");
+    Serial.println( emonDataAPI );
+    client.setCACert(certificate_root_ca);
+    client.connect( emonDataAPI , 443);
     
-    Serial.println("_+_+_+_+_+_ . AA11");
-
-    // client.setCertificate( system_global_variables.server_hw_gw_certificate );
-    // client.setCACert( system_global_variables.server_hw_gw_certificate );
-    // client.setCACert( server_hw_gw_certificate );
-    // client.setCertificate( server_hw_gw_certificate ); // for client verification
-    //client.setPrivateKey(test_client_key);	// for client verification
+    Serial.print("requesting URL: '");
+    Serial.print(emonDataAPI);
+    Serial.println("'");
+    String requestString = String("POST ") + emonDataAPIPath + " HTTP/1.1\r\n" +
+        "Host: " + emonDataAPI + "\r\n" +
+        "User-Agent: KryptonArcHWAgent" + "ESP32" + "agentVersion" + "1" + "\r\n" +
+        "Connection: close\r\n" +
+        "Content-Type: application/json\r\n" +
+        //"Authorization: Bearer " + authorization_code + "\r\n" +
+        "Content-Length: " + jsonToSend.length() + "\r\n" +
+        "\r\n" +
+        jsonToSend + "\r\n";
+        Serial.println(requestString);
+    client.print(requestString);
     
-
-    Serial.println("_+_+_+_+_+_ . AA22");
-
-    Serial.print("connecting to "); Serial.println(host_domain_subdomain);
-    if (!client.connect(host_domain_subdomain, httpsPort)) { // establishing connection with the server(api.github.com) at port 443
-    Serial.println("_+_+_+_+_+_ . AA33");
-        Serial.println("connection failed");
-        return; // this line will return the function to the starting of void setup()
+    Serial.println("request sent");
+    unsigned long timeout = millis();
+    while (client.available() == 0) {
+        if (millis() - timeout > 5000) {
+            Serial.println(">>> Client Timeout !");
+            client.stop();
+            return;
+        }
     }
-
-    Serial.println("_+_+_+_+_+_ . AA44");
-
-
-    if (client.verify( system_global_variables.server_hw_gw_fingerprint , host_domain_subdomain)) { // verfying fingerprint with the server
-        Serial.println("_+_+_+_+_+_ . AA55");
-        Serial.println("certificate matches");
-    } else {
-        Serial.println("_+_+_+_+_+_ . AA66");
-        Serial.println("certificate doesn't match");
-    }
-
-
-
-
 }
 
-
-// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// void check_Lock_Assignment_2_Any_Tenant() {
-
-//     WiFiClientSecure client;
-
-    
-// //    http.begin("http://jsonplaceholder.typicode.com/posts");  //Specify destination for HTTP request
-// //    http.addHeader("Content-Type", "text/plain");             //Specify content-type header
-
-//     // client.setCACert( system_global_variables.server_hw_gw_certificate );
-//     client.setCACert( server_hw_gw_certificate );
-//     // client.setCertificate( server_hw_gw_certificate ); // for client verification
-//     //client.setPrivateKey(test_client_key);	// for client verification
-    
-
-//     Serial.print("connecting to "); Serial.println(host_domain_subdomain);
-//     if (!client.connect(host_domain_subdomain, httpsPort)) { // establishing connection with the server(api.github.com) at port 443
-//         Serial.println("connection failed");
-//         return; // this line will return the function to the starting of void setup()
-//     }
-
-//     Serial.println("_+_+_+_+_+_ . 88888");
-
-
-//     if (client.verify(fingerprint, host_domain_subdomain)) { // verfying fingerprint with the server
-//         Serial.println("certificate matches");
-//     } else {
-//         Serial.println("certificate doesn't match");
-//     }
-//     Serial.println("_+_+_+_+_+_ . 99999");
-
-
-
-// }
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void check_Lock_Assignment_2_Any_Tenant_X222222() { 
-    // https.begin( host_domain_subdomain , system_global_variables.server_hw_gw_fingerprint);
-
-    Serial.println("BBBB 1111");
-    HTTPClient https;
-    WiFiClientSecure newSecure;
-    Serial.println("BBBB 2222");
-    int checkBegin = https.begin(newSecure, "hw_direct.dev.kryptonarc.com", 443, "", false);
-    Serial.println(checkBegin);
-    
-    Serial.println("BBBB 3333");
-
-    // int code = https.GET();
-    int code = https.POST("hot_stuff__payload_from_ESP32  ");
-    String payload = https.getString();
-    Serial.println("BBBB 4444");
-    Serial.println(code);
-    Serial.println("BBBB 5555");
-    Serial.println(payload);
-
-    // !
-    https.end();
-    newSecure.stop();
-}
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void check_Lock_Assignment_2_Any_Tenant_X3333() { 
-
-    const char* host = "hw_direct.dev.kryptonarc.com"; // Server from which data is to be fetched
-    const int httpsPort = 443; // Default port for HTTPS 
-
-    // Use web browser to view and copy
-    // SHA1 fingerprint of the certificate
-    const char* fingerprint = "F1 13 62 10 51 7B 3A F9 1C 96 D8 79 DE 39 2B C3 95 0A EA 57"; // Fingerprint/Thumbprint for website api.github.com
-    
-    WiFiClientSecure client;  // Use WiFiClientSecure class to create client instance
-    Serial.print("connecting to ");
-    Serial.println(host);
-    if (!client.connect(host, httpsPort)) { // establishing connection with the server(api.github.com) at port 443
-        Serial.println("connection failed");
-        return; // this line will return the function to the starting of void setup()
-    }
-
-    if (client.verify(fingerprint, host)) { // verfying fingerprint with the server
-        Serial.println("certificate matches");
-    } else {
-        Serial.println("certificate doesn't match");
-    }
-
-    // String url = "/repos/esp8266/Arduino/commits/master/status"; //address from which we need to get the data inside the server.
-    // Serial.print("requesting URL: ");
-    // Serial.println(url);
-
-    // client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-    //             "Host: " + host + "\r\n" +
-    //             "User-Agent: BuildFailureDetectorESP8266\r\n" +
-    //             "Connection: close\r\n\r\n");
-    // /*
-    // * GET /repos/esp8266/Arduino/commits/master/status HTTP/1.1
-    // * Host : api.github.com
-    // * User-Agent : BuildFailureDetectorESP8266
-    // * Connection : close
-    // */
-
-    // Serial.println("request sent");
-    // while (client.connected()) { // until the client is connected, read out the response
-    //     String line = client.readStringUntil('\n');
-    //     if (line == "\r") {
-    //     Serial.println("headers received");
-    //     break;
-    //     }
-    // }
-    // String line = client.readStringUntil('\n');
-    // if (line.startsWith("{\"state\":\"success\"")) {
-    //     Serial.println("esp8266/Arduino CI successfull!");
-    // } else {
-    //     Serial.println("esp8266/Arduino CI has failed");
-    // }
-    // Serial.println("reply was:");
-    // Serial.println("==========");
-    // Serial.println(line);
-    // Serial.println("==========");
-    // Serial.println("closing connection");i
-
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void check_Lock_Assignment_2_Any_Tenant_X4444() { 
+////////////////////////////////////////////////////////////////////////////////////
+// hardware direct status check
+void post2_hw_direct_statuscheck___Backup(
+    // String sE01, String sE02, String sE03, String sE04, String sE05, String sE06, String sE07, String sE08, String sE09, String sE10
+    ){
+    int  conn;
+    DynamicJsonDocument doc( 512 );
     WiFiClientSecure client;
-    const char* server = "hw_direct.dev.kryptonarc.com"; // Server from which data is to be fetched
-    const char* test_root_ca = \
-                "-----BEGIN CERTIFICATE-----\n" \
-                "MIIDZDCCAkwCCQDifMO7eM+sRjANBgkqhkiG9w0BAQsFADB0MQswCQYDVQQGEwJT\n" \
-                "RTESMBAGA1UECAwJQXVzdHJhbGlhMRIwEAYDVQQHDAlNZWxib3VybmUxEDAOBgNV\n" \
-                "BAoMB2hpbWluZHMxCzAJBgNVBAsMAkNBMR4wHAYDVQQDDBVjYS5kZXYua3J5cHRv\n" \
-                "bmFyYy5jb20wHhcNMjIxMTE4MDg0NDA5WhcNMjMxMTE4MDg0NDA5WjB0MQswCQYD\n" \
-                "VQQGEwJTRTESMBAGA1UECAwJQXVzdHJhbGlhMRIwEAYDVQQHDAlNZWxib3VybmUx\n" \
-                "EDAOBgNVBAoMB2hpbWluZHMxCzAJBgNVBAsMAkNBMR4wHAYDVQQDDBVjYS5kZXYu\n" \
-                "a3J5cHRvbmFyYy5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCz\n" \
-                "/5k/CqJotYGxqtiqX14+AU74ljsrmoGspnnVgMAPOTB1ZfA+musBPOHHxDxVPTeD\n" \
-                "H5ikkn6FcuXKt6XX044mfrDE7Jemx1M2mCJah3dghhYP+j6jW40L9ujC+TVgVHAx\n" \
-                "DDe7J3XhquposxptBu2dnAxoO7aa7ckPY7KTVWizTfuBsnw+Ln7rCVJKYWezvvF5\n" \
-                "8yC+5Rlq+3MTOby8h+8db/uVa2a2gRgKx33jcnBjDms6xV6LMb5+UMyxt0l62eSk\n" \
-                "KgDNFTzIbtFHG4JSDBqD+OU0TNsFHdzt/HbUJLdBeDLOasQvvOHLVjm3VSGsHuJR\n" \
-                "z0D6CKfnMI6xbWxsmTBjAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAHtHB18MMNf/\n" \
-                "MY3728gmdYOl1ev18THgdFo/eOfSurgUT2tHa7ye/iOCCoYLzbRjRXzEWhY2ECR2\n" \
-                "TwaU1EywPf9COPEA/D7jVTjkQVuYmjtCckVriEt1lkYpjJHfFVY4og6j/sK9ada2\n" \
-                "uvyr/8JueBGTUGfIxndMKlh3Y7VmrhLKcwWGBhF+MP3QE+JtVBCn4Ay4sCDB/k/9\n" \
-                "JrUv8qf7Pld+hWoyXnwpz7ixoUqUqgSRigISUbgpl5ovWsCkjF3xYPYnlhAOuE8M\n" \
-                "Zghuzj2LUitMQzcYir0aakQ/c4koB2RMn6Ut6fOrackENDrYHRuJt5hm6E1dhX14\n" \
-                "9+po9PqU408=\n" \
-                "-----END CERTIFICATE-----\n" ;
+    
+    doc["sE01"] = "sE01____tttt";
+    doc["sE02"] = "sE02____tttt";
+    doc["sE03"] = "sE03____tttt";
+    doc["sE04"] = "sE04____tttt";
+    doc["sE05"] = "sE05____tttt";
+    doc["sE06"] = "sE06____tttt";
+    doc["sE07"] = "sE07____tttt";
+    doc["sE08"] = "sE08____tttt";
+    doc["sE09"] = "sE09____tttt";
+    doc["sE10"] = "sE10____tttt";
 
-    client.setCACert( test_root_ca );
-    Serial.println("\nStarting connection to server...");
-    int conn = client.connect(server, 443);
+    String json;
+    serializeJson(doc, json);
 
-    Serial.println("HTTP - GET!");
-    if (!conn)
-        Serial.println("Connection failed!");
-    else {
-        Serial.println("Connected to server!");
+    const char* emonDataAPI = system_global_variables.server_hardware_direct_ca_domain;
+    const char* emonDataAPIPath = "/raw_hw/statuscheck";
+    const char* certificate_root_ca = system_global_variables.server_hardware_direct_ca_certificate ;
+    Serial.print("connecting to : '");
+    Serial.print(emonDataAPI);
+    Serial.println("'");
+    Serial.println( emonDataAPI );
+    client.setCACert(certificate_root_ca);
+    conn = client.connect( emonDataAPI , 443);
+    
+    if (conn == 1) {
 
+        Serial.print("requesting URL: '");
+        Serial.print(emonDataAPI);
+        Serial.println("'");
+        String requestString = String("POST ") + emonDataAPIPath + " HTTP/1.1\r\n" +
+            "Host: " + emonDataAPI + "\r\n" +
+            "User-Agent: KryptonArcHWAgent" + "ESP32" + "agentVersion" + "1" + "\r\n" +
+            "Connection: close\r\n" +
+            "Content-Type: application/json\r\n" +
+            "Cache-Control: no-cache\r\n" +
+            //"Authorization: Bearer " + authorization_code + "\r\n" +
+            "Content-Length: " + json.length() + "\r\n" +
+            "\r\n" +
+            json + "\r\n";
+        Serial.println(requestString);
         
-        // Make a HTTP request:
-        client.println("GET /raw_hw_check HTTP/1.1");
-        client.println("Host: hw_direct.dev.kryptonarc.com");
-        client.println("Connection: close");
-        client.println();
-
-        while (client.connected()) {
-            String line = client.readStringUntil('\n');
-            if (line == "\r") {
-                Serial.println("headers received");
-                break;
+        
+        
+        // client.print(requestString);
+        if (client.println() == 0)
+        {
+            Serial.println(F("Failed to send request"));
+            return;
+        }
+        
+        Serial.println("request sent");
+        Serial.println("Waiting for reply... ");
+        unsigned long timeout = millis();
+        
+        while (client.available() == 0) {
+            Serial.print(".");
+            if (millis() - timeout > 5000) {
+                Serial.println(">>> Client Timeout !");
+                client.stop();
+                // return "request timeout";
+                return;
             }
         }
-        // if there are incoming bytes available
-        // from the server, read them and print them:
+
+        
+
+        // Serial.println();
+        // Serial.println("Got response");
+        // Serial.println("return status: ");
+        // String response = client.readStringUntil('\n');
+        // Serial.println(response.c_str());
+
+        ////////////////////////////////////////////////////////////////////////////////////////
+        //Print Server Response
+        Serial.println("whole returned data");
         while (client.available()) {
             char c = client.read();
             Serial.write(c);
+
+            // String response = client.readStringUntil('\n');
+            // Serial.println(response.c_str());
+
+
+            // String line = client.readStringUntil('\n');
+            // if (line.startsWith("{\"state\":\"success\"")) {
+            // Serial.println("esp8266/Arduino CI successfull!");
+            // } else {
+            // Serial.println("esp8266/Arduino CI has failed");
+            // }
+
+        }
+        
+        Serial.println(); 
+        Serial.println("closing connection");
+        client.stop();
+
+
+
+    // JSON
+    // Allocate the JSON document
+    const size_t capacity = JSON_ARRAY_SIZE(10) + 10 * JSON_OBJECT_SIZE(2) + 10 * JSON_OBJECT_SIZE(3) + 10 * JSON_OBJECT_SIZE(5) + 10 * JSON_OBJECT_SIZE(8) + 3730;
+    DynamicJsonDocument doc(capacity);
+
+    // Parse JSON object
+    DeserializationError error = deserializeJson(doc, client);
+
+    if (error)
+    {
+        Serial.print(F("deserializeJson() failed: "));
+        Serial.println(error.c_str());
+        return;
+    }
+
+    JsonObject root_0 = doc[0];
+    Serial.println("JSON Docss");
+    Serial.println(root_0);
+
+
+    // Get the Name:
+    const char *root_0_name = root_0["message"];
+    Serial.println("message >>> ");
+    Serial.println(root_0_name);
+
+        return;
+    } else {
+        client.stop();
+        Serial.println("Connection Failed");
+        return;
+    }
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+// hardware direct status check
+//  https://github.com/witnessmenow/arduino-sample-api-request/blob/master/ESP32/HTTP_GET_JSON/HTTP_GET_JSON.ino
+void post2_hw_direct_statuscheck(
+    String sE01, String sE02, String sE03, String sE04, String sE05, String sE06, String sE07, String sE08, String sE09, String sE10
+    ){
+    int  conn;
+    DynamicJsonDocument doc( 512 );
+    WiFiClientSecure client;
+    
+    doc["sE01"] = sE01; // "sE01____tttt";
+    doc["sE02"] = sE02; // "sE02____tttt";
+    doc["sE03"] = sE03; // "sE03____tttt";
+    doc["sE04"] = sE04; // "sE04____tttt";
+    doc["sE05"] = sE05; // "sE05____tttt";
+    doc["sE06"] = sE06; // "sE06____tttt";
+    doc["sE07"] = sE07; // "sE07____tttt";
+    doc["sE08"] = sE08; // "sE08____tttt";
+    doc["sE09"] = sE09; // "sE09____tttt";
+    doc["sE10"] = sE10; // "sE10____tttt";
+
+    String json;
+    serializeJson(doc, json);
+
+    const char* emonDataAPI = system_global_variables.server_hardware_direct_ca_domain;
+    const char* emonDataAPIPath = "/raw_hw/statuscheck";
+    const char* certificate_root_ca = system_global_variables.server_hardware_direct_ca_certificate ;
+    Serial.print("connecting to : '");
+    Serial.print(emonDataAPI);
+    Serial.println("'");
+    Serial.println( emonDataAPI );
+    client.setCACert(certificate_root_ca);
+    conn = client.connect( emonDataAPI , 443);
+    
+    if (conn == 1) {
+
+        Serial.print("requesting URL: '");
+        Serial.print(emonDataAPI);
+        Serial.println("'");
+        String requestString = String("POST ") + emonDataAPIPath + " HTTP/1.1\r\n" +
+            "Host: " + emonDataAPI + "\r\n" +
+            "User-Agent: KryptonArcHWAgent" + "ESP32" + "agentVersion" + "1" + "\r\n" +
+            "Connection: close\r\n" +
+            "Content-Type: application/json\r\n" +
+            // "Cache-Control: no-cache\r\n" +
+            //"Authorization: Bearer " + authorization_code + "\r\n" +
+            "Content-Length: " + json.length() + "\r\n" +
+            "\r\n" +
+            json + "\r\n";
+        Serial.println(requestString);
+        
+        
+        
+        client.print(requestString);
+        // if (client.println() == 0)
+        // {
+        //     Serial.println(F("Failed to send request"));
+        //     return;
+        // }
+        
+        Serial.println("request sent");
+        Serial.println("Waiting for reply... ");
+        unsigned long timeout = millis();
+        
+        while (client.available() == 0) {
+            Serial.print(".");
+            if (millis() - timeout > 5000) {
+                Serial.println(">>> Client Timeout !");
+                client.stop();
+                // return "request timeout";
+                return;
+            }
         }
 
         
 
+        // Serial.println();
+        // Serial.println("Got response");
+        // Serial.println("return status: ");
+        // String response = client.readStringUntil('\n');
+        // Serial.println(response.c_str());
+
+        ////////////////////////////////////////////////////////////////////////////////////////
+        //Print Server Response
+
+        // Check HTTP status
+        char status[32] = {0};
+        client.readBytesUntil('\r', status, sizeof(status));
+        if (strcmp(status, "HTTP/1.1 200 OK") != 0)
+        {
+            Serial.print(F("Unexpected response: "));
+            Serial.println(status);
+            return;
+        }
+
+        // Skip HTTP headers
+        char endOfHeaders[] = "\r\n\r\n";
+        if (!client.find(endOfHeaders))
+        {
+            Serial.println(F("Invalid response"));
+            return;
+        }
+
+        // This is probably not needed for most, but I had issues
+        // with the Tindie api where sometimes there were random
+        // characters coming back before the body of the response.
+        // This will cause no hard to leave it in
+        // peek() will look at the character, but not take it off the queue
+        while (client.available() && client.peek() != '{')
+        {
+            char c = 0;
+            client.readBytes(&c, 1);
+            Serial.print(c);
+            Serial.println("BAD");
+        }
+
+        //  // While the client is still availble read each
+        //  // byte and print to the serial monitor
+        //  while (client.available()) {
+        //    char c = 0;
+        //    client.readBytes(&c, 1);
+        //    Serial.print(c);
+        //  }
+
+        //Use the ArduinoJson Assistant to calculate this:
+        //StaticJsonDocument<192> docReturned;
+        DynamicJsonDocument docReturned(64); //For ESP32/ESP8266 you'll mainly use dynamic.
+
+        DeserializationError error = deserializeJson(docReturned, client);
+
+        if (!error) {
+            const char*  s__E_Message = docReturned["sEMessage"];
+
+            Serial.print("s__E_Message: ");
+            Serial.println(s__E_Message);
+            
+        } else {
+            Serial.print(F("deserializeJson() failed: "));
+            Serial.println(error.f_str());
+            return;
+        }
+
+        Serial.println(); 
+        Serial.println("closing connection");
         client.stop();
+
+
+
+
+        return;
+    } else {
+        client.stop();
+        Serial.println("Connection Failed");
+        return;
     }
 
-
 }
+
 
