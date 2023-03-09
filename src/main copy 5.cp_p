@@ -4,11 +4,11 @@
 #include "BLEUtils.h"
 #include "BLE2902.h"
 
+
 #include "iostream"    // std::cout
 #include "algorithm"    // std::min
 using namespace std;
 
-const int ledPin = 18;
 
 #define SERVICE_UUID        "4fafc102-1fb5-432e-8fcc-c5c2c331914b" // random UUID
 #define CHARACTERISTIC_UUID "beb593b3-3e61-4a78-7f5b-e861ba07a826" // random UUID
@@ -18,33 +18,8 @@ BLECharacteristic *pCharacteristic;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
 std::string rxValue = "";
-String rxValueCache = "";
-
-bool deviceLocked = false;
-
-String txValue = "";
-
-void incomingStringProcessing(String receivingString ){
-
-  if ( receivingString == "set2LOCK2set" ) {
-    deviceLocked = true;
-    digitalWrite (ledPin, HIGH);	// turn on the LED
-
-  } else if ( receivingString ==  "set2UNLOCK2set" ) {
-    deviceLocked = false;
-    digitalWrite (ledPin, LOW);	// turn off the LED
-  } else if ( receivingString ==  "updateSTATUSupdate" ) {
-
-    Serial.println("updateSTATUSupdate: ");
-
-    if ( deviceLocked ){
-      txValue = "LStatus__LOCKED__LStatus";
-    } else {
-      txValue = "LStatus__UNLOCKED__LStatus";
-    }
-  }
-  
-};
+// std::string txValue = "";
+std::string txValue = "sending Data from MCU";
 
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServe_r) {
@@ -63,25 +38,11 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         rxValue = value;
         Serial.println("Received Value: ");
         Serial.println(rxValue.c_str());
-
-        String rxValueString = rxValue.c_str();
-
-        if ( rxValueString == "10_react_native_101" ){
-          rxValueCache = "";
-
-        } else if ( rxValueString == "90_react_native_109" ){
-          incomingStringProcessing( rxValueCache );
-          rxValueCache = "";
-        } else {
-          rxValueCache = rxValueCache + rxValueString;
-        }
-        
       }
     }
 };
 
 void setup() {
-  pinMode(ledPin, OUTPUT);
   Serial.begin(115200);
 
   BLEDevice::init("KryptonArc_BLE");
@@ -111,41 +72,29 @@ void setup() {
   Serial.println("Waiting for a device to connect...");
 }
 
-void sendingChunkData(String sendingChunk){
-    pCharacteristic->setValue(sendingChunk.c_str());
-    pCharacteristic->notify();
-    // Serial.println("Sent Value: ");
-    // Serial.println(sendingChunk.c_str());
-
-    Serial.println("Senting Data: ");
-    delay( 10 );
-};
-
 void loop() {
   if (deviceConnected) {
-    int txValueLength = txValue.length();
+    String msg = "81828384858687888980___81828384858687888980___81828384858687888980";
+    int msgLength = msg.length();
+    Serial.print("msgLength ::: ");
+    Serial.println( msgLength );
 
-    if (txValue.length() > 0) {
-
-      int sendingChunkSize = 20; //max packet size
-      // Starting packet
-      String starter_block = "100_esp32_000000101";
-      sendingChunkData(starter_block);
-
-      // Data packets
-      for (int i = 0; i < txValueLength; i += sendingChunkSize) {
-        String sendingChunk = txValue.substring(i, min(i + sendingChunkSize, txValueLength)); //get next sendingChunk
-        sendingChunkData( sendingChunk );
-
-        // delay between packet transfer
-        delay(10);
-      }
-      // Finishing packet
-      String finisher_block = "900_esp32_000000109";
-      sendingChunkData(finisher_block);
-      txValue = "";
+    int chunkSize = 18; //max packet size
+    for (int i = 0; i < msgLength; i += chunkSize) {
+      String chunk = msg.substring(i, min(i + chunkSize, msgLength)); //get next chunk
+      Serial.print("chunk ::: ");
+      Serial.println( chunk + "_+_+_+_+_" );
+      // SerialBT.println(chunk); //send chunk to Bluetooth
     }
     
+    if (txValue.length() > 0) {
+      pCharacteristic->setValue(txValue);
+      pCharacteristic->notify();
+      Serial.println("Sent Value: ");
+      Serial.println(txValue.c_str());
+      delay(1000);
+      // txValue = "";
+    }
   }
 
   if (deviceConnected != oldDeviceConnected) {
@@ -155,4 +104,7 @@ void loop() {
       Serial.println("Waiting for a device to connect...");
     }
   }
+  // Serial.println("deviceConnected: ");
+  // Serial.println(deviceConnected);
+  delay(10);
 }

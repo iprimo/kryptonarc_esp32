@@ -1,0 +1,258 @@
+// https://github.com/palmmaximilian/ReactNativeArduinoBLE
+// https://github.com/palmmaximilian/ReactNativeArduinoBLE
+
+#include "Arduino.h"
+#include "ArduinoJSON.h"
+#include "modules/system_structs.cpp"
+#include "modules/bluetooth_works.h"
+#include "modules/wifi_works.hpp"
+#include "modules/hardware_uuid.h"
+#include "modules/e2prom_read_write.h"
+#include "modules/logging_service.hpp"
+#include "modules/notification.hpp"
+#include "modules/cloud_works.hpp"
+#include "modules/ping_works.hpp"
+#include "modules/morse_code.hpp"
+
+SYSTEM_GLOBAL_VAR system_global_variables;
+TENANT_GLOBAL_VAR tenant_global_variables;
+DEVICE_HARDWARE_INFO MCU____ID;
+
+void setup()
+{
+    Serial.begin(115200);
+    tenant_global_variables.cTenant = "a_b_c_1111_tenant";
+    tenant_global_variables.cProfile = "a_b_c_1111_profile";
+    tenant_global_variables.cHardware = "a_b_c_1111_padlock";
+
+    // put your setup code here, to run once:
+    pinMode (system_global_variables.ledRed, OUTPUT);
+    pinMode (system_global_variables.ledBlue, OUTPUT);
+    pinMode (system_global_variables.ledGreen, OUTPUT);
+    pinMode( system_global_variables.buzzerPassive, OUTPUT);
+
+}
+
+void loop()
+{
+
+    const char* funcID = "67827";
+    const char* funcName = "mainLoop";
+    PassingDataStruct wifi_scan_result, wifi_connect_result, Ping_IP, Ping_Host;
+
+    Serial.println("Rest_All_Notification 111");
+    notification_reset_all();
+    // notification_sound( "Rest_All_Notification" );
+    // delay(3000);
+    // Serial.println("Rest_All_Notification 222");
+
+    // Reading Existing Configration from E2PROM~
+    while ( true ) {
+        // If SSID of KryptonArc-eKeySmith exists directly go to eKeySmith (even without Tenant config)
+
+        // Config Exists
+        if (false) {
+            // Yes - (2 Config Exists) - (Start of Bluetooth First attempt)
+                // Start Blueooth attempts and connect to App (Notifcation: 0x46282)
+                // Bluetooth attempt works
+                    // Yes - (2 Bluetooth attempt works)
+                        // Stay here and execute instructions (Notifcation: 0x77299)
+                        // Portentila tasks: 
+                            // User Not logged in - Simple-Public-Data-Displayed
+                            // User logged in - Not have persmission to access this device -> Detaild Public info displayed
+                            // User loggdin - Actions could changed depenidng on permission
+                            // ImageUpgrade - Approval Needed ()
+                    // No - (2 Bluetooth attempt works)
+                        // KryptonArc-eKeysmith SSID exists ? (For Paid Accounts)
+                            // Yes - (2 KryptonArc-eKeysmith SSID exists)
+                                // (Notifcation: 0x48277)
+                                // Wifi - eKeysmith - If device regsitered ans is ON for 5 Miniutes of devie ON, it goes for eKeysmith
+                            // No - (2 KryptonArc-eKeysmith SSID exists)
+                                // (Notifcation: 0x42729)
+                                // Try for 5 Minute
+                                // 5 Minutes failed 
+                                    // Yes - (2 raise fault (Notifcation: 0x57991)
+                        
+        } else {
+            // No - (2 Config Exists) - (Directly go to WiFi attempts)
+            int repeat_in_case_of_failure = 0; // incase of wifi detection failure it tries 3 more times
+            PassingDataStruct wifi_scan_result;
+            wifi_scan_result.bOperationLogic = false;
+            
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Searching for WiFi SSID
+            // If successful -> move to next step 
+            // If Not successful -> return and stop
+            while ( !wifi_scan_result.bOperationLogic && repeat_in_case_of_failure <= 3 ){
+                wifi_scan_result = wifiTargetedNetworkScan( system_global_variables.STANDARD_WIFI_SSID );
+                repeat_in_case_of_failure++;
+                delay(1000); // delay between each scan
+            }
+            // If wifi not detected - sound error and return cycle
+            if ( !wifi_scan_result.bOperationLogic ){
+                loggingService( "LogMessage: error code=0x47197" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                // loggingService( wifi_scan_result.cMessage , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                notification_light( "redLedFlashing", 3 , 100 );
+                notification_sound( "Error_Triple" , 10 );
+                morse_code_data_transfer("0x47197"); // could not detect Wifi SSID
+                return;
+            } else {
+                loggingService( "LogMessage: wifi detected, moving to next step" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                notification_light( "blueLedFlashing", 3 , 100 );
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Connecting to wifi SSID
+            // If successful -> move to next step 
+            // If Not successful -> return and stop
+            // TBD: if failed try 3 times
+            wifi_connect_result = initWiFi( system_global_variables.STANDARD_WIFI_SSID , system_global_variables.STANDARD_WIFI_PASSWORD );
+            if ( !wifi_connect_result.bOperationLogic ) {
+                loggingService( "LogMessage: Device could not connect to Wifi" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                notification_light( "redLedFlashing", 3 , 100 );
+                notification_sound( "Error_Triple" , 10 );
+                morse_code_data_transfer("0x56923");
+                return;
+            } else {
+                loggingService( "LogMessage: Device connected to Wifi" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
+            
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Testing Wifi Connectivity by ping Google IP
+            // Move to next step if successful OR not successful
+            Ping_IP = ping_ip_google();
+            if ( !Ping_IP.bOperationLogic ) {
+                loggingService( "LogMessage: Wifi ping Google IP failed" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                notification_light( "redLedFlashing", 3 , 100 );
+                morse_code_data_transfer("0x85772"); // could not ping google IP address
+                // return;
+            } else {
+                loggingService( "LogMessage: Wifi ping Google IP successful" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+            // Testing DNS by ping Google hostname
+            Ping_Host = ping_host_google();
+            if ( !Ping_Host.bOperationLogic ) {
+                loggingService( "LogMessage: Wifi ping Google host failed" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                notification_light( "redLedFlashing", 3 , 100 );
+                morse_code_data_transfer("0x75422"); // could not ping google hostname
+                // return;
+            } else {
+                loggingService( "LogMessage: Wifi ping Google host successful" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Extracing MCU ID
+            // TBD: if failed try 3 times -> if fails stop & return (Error: 0x58277)
+            loggingService( "LogMessage: Start of extracting MCU details" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+            MCU____ID = getMacAddress();
+            
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Extracing Controller board Version
+            // TBD: if failed try 3 times -> if fails stop & return (Error: 0x47292)
+            loggingService( "LogMessage: Start of extracting Controller board version" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+            
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Check on the Cloud server if the device is registered to global device table
+            HTTPWorksReply device_register_check;
+            int repeat_http_call_register = 0; 
+            loggingService( "LogMessage: Start communication with registration API" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+            while ( !device_register_check.bEDeviceRegisteredLogic && repeat_http_call_register <= 3 ){
+                device_register_check = post2_hw_direct_statuscheck(
+                    MCU____ID.sChipModel.c_str() ,
+                    MCU____ID.sChipRevision.c_str() ,
+                    MCU____ID.sChipCores.c_str(),
+                    MCU____ID.sChipId.c_str(),
+                    
+                    MCU____ID.baseMacChrSOFTAP,
+                    MCU____ID.baseMacChrBT,
+                    MCU____ID.baseMacChrETH,
+                    MCU____ID.baseMacChrWiFi,
+                    "BoardVersion0",
+                    ""                   
+                );
+                if ( device_register_check.bEServerReachableLogic && device_register_check.bEServerRespondedLogic ){
+                    repeat_http_call_register = 9999;
+                } else {
+                    repeat_http_call_register++;
+                    delay(1000); // delay between each scan
+                }
+            }
+            Serial.println( " _+_+_+_+_  _+_+_+_+_  _+_+_+_+_  _+_+_+_+_  _+_+_+_+_ 8888" );
+            
+            if ( device_register_check.bEDeviceRegisteredLogic ) {
+                Serial.println( " _+_+_+_+_  _+_+_+_+_  _+_+_+_+_  _+_+_+_+_  _+_+_+_+_ 8888AAAAA" );
+            } else {
+                loggingService( "LogMessage: Start device registration process" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                Serial.println( " _+_+_+_+_  _+_+_+_+_  _+_+_+_+_  _+_+_+_+_  _+_+_+_+_ 8888CCCCC" );
+            }
+
+
+
+
+            // Prior to wiping or opening the device, some checks has to be done on the server, to ensure the device is not manipulated, 
+            //      and acutally does not belong to existing user
+            
+
+            // Checking if the Device registered to (global-hardware-table & a tenant)
+            if (false){
+                // Serial.println("Submodule: Yes & Yes - Device registered to (global-hardware-table & a tenant)");
+                
+                // Yes & Yes - Device registered to (global-hardware-table & a tenant)
+                // Wifi - Go to eKeysmith - does not have config on it, but it is registed - potenional config wipe or device manipulation
+            } else if (false){
+                // Serial.println("Submodule: Yes & No - Device registered to (global-hardware-table & a tenant)");
+
+                // Yes & No - Device registered to (global-hardware-table & a tenant)
+                // DownloadLatestImage via WiFi
+                // Keep Checking for assigment to a tenant
+            } else if (false){
+                // Serial.println("Submodule: No & Yes - Device registered to (global-hardware-table & a tenant)");
+
+                // No & Yes - Device registered to (global-hardware-table & a tenant)
+                // Wait for Tenant instructions
+            } else {
+                // Serial.println("Submodule: No & No - Device registered to (global-hardware-table & a tenant)");
+
+                // No & No - Device registered to (global-hardware-table & a tenant)
+                // Wipe E2PROM\DownloadImage\CallHome\Regsiter - (No approval)
+                // If allowed by cloud:
+                    // Register to global hardware repo (if device already does not exists, User has to put the MAC address details has to be put in manually)
+                // If allowed by cloud:
+                    // DownloadLatestImage via WiFi
+                // CallHome
+
+            }
+
+
+        }
+
+
+        
+
+               
+
+        // Wait a bit before scanning again
+        delay(1000);
+
+    }
+}
+
+
+
+

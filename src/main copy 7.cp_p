@@ -4,11 +4,14 @@
 #include "BLEUtils.h"
 #include "BLE2902.h"
 
+
 #include "iostream"    // std::cout
 #include "algorithm"    // std::min
 using namespace std;
 
+
 const int ledPin = 18;
+
 
 #define SERVICE_UUID        "4fafc102-1fb5-432e-8fcc-c5c2c331914b" // random UUID
 #define CHARACTERISTIC_UUID "beb593b3-3e61-4a78-7f5b-e861ba07a826" // random UUID
@@ -20,31 +23,33 @@ bool oldDeviceConnected = false;
 std::string rxValue = "";
 String rxValueCache = "";
 
+
 bool deviceLocked = false;
 
-String txValue = "";
+// std::string txValue = "";
+String txValue = "717273747576777879000000000000_11111111111111_222222222___717273747576777879000000000000_11111111111111_222222222___717273747576777879000000000000_11111111111111_222222222";
 
 void incomingStringProcessing(String receivingString ){
+    Serial.print("receivingString      >>> ");
+    Serial.println(receivingString );
 
-  if ( receivingString == "set2LOCK2set" ) {
+  if ( strcmp( receivingString.c_str() , "set2LOCK2set" ) ){
     deviceLocked = true;
     digitalWrite (ledPin, HIGH);	// turn on the LED
+    Serial.print("receivingString      <<<<????");
 
-  } else if ( receivingString ==  "set2UNLOCK2set" ) {
+  } else if ( strcmp( receivingString.c_str() , "set2UNLOCK2set" ) ){
     deviceLocked = false;
     digitalWrite (ledPin, LOW);	// turn off the LED
-  } else if ( receivingString ==  "updateSTATUSupdate" ) {
-
-    Serial.println("updateSTATUSupdate: ");
-
-    if ( deviceLocked ){
-      txValue = "LStatus__LOCKED__LStatus";
-    } else {
-      txValue = "LStatus__UNLOCKED__LStatus";
-    }
+    Serial.print("set2UNLOCK2set      <<<<????");
   }
+  Serial.print("deviceLocked  ::111: ");
+  Serial.println(deviceLocked);
   
 };
+
+
+
 
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServe_r) {
@@ -63,22 +68,29 @@ class MyCallbacks: public BLECharacteristicCallbacks {
         rxValue = value;
         Serial.println("Received Value: ");
         Serial.println(rxValue.c_str());
-
-        String rxValueString = rxValue.c_str();
-
-        if ( rxValueString == "10_react_native_101" ){
+        if ( strcmp( rxValue.c_str()  , "10_react_native_101" ) ){
+          Serial.println("10_react_native_101 : ");
+          Serial.println(rxValue.c_str());
           rxValueCache = "";
 
-        } else if ( rxValueString == "90_react_native_109" ){
+        } else if ( strcmp( rxValue.c_str()  , "90_react_native_109" ) ){
+          Serial.println("90_react_native_109 : ");
+          Serial.println( rxValue.c_str());
+          Serial.println("rxValueCache &&&&: ");
+          Serial.println( rxValueCache );
           incomingStringProcessing( rxValueCache );
           rxValueCache = "";
         } else {
-          rxValueCache = rxValueCache + rxValueString;
+          rxValueCache = rxValueCache + rxValue.c_str();
+
+          Serial.println("rxValueCache $$$$: ");
+          Serial.println( rxValueCache );
         }
         
       }
     }
 };
+
 
 void setup() {
   pinMode(ledPin, OUTPUT);
@@ -111,15 +123,17 @@ void setup() {
   Serial.println("Waiting for a device to connect...");
 }
 
+
+
+
 void sendingChunkData(String sendingChunk){
     pCharacteristic->setValue(sendingChunk.c_str());
     pCharacteristic->notify();
-    // Serial.println("Sent Value: ");
-    // Serial.println(sendingChunk.c_str());
-
-    Serial.println("Senting Data: ");
+    Serial.println("Sent Value: ");
+    Serial.println(sendingChunk.c_str());
     delay( 10 );
 };
+
 
 void loop() {
   if (deviceConnected) {
@@ -155,4 +169,6 @@ void loop() {
       Serial.println("Waiting for a device to connect...");
     }
   }
+
+
 }

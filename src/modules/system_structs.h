@@ -13,9 +13,9 @@ struct PassingDataStruct
     long lValue;
     bool bOperationLogic = false;
     
-    // To print sMessage use "Serial.println(str.c_str());"
+    // To print sEMessage use "Serial.println(str.c_str());"
     // Source: https://techoverflow.net/2022/09/07/how-to-serial-println-a-stdstring/
-    std::string sMessage;
+    std::string sEMessage;
 
     const char *cMessage;
 
@@ -36,6 +36,28 @@ struct PassingDataStruct
 };
 
 #endif
+
+
+
+#ifndef HTTPWorksReply_H
+#define HTTPWorksReply_H
+struct HTTPWorksReply
+{
+    bool bEServerReachableLogic = false;
+    bool bEServerRespondedLogic = false;
+    bool bEDeviceRegisteredLogic = false;
+    std::string sEReturnedData;
+    // To print sEMessage use "Serial.println(str.c_str());"
+    // Source: https://techoverflow.net/2022/09/07/how-to-serial-println-a-stdstring/
+    std::string sEMessage;
+    const char *cMessage;
+
+};
+
+#endif
+
+
+
 
 
 #ifndef GLOBAL_TENANT_VAR
@@ -134,9 +156,9 @@ Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
 struct DEVICE_HARDWARE_INFO 
 {
     std::string sChipModel;
-    int iChipRevision = 0;
-    int iChipCores = 0;
-    uint32_t uChipId = 0;
+    std::string sChipRevision;
+    std::string sChipCores;
+    std::string sChipId;
 
     char baseMacChrSOFTAP[18] = {0};
     char baseMacChrBT[18] = {0};
