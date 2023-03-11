@@ -6,12 +6,9 @@
 
 #include "iostream"    // std::cout
 #include "algorithm"    // std::min
-
-#include "modules/servo.hpp"
-
 using namespace std;
 
-const int ledPin = 17;
+const int ledPin = 18;
 
 #define SERVICE_UUID        "4fafc102-1fb5-432e-8fcc-c5c2c331914b" // random UUID
 #define CHARACTERISTIC_UUID "beb593b3-3e61-4a78-7f5b-e861ba07a826" // random UUID
@@ -31,12 +28,10 @@ void incomingStringProcessing(String receivingString ){
 
   if ( receivingString == "set2LOCK2set" ) {
     deviceLocked = true;
-    servoWorksClose();
     digitalWrite (ledPin, HIGH);	// turn on the LED
 
   } else if ( receivingString ==  "set2UNLOCK2set" ) {
     deviceLocked = false;
-    servoWorksOpen();
     digitalWrite (ledPin, LOW);	// turn off the LED
   } else if ( receivingString ==  "updateSTATUSupdate" ) {
 
@@ -86,10 +81,6 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 };
 
 void setup() {
-  //// Servo works
-  servoInitiate();
-
-  //// Bluetooth works
   pinMode(ledPin, OUTPUT);
   Serial.begin(115200);
 
