@@ -1,6 +1,7 @@
 // https://stackoverflow.com/questions/6882637/using-struct-in-different-cpp-file
 // https://stackoverflow.com/questions/6882637/using-struct-in-different-cpp-file
 // 
+#include "cstddef"
 #include <string>
 using namespace std;
 
@@ -57,6 +58,24 @@ struct HTTPWorksReply
 #endif
 
 
+
+
+
+#ifndef GLOBAL_BROADCAST_VAR
+#define GLOBAL_BROADCAST_VAR
+struct BROADCAST_GLOBAL_VAR
+{
+    char* outputA = NULL;
+    const char* outputA_SubStringStart = "-BOAV_";
+    const char* outputA_SubStringEnd = "_BOAV-";
+
+    // char baseMacChrBT[18] = {0};
+    
+    // char* valueB = NULL;
+    // const char* valueB_SubStringStart = "-BO1AV_";
+    // const char* valueB_SubStringEnd = "_BO1AV-";
+};
+#endif
 
 
 

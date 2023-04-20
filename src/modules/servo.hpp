@@ -68,3 +68,8 @@ void servoWorksOpen() {
 void servoWorksClose() {
 	myservo.write( 90 );
 }
+
+
+void servoWorksDrive( int target_value  ) {
+	myservo.write( target_value );
+}
