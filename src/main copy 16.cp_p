@@ -10,11 +10,21 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "modules/servo.hpp"
+// #include "modules/servo.hpp"
+
+#include <ESP32Servo.h>
+
+Servo myservo;  // create servo object to control a servo
+// 16 servo objects can be created on the ESP32
+
+// Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
+static const int servoPin = 18;
+
+
+
 #include "modules/string_works.hpp"
 #include "modules/hardware_uuid.h"
 #include "modules/system_structs.cpp"
-#include "modules/encryption_works.hpp"
 
 SYSTEM_GLOBAL_VAR system_global_variables;
 BROADCAST_GLOBAL_VAR broadcast_global_variables;
@@ -58,7 +68,7 @@ void incomingStringProcessing(String receivingString ){
       Serial.print("broadcastOutputAValInt:   ");
       Serial.println( broadcastOutputAValInt );
       Serial.println("****** <<<<< ");
-      servoWorksDrive( broadcastOutputAValInt );
+      myservo.write( broadcastOutputAValInt );
     }
 
 if ( receivingString ==  "TI_GetStatus_TI" ) {
@@ -115,7 +125,20 @@ void setup() {
 
 
   //// Servo works
-  servoInitiate();
+  // servoInitiate();
+  // Allow allocation of all timers
+	ESP32PWM::allocateTimer(0);
+	ESP32PWM::allocateTimer(1);
+	ESP32PWM::allocateTimer(2);
+	ESP32PWM::allocateTimer(3);
+	// myservo.setPeriodHertz(50);    // standard 50 hz servo
+	myservo.attach(servoPin); // attaches the servo on pin 18 to the servo object
+	// using default min/max of 1000us and 2000us
+	// different servos may require different min/max settings
+	// for an accurate 0 to 180 sweep
+
+
+
 
   //// Bluetooth works
   pinMode(ledPin, OUTPUT);
@@ -159,9 +182,37 @@ void sendingChunkData(String sending_Chunk){
   delay( 10 );
 };
 
+// const char* key = "mysecretkey"; // the encryption key
+// const int keyLen = strlen(key);
 
 void loop() {
   while ( true ){
+
+
+    // // ////////////////////////////////////////////////////////////////////////////////  Testing Section   >>>
+    
+    // String plaintext = "Hello, world!";
+    
+    // // Encrypt the plaintext
+    // String ciphertext = encrypt(plaintext, key);
+    
+    // Serial.print("Plaintext: ");
+    // Serial.println(plaintext);
+    
+    // Serial.print("Ciphertext: ");
+    // Serial.println(ciphertext);
+    
+    // // Decrypt the ciphertext
+    // String decryptedtext = decrypt(ciphertext, key);
+    
+    // Serial.print("Decrypted text: ");
+    // Serial.println(decryptedtext);
+    
+    // delay(1000);
+    
+    // // ////////////////////////////////////////////////////////////////////////////////  Testing Section   <<<
+
+
 
     // This hardware does not automatically send out data, it has to be instructed to send data by the device connected
     if (deviceConnected) {

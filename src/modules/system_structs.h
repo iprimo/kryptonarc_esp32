@@ -65,9 +65,9 @@ struct HTTPWorksReply
 #define GLOBAL_BROADCAST_VAR
 struct BROADCAST_GLOBAL_VAR
 {
-    char* outputA = NULL;
-    const char* outputA_SubStringStart = "-BOAV_";
-    const char* outputA_SubStringEnd = "_BOAV-";
+    char* broadcastOutputA = NULL;
+    const char* broadcastOutputA_SubStringStart = "-BOAV_";
+    const char* broadcastOutputA_SubStringEnd = "_BOAV-";
 
     // char baseMacChrBT[18] = {0};
     

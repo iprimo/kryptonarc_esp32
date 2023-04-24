@@ -13,6 +13,14 @@
 #include "modules/servo.hpp"
 #include "modules/string_works.hpp"
 #include "modules/hardware_uuid.h"
+// #include "modules/global_variables.hpp"
+#include "modules/system_structs.cpp"
+
+SYSTEM_GLOBAL_VAR system_global_variables;
+BROADCAST_GLOBAL_VAR broadcast_global_variables;
+TENANT_GLOBAL_VAR tenant_global_variables;
+DEVICE_HARDWARE_INFO MCU____ID;
+
 
 
 using namespace std;
@@ -32,33 +40,27 @@ String rxValueCache = "";
 bool deviceLocked = false;
 
 String txValue = "";
-DEVICE_HARDWARE_INFO MCU____ID;
 
 void incomingStringProcessing(String receivingString ){
 
+    char myCharArray[receivingString.length() + 1]; // Allocate a char array with enough space to hold the string
+    strcpy(myCharArray, receivingString.c_str()); // Copy the contents of the string to the char array
 
-  if ( receivingString == "-BOAV_90_BOAV-" ) {
-    deviceLocked = true;
-    // servoWorksClose();
-    servoWorksDrive(0, 0);
-    digitalWrite (ledPin, HIGH);	// turn on the LED
+    String outputAValString = find_values_between_substringsV3( myCharArray, broadcast_global_variables.outputA_SubStringStart , broadcast_global_variables.outputA_SubStringEnd );
 
-  } else if ( receivingString ==  "BOAV_0_BOAV" ) {
-    deviceLocked = false;
-    // servoWorksOpen();
-    servoWorksDrive(0, 90);
-    digitalWrite (ledPin, LOW);	// turn off the LED
-  } else if ( receivingString ==  "TI_GetStatus_TI" ) {
-
-    Serial.println("TI_GetStatus_TI: ");
-
-    if ( deviceLocked ){
-      // Output A Value = 90
-      txValue = "OAV_90_OAV";
-    } else {
-      // Output A Value = 0
-      txValue = "OAV_0_OAV";
+    if ( outputAValString != "N_A__" ){
+      int outputAValInt = outputAValString.toInt();
+      Serial.println("****** >>>>> ");
+      Serial.print("outputAValInt:   ");
+      Serial.println( outputAValInt );
+      Serial.println("****** <<<<< ");
+      servoWorksDrive( outputAValInt );
     }
+
+if ( receivingString ==  "TI_GetStatus_TI" ) {
+  // Device Response : DR
+    Serial.println("TI_GetStatus_TI: ");
+    txValue = "-DR_200!OK!_DR-";
   }
   
 };
@@ -141,61 +143,13 @@ void sendingChunkData(String sendingChunk){
     Serial.println("Senting Data: ");
     delay( 10 );
 };
-
-void loop() {
-  // ////////////////////////////////////////////////////////////////////////////////  Testing Section   >>>
-  // char str[] = "The quick brown fox jumps over the lazy dog";
-  // char substr1[] = "quick";
-  // char substr2[] = "lazy";
-  // char* value;
-
-  // value = find_value_between_substringsV1(str, substr1, substr2);
-  // if (value != NULL) {
-  //   Serial.println("***** ***** ***** ***** ***** : ");
-  //   Serial.println("" );
-
-  //   Serial.print("substr1: " );
-  //   Serial.print( substr1 );
-  //   Serial.println("" );
-
-  //   Serial.print("substr2: " );
-  //   Serial.print( substr2 );
-  //   Serial.println("" );
-
-  //   Serial.print("value: " );
-  //   Serial.print( value );
-  //   Serial.println("" );
-
     
-  //   free(value);
-  // }
-
-    char str[] = "This is string A1:12345A2 and string B1:67890B2";
-    char *broadcastOutputA, *valueB;
-    char substringA1[] = "A1:";
-    char substringA2[] = "A2";
-    char substringB1[] = "B1:";
-    char substringB2[] = "B2";
-
-
-    // find_values_between_substringsV2(str, "A1:", "A2", "B1:", "B2", &broadcastOutputA, &valueB);
-    find_values_between_substringsV2(str, substringA1, substringA2, substringB1, substringB2, &broadcastOutputA, &valueB);
-
-
-    Serial.println("***** ***** ***** ***** ***** : ");
-    Serial.println("");
-    Serial.print("Value A: ");
-    Serial.print(broadcastOutputA);
-
-    Serial.println("");
-    Serial.print("Value B: ");
-    Serial.print(valueB);
-
-    free(broadcastOutputA);
-    free(valueB);
-
-
-  // ////////////////////////////////////////////////////////////////////////////////  Testing Section   <<<
+void loop() {
+  // // ////////////////////////////////////////////////////////////////////////////////  Testing Section   >>>
+  
+  
+  
+  // // ////////////////////////////////////////////////////////////////////////////////  Testing Section   <<<
 
 
 
