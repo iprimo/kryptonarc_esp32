@@ -32,7 +32,7 @@ String rxValueCache = "";
 bool deviceLocked = false;
 
 String txValue = "";
-DEVICE_HARDWARE_INFO MCU____ID;
+DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED MCU____ID;
 
 void incomingStringProcessing(String receivingString ){
 

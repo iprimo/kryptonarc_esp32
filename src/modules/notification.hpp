@@ -2,16 +2,16 @@
 #include "system_structs.cpp"
 #include "pitches.hpp"
 
-extern SYSTEM_GLOBAL_VAR system_global_variables;
+extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
 
 const int led_default_off = HIGH;    // the OFF state of LED
 const int led_default_on = LOW;    // the ON state of LED
 
 void notification_reset_all( ) { 
-    tone(system_global_variables.buzzerPassive, 0);
-    digitalWrite (system_global_variables.ledRed, led_default_off);
-    digitalWrite (system_global_variables.ledBlue, led_default_off);
-    digitalWrite (system_global_variables.ledGreen, led_default_off);
+    tone(software_parameters_fixed.buzzerPassive, 0);
+    digitalWrite (software_parameters_fixed.ledRed, led_default_off);
+    digitalWrite (software_parameters_fixed.ledBlue, led_default_off);
+    digitalWrite (software_parameters_fixed.ledGreen, led_default_off);
 }
 
 void notification_sound( const char *cNotificationSelector , int sound_repeat ) {
@@ -22,10 +22,10 @@ void notification_sound( const char *cNotificationSelector , int sound_repeat ) 
         {
             if ( sound_state ){
                 sound_state = LOW;
-                tone(system_global_variables.buzzerPassive, 200);
+                tone(software_parameters_fixed.buzzerPassive, 200);
             } else {
                 sound_state = HIGH;
-                tone(system_global_variables.buzzerPassive, 0);
+                tone(software_parameters_fixed.buzzerPassive, 0);
             }
             delay( 100 );
         } 
@@ -33,26 +33,26 @@ void notification_sound( const char *cNotificationSelector , int sound_repeat ) 
         for (int i = 0; i < sound_repeat ; i++) {
             for (int i = 200; i <= 800; i++)  // loop from 200 to 800 (frequency)
             {
-                tone(system_global_variables.buzzerPassive, i);
+                tone(software_parameters_fixed.buzzerPassive, i);
                 delay(5);
             }
             delay(1000);                      //3 seconds on highest frequency
             for (int i = 800; i >= 200; i--)  // loop from 200 to 800 (frequency)
             {
-                tone(system_global_variables.buzzerPassive, i);
+                tone(software_parameters_fixed.buzzerPassive, i);
                 delay(5);
             }
         }
         } else if ( cNotificationSelector == "some_sound" ){
             for (int i = 200; i <= 800; i++)  // loop from 200 to 800 (frequency)
             {
-                tone(system_global_variables.buzzerPassive, i);
+                tone(software_parameters_fixed.buzzerPassive, i);
                 delay(2);
             }
             delay(1000);                      //3 seconds on highest frequency
             for (int i = 800; i >= 200; i--)  // loop from 200 to 800 (frequency)
             {
-                tone(system_global_variables.buzzerPassive, i);
+                tone(software_parameters_fixed.buzzerPassive, i);
                 delay(2);
             }
     } else {
@@ -70,10 +70,10 @@ void notification_light( const char *cNotificationSelector, int flashTimes , int
         {
             if ( led_status ){
                 led_status = LOW;
-                digitalWrite (system_global_variables.ledBlue, led_status);
+                digitalWrite (software_parameters_fixed.ledBlue, led_status);
             } else {
                 led_status = HIGH;
-                digitalWrite (system_global_variables.ledBlue, led_status);
+                digitalWrite (software_parameters_fixed.ledBlue, led_status);
             }
             delay( flashSpeed );
             }       
@@ -83,10 +83,10 @@ void notification_light( const char *cNotificationSelector, int flashTimes , int
         {
             if ( led_status ){
                 led_status = LOW;
-                digitalWrite (system_global_variables.ledRed, led_status);
+                digitalWrite (software_parameters_fixed.ledRed, led_status);
             } else {
                 led_status = HIGH;
-                digitalWrite (system_global_variables.ledRed, led_status);
+                digitalWrite (software_parameters_fixed.ledRed, led_status);
             }
             delay( flashSpeed );
             }       
@@ -96,10 +96,10 @@ void notification_light( const char *cNotificationSelector, int flashTimes , int
         {
             if ( led_status ){
                 led_status = LOW;
-                digitalWrite (system_global_variables.ledGreen, led_status);
+                digitalWrite (software_parameters_fixed.ledGreen, led_status);
             } else {
                 led_status = HIGH;
-                digitalWrite (system_global_variables.ledGreen, led_status);
+                digitalWrite (software_parameters_fixed.ledGreen, led_status);
             }
             delay( flashSpeed );
             }       

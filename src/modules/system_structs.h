@@ -79,22 +79,40 @@ struct BROADCAST_GLOBAL_VAR
 
 
 
-#ifndef GLOBAL_TENANT_VAR
-#define GLOBAL_TENANT_VAR
-struct TENANT_GLOBAL_VAR
+#ifndef E2PROM_DATA_FIXED
+#define E2PROM_DATA_FIXED
+struct E2PROM_STORED_DATA_FIXED
 {
-    const char *cTenant;
-    const char *cProfile;
-    const char *cHardware;
+    // const char *cTenant;
+    // const char *cProfile;
+    // const char *cHardware;
+    
+    // char board_model[256] ;
+    // char hardware_uuid[256] ;
+    // char vender_uuid[256] ;
+    // char device_addr[256] ;
+    // char tenant_addr[256] ;
+    // char secure_code_01[256] ;
+    // char secure_code_02[256] ;
+    // char secure_code_03[256] ;
+    
+    char board_model[255] ;
+    char hardware_uuid[255] ;
+    char vender_uuid[255] ;
+    char device_addr[255] ;
+    char tenant_addr[255] ;
+    char secure_code_01[255] ;
+    char secure_code_02[255] ;
+    char secure_code_03[255] ;
 };
 #endif
 
 
 
 
-#ifndef GLOBAL_SYSTEM_VAR
-#define GLOBAL_SYSTEM_VAR
-struct SYSTEM_GLOBAL_VAR
+#ifndef GLOBAL_SOFTWARE_FIXED
+#define GLOBAL_SOFTWARE_FIXED
+struct SOFTWARE_GLOBAL_PARAMETERS_FIXED
 {
     const char* STANDARD_WIFI_SSID = "KryptonArc2G";
     const char* STANDARD_WIFI_PASSWORD = "PleaseHelpMe";
@@ -172,13 +190,17 @@ Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
 
 #ifndef GLOBAL_HARDWARE_ID_VAR
 #define GLOBAL_HARDWARE_ID_VAR
-struct DEVICE_HARDWARE_INFO 
+struct DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED 
 {
-    std::string sChipModel;
-    std::string sChipRevision;
-    std::string sChipCores;
-    std::string sChipId;
+    // ESP32 Chip model = ESP32-D0WDQ6 Rev 1
+    // This chip has 2 cores
+    // Chip ID: 7743348
 
+    char cChipModel[256] ;
+    char cChipRevision[256] ;
+    char cChipCores[256] ;
+    char cChipId[256] ;
+    
     char baseMacChrSOFTAP[18] = {0};
     char baseMacChrBT[18] = {0};
     char baseMacChrETH[18] = {0};

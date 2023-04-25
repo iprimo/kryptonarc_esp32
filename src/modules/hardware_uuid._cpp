@@ -7,13 +7,13 @@
 
 #define Max_Digits 10
 
-DEVICE_HARDWARE_INFO HardwareID;
+DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED HardwareID;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // https://github.com/espressif/arduino-esp32/blob/master/libraries/ESP32/examples/ChipID/GetChipID/GetChipID.ino
 
 // MAC Addresses 
-DEVICE_HARDWARE_INFO getMacAddress() {
+DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED getMacAddress() {
 	uint32_t chipId = 0;
 	for(int i=0; i<17; i=i+8) {
 	  chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;

@@ -14,22 +14,22 @@
 #include "modules/ping_works.hpp"
 #include "modules/morse_code.hpp"
 
-SYSTEM_GLOBAL_VAR system_global_variables;
-TENANT_GLOBAL_VAR tenant_global_variables;
-DEVICE_HARDWARE_INFO MCU____ID;
+SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
+E2PROM_STORED_DATA_FIXED e2prom_variables;
+DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED MCU____ID;
 
 void setup()
 {
     Serial.begin(115200);
-    tenant_global_variables.cTenant = "a_b_c_1111_tenant";
-    tenant_global_variables.cProfile = "a_b_c_1111_profile";
-    tenant_global_variables.cHardware = "a_b_c_1111_padlock";
+    e2prom_variables.cTenant = "a_b_c_1111_tenant";
+    e2prom_variables.cProfile = "a_b_c_1111_profile";
+    e2prom_variables.cHardware = "a_b_c_1111_padlock";
 
     // put your setup code here, to run once:
-    pinMode (system_global_variables.ledRed, OUTPUT);
-    pinMode (system_global_variables.ledBlue, OUTPUT);
-    pinMode (system_global_variables.ledGreen, OUTPUT);
-    pinMode( system_global_variables.buzzerPassive, OUTPUT);
+    pinMode (software_parameters_fixed.ledRed, OUTPUT);
+    pinMode (software_parameters_fixed.ledBlue, OUTPUT);
+    pinMode (software_parameters_fixed.ledGreen, OUTPUT);
+    pinMode( software_parameters_fixed.buzzerPassive, OUTPUT);
 
 }
 
@@ -85,20 +85,20 @@ void loop()
             // If successful -> move to next step 
             // If Not successful -> return and stop
             while ( !wifi_scan_result.bOperationLogic && repeat_in_case_of_failure <= 3 ){
-                wifi_scan_result = wifiTargetedNetworkScan( system_global_variables.STANDARD_WIFI_SSID );
+                wifi_scan_result = wifiTargetedNetworkScan( software_parameters_fixed.STANDARD_WIFI_SSID );
                 repeat_in_case_of_failure++;
                 delay(1000); // delay between each scan
             }
             // If wifi not detected - sound error and return cycle
             if ( !wifi_scan_result.bOperationLogic ){
-                loggingService( "LogMessage: error code=0x47197" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
-                // loggingService( wifi_scan_result.cMessage , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                loggingService( "LogMessage: error code=0x47197" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
+                // loggingService( wifi_scan_result.cMessage , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
                 notification_light( "redLedFlashing", 3 , 100 );
                 notification_sound( "Error_Triple" , 10 );
                 morse_code_data_transfer("0x47197"); // could not detect Wifi SSID
                 return;
             } else {
-                loggingService( "LogMessage: wifi detected, moving to next step" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                loggingService( "LogMessage: wifi detected, moving to next step" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
                 notification_light( "blueLedFlashing", 3 , 100 );
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,15 +110,15 @@ void loop()
             // If successful -> move to next step 
             // If Not successful -> return and stop
             // TBD: if failed try 3 times
-            wifi_connect_result = initWiFi( system_global_variables.STANDARD_WIFI_SSID , system_global_variables.STANDARD_WIFI_PASSWORD );
+            wifi_connect_result = initWiFi( software_parameters_fixed.STANDARD_WIFI_SSID , software_parameters_fixed.STANDARD_WIFI_PASSWORD );
             if ( !wifi_connect_result.bOperationLogic ) {
-                loggingService( "LogMessage: Device could not connect to Wifi" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                loggingService( "LogMessage: Device could not connect to Wifi" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
                 notification_light( "redLedFlashing", 3 , 100 );
                 notification_sound( "Error_Triple" , 10 );
                 morse_code_data_transfer("0x56923");
                 return;
             } else {
-                loggingService( "LogMessage: Device connected to Wifi" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                loggingService( "LogMessage: Device connected to Wifi" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             
@@ -128,12 +128,12 @@ void loop()
             // Move to next step if successful OR not successful
             Ping_IP = ping_ip_google();
             if ( !Ping_IP.bOperationLogic ) {
-                loggingService( "LogMessage: Wifi ping Google IP failed" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                loggingService( "LogMessage: Wifi ping Google IP failed" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
                 notification_light( "redLedFlashing", 3 , 100 );
                 morse_code_data_transfer("0x85772"); // could not ping google IP address
                 // return;
             } else {
-                loggingService( "LogMessage: Wifi ping Google IP successful" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                loggingService( "LogMessage: Wifi ping Google IP successful" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             
@@ -141,19 +141,19 @@ void loop()
             // Testing DNS by ping Google hostname
             Ping_Host = ping_host_google();
             if ( !Ping_Host.bOperationLogic ) {
-                loggingService( "LogMessage: Wifi ping Google host failed" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                loggingService( "LogMessage: Wifi ping Google host failed" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
                 notification_light( "redLedFlashing", 3 , 100 );
                 morse_code_data_transfer("0x75422"); // could not ping google hostname
                 // return;
             } else {
-                loggingService( "LogMessage: Wifi ping Google host successful" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                loggingService( "LogMessage: Wifi ping Google host successful" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Extracing MCU ID
             // TBD: if failed try 3 times -> if fails stop & return (Error: 0x58277)
-            loggingService( "LogMessage: Start of extracting MCU details" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+            loggingService( "LogMessage: Start of extracting MCU details" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
             MCU____ID = getMacAddress();
             
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +162,7 @@ void loop()
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Extracing Controller board Version
             // TBD: if failed try 3 times -> if fails stop & return (Error: 0x47292)
-            loggingService( "LogMessage: Start of extracting Controller board version" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+            loggingService( "LogMessage: Start of extracting Controller board version" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
             
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -171,7 +171,7 @@ void loop()
             // Check on the Cloud server if the device is registered to global device table
             HTTPWorksReply device_register_check;
             int repeat_http_call_register = 0; 
-            loggingService( "LogMessage: Start communication with registration API" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+            loggingService( "LogMessage: Start communication with registration API" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
             while ( !device_register_check.bEDeviceRegisteredLogic && repeat_http_call_register <= 3 ){
                 device_register_check = post2_hw_direct_statuscheck(
                     MCU____ID.sChipModel.c_str() ,
@@ -198,7 +198,7 @@ void loop()
             if ( device_register_check.bEDeviceRegisteredLogic ) {
                 Serial.println( " _+_+_+_+_  _+_+_+_+_  _+_+_+_+_  _+_+_+_+_  _+_+_+_+_ 8888AAAAA" );
             } else {
-                loggingService( "LogMessage: Start device registration process" , funcID , funcName , tenant_global_variables.cTenant, tenant_global_variables.cProfile  );
+                loggingService( "LogMessage: Start device registration process" , funcID , funcName , e2prom_variables.cTenant, e2prom_variables.cProfile  );
                 Serial.println( " _+_+_+_+_  _+_+_+_+_  _+_+_+_+_  _+_+_+_+_  _+_+_+_+_ 8888CCCCC" );
             }
 

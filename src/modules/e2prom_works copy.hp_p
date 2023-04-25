@@ -1,0 +1,154 @@
+// // // Source example
+// https://stackoverflow.com/questions/56139657/write-string-to-permanent-flash-memory-of-arduino-esp32
+// https://stackoverflow.com/questions/56139657/write-string-to-permanent-flash-memory-of-arduino-esp32
+
+#include <Arduino.h>
+#include <string>
+#include "EEPROM.h"
+
+
+#define BLOCK_INDEX_00 0
+#define BLOCK_NAME_00 "padlock_addr"
+
+#define BLOCK_INDEX_01 1
+#define BLOCK_NAME_01 "tenant_addr"
+
+#define BLOCK_INDEX_02 2
+#define BLOCK_NAME_02 "aes_01_code_addr"
+
+#define BLOCK_INDEX_03 3
+#define BLOCK_NAME_03 "aes_02_code_addr"
+
+#define BLOCK_INDEX_04 4
+#define BLOCK_NAME_04 "aes_03_code_addr"
+
+#define BLOCK_INDEX_05 5
+#define BLOCK_NAME_05 "locksmith_01_lock_verification"
+
+#define BLOCK_INDEX_06 6
+#define BLOCK_NAME_06 "locksmith_02_lock_verification"
+
+#define BLOCK_INDEX_07 7
+#define BLOCK_NAME_07 "locksmith_03_lock_verification"
+
+#define BLOCK_INDEX_08 8
+#define BLOCK_NAME_08 "placeholder_01"
+
+#define BLOCK_INDEX_09 9
+#define BLOCK_NAME_09 "placeholder_02"
+
+#define BLOCK_INDEX_10 10
+#define BLOCK_NAME_10 ""
+
+#define BLOCK_INDEX_11 11
+#define BLOCK_NAME_11 ""
+
+#define BLOCK_INDEX_12 12
+#define BLOCK_NAME_12 ""
+
+
+#define EEPROM_BLOCKS_SIZE 256
+#define ACTIVE_EEPROM_SIZE 4096 
+
+String e2promInitiate() {
+    Serial.println("e2prom - starting now...");
+    if ( !EEPROM.begin( ACTIVE_EEPROM_SIZE ) ) {
+        Serial.println("failed to init EEPROM");
+        delay(1000000);
+        return "error occured";
+    } else {
+        return "e2prom initiated";
+    }
+}
+
+
+String e2promWriteWorks(String type_selector, String data) {
+    int block_index = -1;
+    if ( type_selector  == BLOCK_NAME_00   ){
+        block_index = BLOCK_INDEX_00 ;
+    } else if ( type_selector  == BLOCK_NAME_01   ){
+        block_index = BLOCK_INDEX_01 ;
+    } else if ( type_selector  == BLOCK_NAME_02   ){
+        block_index = BLOCK_INDEX_02 ;
+    } else if ( type_selector  == BLOCK_NAME_03   ){
+        block_index = BLOCK_INDEX_03 ;
+    } else if ( type_selector  == BLOCK_NAME_04   ){
+        block_index = BLOCK_INDEX_04 ;
+    } else if ( type_selector  == BLOCK_NAME_05   ){
+        block_index = BLOCK_INDEX_05 ;
+    } else if ( type_selector  == BLOCK_NAME_06   ){
+        block_index = BLOCK_INDEX_06 ;
+    } else if ( type_selector  == BLOCK_NAME_07   ){
+        block_index = BLOCK_INDEX_07 ;
+    } else if ( type_selector  == BLOCK_NAME_08   ){
+        block_index = BLOCK_INDEX_08 ;
+    } else if ( type_selector  == BLOCK_NAME_09   ){
+        block_index = BLOCK_INDEX_09 ;
+    }
+
+    // Serial.print(">>>>>   type_selector: ");
+    // Serial.print(type_selector);
+    // Serial.println("<<<<<");
+
+    char *str_in_char = new char[data.length() + 1];
+    strcpy(str_in_char, data.c_str());
+    
+    // writing byte-by-byte to EEPROM
+    int starting_mem_address = EEPROM_BLOCKS_SIZE  * block_index;
+    for (int i = 0; i < EEPROM_BLOCKS_SIZE; i++) {
+        EEPROM.write( (starting_mem_address + i ), str_in_char[i] );
+    }
+    EEPROM.commit();
+
+	return "Done Writing";
+}
+
+String e2promReadWorks( String type_selector ) {
+    int block_index = -1;
+    String sss = "";
+    if ( type_selector  == BLOCK_NAME_00   ){
+        block_index = BLOCK_INDEX_00 ;
+    } else if ( type_selector  == BLOCK_NAME_01   ){
+        block_index = BLOCK_INDEX_01 ;
+    } else if ( type_selector  == BLOCK_NAME_02   ){
+        block_index = BLOCK_INDEX_02 ;
+    } else if ( type_selector  == BLOCK_NAME_03   ){
+        block_index = BLOCK_INDEX_03 ;
+    } else if ( type_selector  == BLOCK_NAME_04   ){
+        block_index = BLOCK_INDEX_04 ;
+    } else if ( type_selector  == BLOCK_NAME_05   ){
+        block_index = BLOCK_INDEX_05 ;
+    } else if ( type_selector  == BLOCK_NAME_06   ){
+        block_index = BLOCK_INDEX_06 ;
+    } else if ( type_selector  == BLOCK_NAME_07   ){
+        block_index = BLOCK_INDEX_07 ;
+    } else if ( type_selector  == BLOCK_NAME_08   ){
+        block_index = BLOCK_INDEX_08 ;
+    } else if ( type_selector  == BLOCK_NAME_09   ){
+        block_index = BLOCK_INDEX_09 ;
+    }
+
+    // reading byte-by-byte from EEPROM
+    int starting_mem_address = EEPROM_BLOCKS_SIZE * block_index;
+    for (int i = 0; i < EEPROM_BLOCKS_SIZE ; i++) {
+        byte readValue = EEPROM.read( starting_mem_address + i  );
+
+        if (readValue == 0) {
+            break;
+        }
+
+        char readValueChar = char(readValue);
+        // Serial.print(readValueChar);
+        // strncat( str, &readValueChar, 1 );
+        sss = sss + readValueChar;
+    }
+    // Serial.println("}} ");
+    // Serial.println(sss);
+    // Serial.println("----------111");
+	return sss;
+}
+
+
+
+
+

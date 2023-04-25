@@ -26,10 +26,10 @@ static const int servoPin = 18;
 #include "modules/hardware_uuid.h"
 #include "modules/system_structs.cpp"
 
-SYSTEM_GLOBAL_VAR system_global_variables;
+SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
 BROADCAST_GLOBAL_VAR broadcast_global_variables;
-TENANT_GLOBAL_VAR tenant_global_variables;
-DEVICE_HARDWARE_INFO MCU____ID;
+E2PROM_STORED_DATA_FIXED e2prom_variables;
+DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED MCU____ID;
 
 
 

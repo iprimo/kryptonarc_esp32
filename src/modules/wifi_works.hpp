@@ -3,15 +3,15 @@
 #include "WiFi.h"
 #include "system_structs.cpp"
 
-extern  TENANT_GLOBAL_VAR tenant_global_variables;  
-    // Serial.print( "tenant_global_variables.cTenant       >>>> s");
-    // Serial.println(tenant_global_variables.cTenant);
+extern  E2PROM_STORED_DATA_FIXED e2prom_variables;  
+    // Serial.print( "e2prom_variables.cTenant       >>>> s");
+    // Serial.println(e2prom_variables.cTenant);
 
-    // Serial.print( "tenant_global_variables.cProfile       >>>> s");
-    // Serial.println(tenant_global_variables.cProfile);
+    // Serial.print( "e2prom_variables.cProfile       >>>> s");
+    // Serial.println(e2prom_variables.cProfile);
 
-    // Serial.print( "tenant_global_variables.cHardware       >>>> s");
-    // Serial.println(tenant_global_variables.cHardware);
+    // Serial.print( "e2prom_variables.cHardware       >>>> s");
+    // Serial.println(e2prom_variables.cHardware);
 
 const char* ENC_TYPE[] = {
                             "Open",

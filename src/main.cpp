@@ -12,20 +12,21 @@
 
 #include "modules/servo.hpp"
 #include "modules/string_works.hpp"
-#include "modules/hardware_uuid.h"
+#include "modules/hardware_info_works.hpp"
 #include "modules/system_structs.cpp"
 #include "modules/encryption_works.hpp"
+#include "modules/e2prom_works.hpp"
 
-SYSTEM_GLOBAL_VAR system_global_variables;
+
+SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
+DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_MCU_ID_fixed;
+E2PROM_STORED_DATA_FIXED e2prom_variables;
 BROADCAST_GLOBAL_VAR broadcast_global_variables;
-TENANT_GLOBAL_VAR tenant_global_variables;
-DEVICE_HARDWARE_INFO MCU____ID;
 
 
 
 using namespace std;
 
-const int ledPin = 17;
 
 #define SERVICE_UUID        "4fafc102-1fb5-432e-8fcc-c5c2c331914b" // random UUID
 #define CHARACTERISTIC_UUID "beb593b3-3e61-4a78-7f5b-e861ba07a826" // random UUID
@@ -110,16 +111,72 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
 
 void setup() {
+  Serial.begin(115200);
+  constrcut_MCU_ID_fixed = getMacAddress( );
+ 
+  Serial.println("*****A11111");
+  Serial.println( constrcut_MCU_ID_fixed.cChipModel );
+  Serial.println( constrcut_MCU_ID_fixed.cChipRevision );
+  Serial.println( constrcut_MCU_ID_fixed.cChipCores );
+  Serial.println( constrcut_MCU_ID_fixed.cChipId );
+  Serial.println("*****A222222");
+  Serial.println( constrcut_MCU_ID_fixed.baseMacChrSOFTAP );
+  Serial.println( constrcut_MCU_ID_fixed.baseMacChrBT );
+  Serial.println( constrcut_MCU_ID_fixed.baseMacChrETH );
+  Serial.println( constrcut_MCU_ID_fixed.baseMacChrWiFi );
+  Serial.println("*****A33333");
 
-  Serial.println(" ===== ===== ===== ===== ===== ===== ===== ===== ===== ");
+
+
+
+
+
+
+  e2promInitiate();
+  e2prom_variables = e2promReadAllWorks();
+
+  // Serial.println("*****11 board_model");
+  // Serial.println( e2prom_variables.board_model );
+  // Serial.println("***** hardware_uuid");
+  // Serial.println( e2prom_variables.hardware_uuid );
+  // Serial.println("***** - vender_uuid");
+  // Serial.println( e2prom_variables.vender_uuid );
+  // Serial.println("***** - device_addr");
+  // Serial.println( e2prom_variables.device_addr );
+  // Serial.println("***** - tenant_addr");
+  // Serial.println( e2prom_variables.tenant_addr );
+  // Serial.println("***** - secure_code_01");
+  // Serial.println( e2prom_variables.secure_code_01 );
+  // Serial.println("***** - secure_code_02");
+  // Serial.println( e2prom_variables.secure_code_02 );
+  // Serial.println("***** - secure_code_03");
+  // Serial.println( e2prom_variables.secure_code_03 );
+  // Serial.println("*****");
+
+  Serial.println("*****3333");
+
+  Serial.println("*****1");
+
+  Serial.println( generateUUIDString() );
+
+  Serial.println("*****2");
+
+  Serial.println("*****44");
+  
+
+
+  Serial.println("*****2");
+
+
+
+
+
+
+
 
 
   //// Servo works
   servoInitiate();
-
-  //// Bluetooth works
-  pinMode(ledPin, OUTPUT);
-  Serial.begin(115200);
 
   BLEDevice::init( bleServerName );
   pServe_r = BLEDevice::createServer();

@@ -5,8 +5,8 @@
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
-#include "modules/hardware_uuid.h"
-#include "modules/e2prom_read_write.h"
+// #include "modules/hardware_uuid.h"
+// #include "modules/e2prom_read_write.h"
 
 // BLE SECTION
 BLEServer *pServer = NULL;

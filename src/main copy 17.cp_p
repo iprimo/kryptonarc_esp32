@@ -13,8 +13,8 @@
 #include "modules/servo.hpp"
 #include "modules/string_works.hpp"
 #include "modules/hardware_uuid.h"
-// #include "modules/global_variables.hpp"
 #include "modules/system_structs.cpp"
+#include "modules/encryption_works.hpp"
 
 SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
 BROADCAST_GLOBAL_VAR broadcast_global_variables;
@@ -42,6 +42,8 @@ String rxValueCache = "";
 bool deviceLocked = false;
 
 String txValue = "";
+
+
 
 void incomingStringProcessing(String receivingString ){
 
@@ -157,37 +159,9 @@ void sendingChunkData(String sending_Chunk){
   delay( 10 );
 };
 
-// const char* key = "mysecretkey"; // the encryption key
-// const int keyLen = strlen(key);
 
 void loop() {
   while ( true ){
-
-
-    // // ////////////////////////////////////////////////////////////////////////////////  Testing Section   >>>
-    
-    // String plaintext = "Hello, world!";
-    
-    // // Encrypt the plaintext
-    // String ciphertext = encrypt(plaintext, key);
-    
-    // Serial.print("Plaintext: ");
-    // Serial.println(plaintext);
-    
-    // Serial.print("Ciphertext: ");
-    // Serial.println(ciphertext);
-    
-    // // Decrypt the ciphertext
-    // String decryptedtext = decrypt(ciphertext, key);
-    
-    // Serial.print("Decrypted text: ");
-    // Serial.println(decryptedtext);
-    
-    // delay(1000);
-    
-    // // ////////////////////////////////////////////////////////////////////////////////  Testing Section   <<<
-
-
 
     // This hardware does not automatically send out data, it has to be instructed to send data by the device connected
     if (deviceConnected) {

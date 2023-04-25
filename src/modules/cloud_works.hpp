@@ -8,8 +8,8 @@
 #include "ArduinoJson.h"
 #include<string.h>
 
-extern SYSTEM_GLOBAL_VAR system_global_variables;
-extern TENANT_GLOBAL_VAR tenant_global_variables;
+extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
+extern E2PROM_STORED_DATA_FIXED e2prom_variables;
 
 // https://medium.com/@sanghviyash6/migrating-any-http-request-to-https-on-esp32-5545a6de7845
 // https://medium.com/@sanghviyash6/migrating-any-http-request-to-https-on-esp32-5545a6de7845
@@ -31,9 +31,9 @@ const int httpsPort = 443; // Default port for HTTPS
 void postToAmazonSecure(String jsonToSend){
     WiFiClientSecure client;
     
-    const char* emonDataAPI = system_global_variables.server_hardware_direct_ca_domain;
-    const char* emonDataAPIPath = system_global_variables.server_hardware_direct_ca_path;
-    const char* certificate_root_ca = system_global_variables.server_hardware_direct_ca_certificate ;
+    const char* emonDataAPI = software_parameters_fixed.server_hardware_direct_ca_domain;
+    const char* emonDataAPIPath = software_parameters_fixed.server_hardware_direct_ca_path;
+    const char* certificate_root_ca = software_parameters_fixed.server_hardware_direct_ca_certificate ;
     Serial.print("connecting to : '");
     Serial.print(emonDataAPI);
     Serial.println("'");
@@ -106,9 +106,9 @@ HTTPWorksReply post2_hw_direct_statuscheck(
     String json;
     serializeJson(doc, json);
 
-    const char* emonDataAPI = system_global_variables.server_hardware_direct_ca_domain;
+    const char* emonDataAPI = software_parameters_fixed.server_hardware_direct_ca_domain;
     const char* emonDataAPIPath = "/raw_hw/statuscheck";
-    const char* certificate_root_ca = system_global_variables.server_hardware_direct_ca_certificate ;
+    const char* certificate_root_ca = software_parameters_fixed.server_hardware_direct_ca_certificate ;
     Serial.println("LogMessage: Connecting to : '"); Serial.print(emonDataAPI); Serial.println("'");
     client.setCACert(certificate_root_ca);
     conn = client.connect( emonDataAPI , 443);

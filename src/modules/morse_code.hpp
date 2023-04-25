@@ -3,7 +3,7 @@
 #include "pitches.hpp"
 
 // System wide variables
-extern SYSTEM_GLOBAL_VAR system_global_variables;
+extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
 
 
 /*
@@ -72,15 +72,15 @@ const byte morse_table[] PROGMEM = {
 const char* message;
 char currSignal = '\0';
 int currMsgIdx = 0;
-uint8_t ledPin = system_global_variables.ledRed ;
+uint8_t ledPin = software_parameters_fixed.ledRed ;
 
 void blinkDelay(int duration)
 {
   digitalWrite(ledPin, HIGH);   // turn the LED on (HIGH is the voltage level)
-  tone(system_global_variables.buzzerPassive, 800);
+  tone(software_parameters_fixed.buzzerPassive, 800);
   delay(duration);// wait for the set duration
   digitalWrite(ledPin, LOW);    // turn the LED off by making the voltage LOW
-  tone(system_global_variables.buzzerPassive, 0);
+  tone(software_parameters_fixed.buzzerPassive, 0);
 }
 
 void sendDot()
