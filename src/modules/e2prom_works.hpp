@@ -57,7 +57,7 @@ String e2promInitiate() {
 
 
 
-String e2promWriteWorks(char *type_selector, String data) {
+String e2promWriteWorks( String type_selector, String data) {
     int idx = find_string_in_array( type_selector );
 
     char *str_in_char = new char[data.length() + 1];
@@ -122,12 +122,13 @@ E2PROM_STORED_DATA_FIXED e2promReadAllWorks( ) {
     // Copy it over 
     str.toCharArray(temp_construct.board_model, str_len);
 
-    // str = e2promReadWorks(  "hardware_uuid" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.hardware_uuid, str_len);
-    // str = e2promReadWorks(  "vender_uuid" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.vender_uuid, str_len);
-    // str = e2promReadWorks(  "device_addr" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.device_addr, str_len);
-    // str = e2promReadWorks(  "secure_code_01" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.secure_code_01, str_len);
-    // str = e2promReadWorks(  "secure_code_02" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.secure_code_02, str_len);
-    // str = e2promReadWorks(  "secure_code_03" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.secure_code_03, str_len);
+    str = e2promReadWorks(  "hardware_uuid" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.hardware_uuid, str_len);
+    str = e2promReadWorks(  "vender_uuid" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.vender_uuid, str_len);
+    str = e2promReadWorks(  "device_addr" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.device_addr, str_len);
+    str = e2promReadWorks(  "tenant_addr" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.tenant_addr, str_len);
+    str = e2promReadWorks(  "secure_code_01" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.secure_code_01, str_len);
+    str = e2promReadWorks(  "secure_code_02" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.secure_code_02, str_len);
+    str = e2promReadWorks(  "secure_code_03" )    ;       str_len = str.length() + 1      ;      char_array[str_len]; str.toCharArray(temp_construct.secure_code_03, str_len);
 
 	return temp_construct;
 }

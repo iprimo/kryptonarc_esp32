@@ -45,6 +45,25 @@ String decryptV1(String input, const char* key) {
   return output;
 }
 
+String processString(String inputString) {
+  // String processedString = "";
+
+  // // Remove leading and trailing spaces and convert to lowercase
+  // inputString.trim();
+  // inputString.toLowerCase();
+
+  // // Iterate through each character in the input string and check if it's alphanumeric, '_', or '-'
+  // for (int i = 0; i < inputString.length(); i++) {
+  //   char c = inputString.charAt(i);
+  //   if (isAlphaNumeric(c) || c == '_' || c == '-') {
+  //     processedString += c;
+  //   }
+  // }
+
+  // return processedString;
+
+  return inputString;
+}
 
 
 // // Set up key and data to encrypt
