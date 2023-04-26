@@ -112,87 +112,68 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
 void setup() {
   Serial.begin(115200);
-  constrcut_MCU_ID_fixed = getMacAddress( );
- 
-  // Serial.println("*****A11111");
-  // Serial.println( constrcut_MCU_ID_fixed.cChipModel );
-  // Serial.println( constrcut_MCU_ID_fixed.cChipRevision );
-  // Serial.println( constrcut_MCU_ID_fixed.cChipCores );
-  // Serial.println( constrcut_MCU_ID_fixed.cChipId );
-  // Serial.println("*****A222222");
-  // Serial.println( constrcut_MCU_ID_fixed.baseMacChrSOFTAP );
-  // Serial.println( constrcut_MCU_ID_fixed.baseMacChrBT );
-  // Serial.println( constrcut_MCU_ID_fixed.baseMacChrETH );
-  // Serial.println( constrcut_MCU_ID_fixed.baseMacChrWiFi );
-  // Serial.println("*****A33333");
 
 
+  ////////////////////////////////////////////////////////////////////////
+  //
+  //// Servo works
+  servoInitiate();
 
 
-
-
-
+  ////////////////////////////////////////////////////////////////////////
+  //
   e2promInitiate();
+  constrcut_MCU_ID_fixed = getMacAddress( );
   e2prom_variables = e2promReadAllWorks();
 
 
 
-  Serial.println("*****11 board_model");
-  Serial.println( e2prom_variables.board_model );
-  Serial.println("*****11111 hardware_uuid");
-  Serial.println(  e2prom_variables.hardware_uuid );
-  Serial.println("***** - vender_uuid");
-  Serial.println( e2prom_variables.vender_uuid );
-  Serial.println("***** - device_addr");
-  Serial.println( e2prom_variables.device_addr );
-  Serial.println("***** - tenant_addr");
-  Serial.println( e2prom_variables.tenant_addr );
-  Serial.println("***** - secure_code_01");
-  Serial.println( e2prom_variables.secure_code_01 );
-  Serial.println("***** - secure_code_02");
-  Serial.println( e2prom_variables.secure_code_02 );
-  Serial.println("***** - secure_code_03");
-  Serial.println( e2prom_variables.secure_code_03 );
-  Serial.println("*****");
+  // Serial.println("*****11 board_model");
+  // Serial.println( e2prom_variables.board_model );
+  // Serial.println("*****11111 hardware_uuid");
+  // Serial.println(  e2prom_variables.hardware_uuid );
+  // Serial.println("***** - vender_uuid");
+  // Serial.println( e2prom_variables.vender_uuid );
+  // Serial.println("***** - device_addr");
+  // Serial.println( e2prom_variables.device_addr );
+  // Serial.println("***** - tenant_addr");
+  // Serial.println( e2prom_variables.tenant_addr );
+  // Serial.println("***** - secure_code_01");
+  // Serial.println( e2prom_variables.secure_code_01 );
+  // Serial.println("***** - secure_code_02");
+  // Serial.println( e2prom_variables.secure_code_02 );
+  // Serial.println("***** - secure_code_03");
+  // Serial.println( e2prom_variables.secure_code_03 );
+  // Serial.println("*****");
+
+  ////////////////////////////////////////////////////////////////////////
+  //
+  String ppiiuyy = processString(e2prom_variables.hardware_uuid );
+  Serial.println("*****22222 ppiiuyy");
+  Serial.println( ppiiuyy );
+
+  Serial.println("*****xxxxxxx ppiiuyy  - .length() ::  ");
+  Serial.println( ppiiuyy.length() );
+
   
+  if ( ppiiuyy == 0 ){
+    // String uuid_hw = generateUUIDString() ;
+    String uuid_hw = "rueiwowiuwiwowowowowowowowowo" ;
+    Serial.println("*****xxxxxxx uuid_hw");
+    Serial.println( uuid_hw );
 
-  // String ppiiuyy = processString(e2prom_variables.hardware_uuid );
-  // Serial.println("*****22222 ppiiuyy");
-  // Serial.println( ppiiuyy );
-
-  // if ( !ppiiuyy ){
-  //   String uuid_hw = generateUUIDString() ;
-  //   Serial.println("*****xxxxxxx uuid_hw");
-  //   Serial.println( uuid_hw );
-
+    Serial.println("*****xxxxxxx uuid_hw  - .length() ::  ");
+    Serial.println( uuid_hw.length() );
+    
   //   String k2u2 = e2promWriteWorks("hardware_uuid", uuid_hw );
 
   //   Serial.println("*****xxxxxxx k2u2");
   //   Serial.println( k2u2 );
-  // }
-  
+  }
 
-    // String uuid_hw = generateUUIDString() ;
-    // Serial.println("*****xxxxxxx uuid_hw");
-    // Serial.println( uuid_hw );
+  ////////////////////////////////////////////////////////////////////////
+  //
 
-    // String k2u2 = e2promWriteWorks("hardware_uuid", uuid_hw );
-
-    // Serial.println("*****xxxxxxx k2u2");
-    // Serial.println( k2u2 );
-
-
-
-
-
-
-
-
-
-
-
-  //// Servo works
-  servoInitiate();
 
   BLEDevice::init( bleServerName );
   pServe_r = BLEDevice::createServer();
@@ -220,6 +201,13 @@ void setup() {
   delay(500); // give the bluetooth stack the chance to get things ready
   pAdvertising->start();
   Serial.println("Waiting for a device to connect...");
+
+
+  
+
+
+
+
 }
 
 void sendingChunkData(String sending_Chunk){
@@ -234,6 +222,9 @@ void sendingChunkData(String sending_Chunk){
 
 
 void loop() {
+
+
+
   while ( true ){
 
     // This hardware does not automatically send out data, it has to be instructed to send data by the device connected

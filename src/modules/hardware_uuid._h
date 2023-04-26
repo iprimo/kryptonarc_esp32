@@ -1,5 +1,0 @@
-#include <Arduino.h>
-#include "esp_system.h"
-#include "system_structs.cpp"
-
-DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED getMacAddress();
