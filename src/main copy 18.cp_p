@@ -24,6 +24,7 @@ E2PROM_STORED_DATA_FIXED e2prom_variables;
 BROADCAST_GLOBAL_VAR broadcast_global_variables;
 
 
+
 using namespace std;
 
 
@@ -34,46 +35,15 @@ BLEServer *pServe_r;
 BLECharacteristic *pCharacteristic;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
-
 std::string rxValue = "";
 String rxValueCache = "";
-
-#define ARRAY_SIZE_RECIEVE 1000
-#define sendingChunkSize 20 //max packet size
-// char rxCValue[ARRAY_SIZE_RECIEVE] = {0};
-// char rx_CValueCache[ARRAY_SIZE_RECIEVE] = {0};
-char* rxCValue = new char[ARRAY_SIZE_RECIEVE](); // () initializes all elements to null
-char* rx_CValueCache = new char[ARRAY_SIZE_RECIEVE](); // () initializes all elements to null
-
-
 //BLE server name
 #define bleServerName "KryptonArc_BLE"
 
 bool deviceLocked = false;
 
+String txValue = "";
 
-// char* txCValue = (char*) malloc(256);
-char* txCValue = new char[ 256 ](); // () initializes all elements to null
-
-// char *a = malloc(256);
-// strcpy(a, "This is a string");
-
-
-char* extractSubstring(char* input, int startIndex, int endIndex)
-{
-    int len = strlen(input);
-    if (startIndex < 0 || startIndex >= len) {
-        return NULL; // invalid start index
-    }
-    if (endIndex < 0 || endIndex >= len) {
-        endIndex = len - 1; // adjust end index to last character of the array
-    }
-    int subStrLen = endIndex - startIndex + 1;
-    char* subStr = (char*) malloc(subStrLen + 1); // allocate memory for the substring
-    strncpy(subStr, input + startIndex, subStrLen); // copy the substring to the newly allocated memory
-    subStr[subStrLen] = '\0'; // add null terminator to the end of the substring
-    return subStr;
-}
 
 
 void incomingStringProcessing(String receivingString ){
@@ -92,11 +62,11 @@ void incomingStringProcessing(String receivingString ){
       servoWorksDrive( broadcastOutputAValInt );
     }
 
-  if ( receivingString ==  "TI_GetStatus_TI" ) {
-    // Device Response : DR
-      Serial.println("  >>> > >>>     TI_GetStatus_TI: ");
-      strcpy( txCValue , "-DR_200!OK!_DR-");
-    }
+if ( receivingString ==  "TI_GetStatus_TI" ) {
+  // Device Response : DR
+    Serial.println("TI_GetStatus_TI: ");
+    txValue = "-DR_200!OK!_DR-";
+  }
   
 };
 
@@ -114,53 +84,22 @@ class MyServerCallbacks: public BLEServerCallbacks {
 
 class MyCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
-      uint8_t* received_data = pCharacteristic->getData();
-      // Serial.println("*******111");
-      // Serial.println(*received_data,HEX);
-      // Serial.println("*******222");
-
-      char* pointerCharPointer = (char*) received_data;
-      // Serial.println(pointerCharPointer);
-      // Serial.println("*******333");
-
-      int tx_CValueLength =  strlen( pointerCharPointer );
-      Serial.println("*******444");
-      Serial.println(tx_CValueLength);
-      Serial.println("*******555");
-
-
-
       std::string value = pCharacteristic->getValue();
-      if ( tx_CValueLength > 0) {
+      if (value.length() > 0) {
+        rxValue = value;
+        Serial.println("Received Value: ");
+        Serial.println(rxValue.c_str());
 
-        Serial.println("Received Value: 11333 ");
-        Serial.println(pointerCharPointer);
+        String rxValueString = rxValue.c_str();
 
-        if ( strcmp(pointerCharPointer, "10_react_native_101" ) == 0 ){
-          // std::fill_n( rx_CValueCache, ARRAY_SIZE_RECIEVE, '\0'); // flush the content of the array with null characters
-          for (int i = 0; i < ARRAY_SIZE_RECIEVE; i++) {
-              rx_CValueCache[i] = '\0'; // set each element to the null character
-          }
+        if ( rxValueString == "10_react_native_101" ){
+          rxValueCache = "";
 
-        } else if ( strcmp(pointerCharPointer, "90_react_native_109" ) == 0 ){
-          incomingStringProcessing( rx_CValueCache );
-          // std::fill_n( rx_CValueCache, ARRAY_SIZE_RECIEVE, '\0'); // flush the content of the array with null characters
-          for (int i = 0; i < ARRAY_SIZE_RECIEVE; i++) {
-            rx_CValueCache[i] = '\0'; // set each element to the null character
-          }
-
+        } else if ( rxValueString == "90_react_native_109" ){
+          incomingStringProcessing( rxValueCache );
+          rxValueCache = "";
         } else {
-
-          Serial.println("rx_CValueCache: 1177 ");
-          Serial.println(rx_CValueCache);
-          strcat(rx_CValueCache, pointerCharPointer); // concatenate str2 to str1
-
-          Serial.println("rx_CValueCache: 1188 ");
-          Serial.println(rx_CValueCache);
-
-          // char rxCValue[1000] = {0};
-          // char rx_CValueCache[1000] = {0};
-
+          rxValueCache = rxValueCache + rxValueString;
         }
         
       }
@@ -220,12 +159,9 @@ void setup() {
 
 }
 
-void sendingChunkData(char* sending_Chunk){
-
-
-  pCharacteristic->setValue( sending_Chunk );
+void sendingChunkData(String sending_Chunk){
+  pCharacteristic->setValue(sending_Chunk.c_str());
   pCharacteristic->notify();
-
   // Serial.println("Sent Value: ");
   // Serial.println(sending_Chunk.c_str());
 
@@ -242,48 +178,29 @@ void loop() {
 
     // This hardware does not automatically send out data, it has to be instructed to send data by the device connected
     if (deviceConnected) {
-      int tx_CValueLength =  strlen( txCValue );
-      
-      if ( tx_CValueLength > 0) {
-        Serial.println("txCValue::755555:  ");
-        Serial.println(txCValue);
-        Serial.println("tx_CValueLength::6665555:  ");
-        Serial.println(tx_CValueLength);
+      int txValueLength = txValue.length();
 
+      if (txValue.length() > 0) {
+
+        int sendingChunkSize = 20; //max packet size
         // Starting packet
-        char starter_block[ sendingChunkSize ] = "100_esp32_000000101";
-
-        Serial.println("send :: starter_block :  ");
-        Serial.println(starter_block);
-
-        sendingChunkData( starter_block );
-
-        Serial.println("send :start: ended :  ");
+        String starter_block = "100_esp32_000000101";
+        sendingChunkData(starter_block);
         delay(10);
 
         // Data packets
-        for (int i = 0; i < tx_CValueLength; i += sendingChunkSize) {
-          char* irjwooo =  extractSubstring( txCValue, i, i + sendingChunkSize );
-          Serial.println("send :middle: irjwooo :  ");
-          Serial.println(irjwooo);
-          sendingChunkData( irjwooo );
-          Serial.println("send :middle: ended :  ");
+        for (int i = 0; i < txValueLength; i += sendingChunkSize) {
+          String sendingChunk = txValue.substring(i, min(i + sendingChunkSize, txValueLength)); //get next sendingChunk
+          sendingChunkData( sendingChunk );
+
+          // delay between packet transfer
           delay(10);
         }
         // Finishing packet
-        char finisher_block[ sendingChunkSize ] = "900_esp32_000000109";
-
-        Serial.println("send :: finisher_block :  ");
-        Serial.println(finisher_block);
-
+        String finisher_block = "900_esp32_000000109";
         sendingChunkData(finisher_block);
 
-        Serial.println("send :finish: ended :  ");
-
-        // std::fill_n( txCValue, ARRAY_SIZE_RECIEVE, '\0'); // flush the content of the array with null characters
-        for (int i = 0; i < 256 ; i++) {
-            txCValue[i] = '\0'; // set each element to the null character
-        }
+        txValue = "";
       }
       
     }
