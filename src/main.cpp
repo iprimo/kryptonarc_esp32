@@ -29,7 +29,7 @@ using namespace std;
 #define SERVICE_UUID        "4fafc102-1fb5-432e-8fcc-c5c2c331914b" // random UUID
 #define CHARACTERISTIC_UUID "beb593b3-3e61-4a78-7f5b-e861ba07a826" // random UUID
 
-BLEServer *pServe_r;
+BLEServer *pServer;
 BLECharacteristic *pCharacteristic;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
@@ -64,12 +64,9 @@ char* extractSubstring(char* input, int startIndex, int endIndex) {
 }
 
 
-void incomingStringProcessing(String receivingString ){
+void incomingStringProcessing( char* receivingString ){
 
-    char myCharArray[receivingString.length() + 1]; // Allocate a char array with enough space to hold the string
-    strcpy(myCharArray, receivingString.c_str()); // Copy the contents of the string to the char array
-
-    const char* broadcastOutputAValString = find_values_between_substringsV4( myCharArray, broadcast_global_variables.broadcastOutputA_SubStringStart , broadcast_global_variables.broadcastOutputA_SubStringEnd );
+    const char* broadcastOutputAValString = find_values_between_substringsV4( receivingString, broadcast_global_variables.broadcastOutputA_SubStringStart , broadcast_global_variables.broadcastOutputA_SubStringEnd );
 
     if ( receivingString ==  "TI_GetStatus_TI" ) {
       strcpy( txCValue , "-DR_200!OK!_DR-");
@@ -85,11 +82,11 @@ void incomingStringProcessing(String receivingString ){
 };
 
 class MyServerCallbacks: public BLEServerCallbacks {
-    void onConnect(BLEServer* pServe_r) {
+    void onConnect(BLEServer* pServer) {
       deviceConnected = true;
     };
 
-    void onDisconnect(BLEServer* pServe_r) {
+    void onDisconnect(BLEServer* pServer) {
       deviceConnected = false;
     }
 };
@@ -124,11 +121,46 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 void setup() {
   Serial.begin(115200);
 
-
   ////////////////////////////////////////////////////////////////////////
-  //
-  //// Servo works
+  // Servo works
   servoInitiate();
+  const char* tmp_110 = e2promInitiate();
+
+  e2prom_variables = e2promReadAllWorks();
+  if ( strlen( e2prom_variables.hardware_uuid ) == 0 || strlen( e2prom_variables.board_model ) == 0 || strlen( e2prom_variables.vender_uuid ) == 0 ) {
+
+    e2promWipeAllData();
+    // UUID
+    e2promWriteWorks(  "hardware_uuid" , generateUUIDString() ) ;
+
+    const char* board_model_var = "KA_CB_G090V5B";
+    e2promWriteWorks(  "board_model" , board_model_var ) ;
+
+    const char* zero_uuid = "00000000-0000-0000-0000-000000000000";
+    e2promWriteWorks(  "vender_uuid" , zero_uuid ) ;
+
+    e2prom_variables = e2promReadAllWorks();
+  }
+
+
+  Serial.print(">>1> x2  second ") ; Serial.println(e2prom_variables.hardware_uuid );     Serial.print(">>1> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.hardware_uuid ));
+  Serial.print(">>0> x2  second ") ; Serial.println(e2prom_variables.board_model );     Serial.print(">>0> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.board_model ));
+  Serial.print(">>2> x2  second ") ; Serial.println(e2prom_variables.vender_uuid );     Serial.print(">>2> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.vender_uuid ));
+  Serial.print(">>3> x2  second ") ; Serial.println(e2prom_variables.device_addr );     Serial.print(">>3> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.device_addr ));
+  Serial.print(">>4> x2  second ") ; Serial.println(e2prom_variables.tenant_addr );     Serial.print(">>4> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.tenant_addr ));
+  Serial.print(">>5> x2  second ") ; Serial.println(e2prom_variables.secure_code_01  );     Serial.print(">>5> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.secure_code_01  ));
+  Serial.print(">>6> x2  second ") ; Serial.println(e2prom_variables.secure_code_02  );     Serial.print(">>6> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.secure_code_02  ));
+  Serial.print(">>7> x2  second ") ; Serial.println(e2prom_variables.secure_code_03  );     Serial.print(">>7> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.secure_code_03  ));
+
+
+
+
+
+
+
+
+
+
 
 
   ////////////////////////////////////////////////////////////////////////
@@ -136,10 +168,10 @@ void setup() {
 
 
   BLEDevice::init( BLE_SVR_NAME );
-  pServe_r = BLEDevice::createServer();
-  pServe_r->setCallbacks(new MyServerCallbacks());
+  pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new MyServerCallbacks());
 
-  BLEService *pService = pServe_r->createService(SERVICE_UUID);
+  BLEService *pService = pServer->createService(SERVICE_UUID);
   pCharacteristic = pService->createCharacteristic(
                                          CHARACTERISTIC_UUID,
                                          BLECharacteristic::PROPERTY_NOTIFY |
@@ -153,7 +185,7 @@ void setup() {
 
   pService->start();
 
-  BLEAdvertising *pAdvertising = pServe_r->getAdvertising();
+  BLEAdvertising *pAdvertising = pServer->getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x0);  // set value to 0x00 to not advertise this parameter
@@ -161,12 +193,6 @@ void setup() {
   delay(500); // give the bluetooth stack the chance to get things ready
   pAdvertising->start();
   Serial.println("Waiting for a device to connect...");
-
-
-  
-
-
-
 
 }
 
@@ -212,7 +238,7 @@ void loop() {
       oldDeviceConnected = deviceConnected;
       if (!deviceConnected) {
         delay(500); // give the bluetooth stack the chance to get things ready
-        pServe_r->startAdvertising();
+        pServer->startAdvertising();
         Serial.println("Waiting for a device to connect... ...");
       }
     }

@@ -96,8 +96,8 @@ struct E2PROM_STORED_DATA_FIXED
     // char secure_code_02[256] ;
     // char secure_code_03[256] ;
     
-    char board_model[255] ;
     char hardware_uuid[255] ;
+    char board_model[255] ;
     char vender_uuid[255] ;
     char device_addr[255] ;
     char tenant_addr[255] ;
