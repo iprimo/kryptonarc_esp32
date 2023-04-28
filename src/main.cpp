@@ -10,7 +10,9 @@
 #include "stdlib.h"
 #include "string.h"
 
+#include "ESP32Servo.h"
 #include "modules/servo.hpp"
+
 #include "modules/string_works.hpp"
 #include "modules/hardware_info_works.hpp"
 #include "modules/system_structs.cpp"
@@ -24,6 +26,10 @@ BROADCAST_GLOBAL_VAR broadcast_global_variables;
 
 
 using namespace std;
+
+
+Servo ServoOutputA;
+
 
 
 #define SERVICE_UUID        "4fafc102-1fb5-432e-8fcc-c5c2c331914b" // random UUID
