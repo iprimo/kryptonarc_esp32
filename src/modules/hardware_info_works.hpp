@@ -3,7 +3,7 @@
 #include <cstring>
 #include <iostream>
 #include <string>
-#include "system_structs.cpp"
+#include "system_structs.hpp"
 
 #define Max_Digits 10
 

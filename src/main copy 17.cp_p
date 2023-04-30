@@ -13,7 +13,7 @@
 #include "modules/servo.hpp"
 #include "modules/string_works.hpp"
 #include "modules/hardware_uuid.h"
-#include "modules/system_structs.cpp"
+#include "modules/system_structs.hpp"
 #include "modules/encryption_works.hpp"
 
 SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;

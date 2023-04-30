@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 #include "ArduinoJSON.h"
-#include "modules/system_structs.cpp"
+#include "modules/system_structs.hpp"
 #include "modules/bluetooth_works.h"
 #include "modules/wifi_works.hpp"
 #include "modules/hardware_uuid.h"

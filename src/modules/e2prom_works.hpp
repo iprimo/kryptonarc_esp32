@@ -2,20 +2,25 @@
 #include <stdio.h>
 #include <string.h>
 #include "EEPROM.h"
-#include "system_structs.cpp"
+#include "system_structs.hpp"
 
+extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
+extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_MCU_ID_fixed;
+extern E2PROM_STORED_DATA_FIXED e2prom_variables;
+extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
 
-#define EEPROM_BLOCKS_SIZE 256
+#define EEPROM_BLOCKS_SIZE 128
 #define ACTIVE_EEPROM_SIZE 4096 
 
+// DO NOT CHANGE ORDER OF ARRAY BELOW
 // DO NOT MOVE THE ORDER OR CHANGE THE ORDER OF THIS ARRAY
 // Total E2PROM block4096/256 = 16
 const char *arr[] = {
     "board_model",
     "hardware_uuid",
-    "vender_uuid",
-    "device_addr",
-    "tenant_addr",
+    "vender_xc",
+    "device_xc",
+    "tenant_xc",
     "secure_code_01",
     "secure_code_02",
     "secure_code_03",
@@ -100,9 +105,9 @@ E2PROM_STORED_DATA_FIXED e2promReadAllWorks( ) {
     // Define 
     strcpy(temp_construct.board_model, e2promReadWorks(  "board_model" )  );
     strcpy(temp_construct.hardware_uuid, e2promReadWorks(  "hardware_uuid" )  );
-    strcpy(temp_construct.vender_uuid, e2promReadWorks(  "vender_uuid" ) );
-    strcpy(temp_construct.device_addr, e2promReadWorks(  "device_addr" ) );
-    strcpy(temp_construct.tenant_addr, e2promReadWorks(  "tenant_addr" ) );
+    strcpy(temp_construct.vender_xc, e2promReadWorks(  "vender_xc" ) );
+    strcpy(temp_construct.device_xc, e2promReadWorks(  "device_xc" ) );
+    strcpy(temp_construct.tenant_xc, e2promReadWorks(  "tenant_xc" ) );
     strcpy(temp_construct.secure_code_01, e2promReadWorks(  "secure_code_01" ) );
     strcpy(temp_construct.secure_code_02, e2promReadWorks(  "secure_code_02" ) );
     strcpy(temp_construct.secure_code_03, e2promReadWorks(  "secure_code_03" ) );
@@ -145,3 +150,19 @@ const char* generateUUIDString( ) {
 }
 
 
+
+
+void wipeAllAndReissueAllBasics( ) {
+
+    ////////////////////////////////////////////////////////////////////////
+
+    e2promWipeAllData();
+    // UUID
+    e2promWriteWorks(  "hardware_uuid" , generateUUIDString() ) ;
+
+    // Board Model ID
+    const char* board_model_var = "KA_CB_G090V5B";
+    e2promWriteWorks(  "board_model" , board_model_var ) ;
+
+    e2prom_variables = e2promReadAllWorks();
+}

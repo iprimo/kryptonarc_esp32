@@ -13,7 +13,7 @@
 #include "modules/servo.hpp"
 #include "modules/string_works.hpp"
 #include "modules/hardware_info_works.hpp"
-#include "modules/system_structs.cpp"
+#include "modules/system_structs.hpp"
 #include "modules/encryption_works.hpp"
 #include "modules/e2prom_works.hpp"
 

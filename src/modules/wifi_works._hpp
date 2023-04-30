@@ -1,7 +1,7 @@
 //  https://randomnerdtutorials.com/esp32-useful-wi-fi-functions-arduino/
 #include "Arduino.h"
 #include "WiFi.h"
-#include "system_structs.cpp"
+#include "system_structs.hpp"
 
 extern  E2PROM_STORED_DATA_FIXED e2prom_variables;  
     // Serial.print( "e2prom_variables.cTenant       >>>> s");

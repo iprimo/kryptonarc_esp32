@@ -89,18 +89,18 @@ struct E2PROM_STORED_DATA_FIXED
     
     // char board_model[256] ;
     // char hardware_uuid[256] ;
-    // char vender_uuid[256] ;
-    // char device_addr[256] ;
-    // char tenant_addr[256] ;
+    // char vender_xc[256] ;
+    // char device_xc[256] ;
+    // char tenant_xc[256] ;
     // char secure_code_01[256] ;
     // char secure_code_02[256] ;
     // char secure_code_03[256] ;
     
     char hardware_uuid[255] ;
     char board_model[255] ;
-    char vender_uuid[255] ;
-    char device_addr[255] ;
-    char tenant_addr[255] ;
+    char vender_xc[255] ;
+    char device_xc[255] ;
+    char tenant_xc[255] ;
     char secure_code_01[255] ;
     char secure_code_02[255] ;
     char secure_code_03[255] ;
@@ -196,10 +196,10 @@ struct DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED
     // This chip has 2 cores
     // Chip ID: 7743348
 
-    char cChipModel[256] ;
-    char cChipRevision[256] ;
-    char cChipCores[256] ;
-    char cChipId[256] ;
+    char cChipModel[64] ;
+    char cChipRevision[64] ;
+    char cChipCores[64] ;
+    char cChipId[64] ;
     
     char baseMacChrSOFTAP[18] = {0};
     char baseMacChrBT[18] = {0};

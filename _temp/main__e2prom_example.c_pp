@@ -106,9 +106,9 @@
 ////// .            // Serial.println( e2promReadWorks("padlock_addr")   );
 ////// .            // Serial.println( ">>>    >>> ");
 ////// .        
-////// .            e2promWriteWorks("tenant_addr", "tenant_____00000000223333333333444444444455000001111_____tenant");
-////// .            // Serial.println( "tenant_addr");
-////// .            // Serial.println( e2promReadWorks("tenant_addr")   );
+////// .            e2promWriteWorks("tenant_xc", "tenant_____00000000223333333333444444444455000001111_____tenant");
+////// .            // Serial.println( "tenant_xc");
+////// .            // Serial.println( e2promReadWorks("tenant_xc")   );
 ////// .            // Serial.println( ">>>    >>> ");
 ////// .            
 ////// .            
@@ -168,7 +168,7 @@
 ////// .            Serial.println( "   =====   Read   =====    22222" ) ; 
 ////// .        
 ////// .            Serial.println( e2promReadWorks("padlock_addr")     );
-////// .            Serial.println( e2promReadWorks("tenant_addr")     );
+////// .            Serial.println( e2promReadWorks("tenant_xc")     );
 ////// .            Serial.println( e2promReadWorks("aes_01_code_addr")     );
 ////// .            Serial.println( e2promReadWorks("aes_02_code_addr")     );
 ////// .            Serial.println( e2promReadWorks("aes_03_code_addr")     );

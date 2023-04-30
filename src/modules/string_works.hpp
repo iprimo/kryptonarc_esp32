@@ -1,4 +1,4 @@
-#include "system_structs.cpp"
+#include "system_structs.hpp"
 
 const char* find_values_between_substringsV4(char* str, const char* substringA1, const char* substringA2 ) {
     char* p1 = strstr(str, substringA1);

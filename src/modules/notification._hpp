@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "system_structs.cpp"
+#include "system_structs.hpp"
 #include "pitches.hpp"
 
 extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
