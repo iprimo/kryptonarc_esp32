@@ -15,19 +15,19 @@ using namespace std;
 
 BLEServer *pServe_r;
 BLECharacteristic *pCharacteristic;
-bool deviceConnected = false;
-bool oldDeviceConnected = false;
+bool bleDeviceConnected = false;
+bool oldBLEDeviceConnected = false;
 std::string rxValue = "";
 // std::string txValue = "";
 std::string txValue = "sending Data from MCU";
 
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServe_r) {
-      deviceConnected = true;
+      bleDeviceConnected = true;
     };
 
     void onDisconnect(BLEServer* pServe_r) {
-      deviceConnected = false;
+      bleDeviceConnected = false;
     }
 };
 
@@ -73,7 +73,7 @@ void setup() {
 }
 
 void loop() {
-  if (deviceConnected) {
+  if (bleDeviceConnected) {
     String msg = "81828384858687888980___81828384858687888980___81828384858687888980";
     int msgLength = msg.length();
     Serial.print("msgLength ::: ");
@@ -97,14 +97,14 @@ void loop() {
     }
   }
 
-  if (deviceConnected != oldDeviceConnected) {
-    oldDeviceConnected = deviceConnected;
-    if (!deviceConnected) {
+  if (bleDeviceConnected != oldBLEDeviceConnected) {
+    oldBLEDeviceConnected = bleDeviceConnected;
+    if (!bleDeviceConnected) {
       pServe_r->startAdvertising();
       Serial.println("Waiting for a device to connect...");
     }
   }
-  // Serial.println("deviceConnected: ");
-  // Serial.println(deviceConnected);
+  // Serial.println("bleDeviceConnected: ");
+  // Serial.println(bleDeviceConnected);
   delay(10);
 }

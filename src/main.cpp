@@ -1,3 +1,5 @@
+#include "MD5Builder.h"
+
 #include "HardwareSerial.h"
 #include "BLEDevice.h"
 #include "BLEServer.h"
@@ -33,66 +35,58 @@ BLEUUID mUUID;
 BLEAdvertising *pAdvertising;
 BLEService *pService ;
 
-// int RECIEVE_ARRAY_SIZE=1000 ;
-// int TRANSFER_ARRAY_SIZE=1000;
-// char* rx_DataAssembled = new char[RECIEVE_ARRAY_SIZE](); // () initializes all elements to null
-// char* txCValue = new char[ TRANSFER_ARRAY_SIZE ](); // () initializes all elements to null
-
-
-
-bool deviceConnected = false;
-bool oldDeviceConnected = false;
+bool bleDeviceConnected = false;
+bool oldBLEDeviceConnected = false;
 
 void setup() {
   Serial.begin(115200);
 
   ////////////////////////////////////////////////////////////////////////
-  // Servo works
+  // Servo Initiate
   servoInitiate();
   
   ////////////////////////////////////////////////////////////////////////
-  // Hardware works
-  constrcut_MCU_ID_fixed = getMacAddress() ;
-
-  // Serial.println(">>1> constrcut_MCU_ID_fixed >>constrcut_MCU_ID_fixed>    ") ; 
-  // Serial.println(constrcut_MCU_ID_fixed.cChipModel           );
-	// Serial.println(constrcut_MCU_ID_fixed.cChipRevision        );
-	// Serial.println(constrcut_MCU_ID_fixed.cChipCores           );
-	// Serial.println(constrcut_MCU_ID_fixed.cChipId              );
-	// Serial.println(constrcut_MCU_ID_fixed.baseMacChrSOFTAP     );
-	// Serial.println(constrcut_MCU_ID_fixed.baseMacChrBT         );
-	// Serial.println(constrcut_MCU_ID_fixed.baseMacChrETH        );
-	// Serial.println(constrcut_MCU_ID_fixed.baseMacChrWiFi       );
-
-
-  ////////////////////////////////////////////////////////////////////////
-  // E2PROM works
+  // E2PROM Initiate
   e2promInitiate();
 
-  e2prom_variables = e2promReadAllWorks();
-
-  if ( strlen( e2prom_variables.hardware_uuid ) == 0 || strlen( e2prom_variables.board_model ) == 0) {
-    wipeAllAndReissueAllBasics();
-  }
-
-  // Serial.print(">>1> x2  second ") ; Serial.println(e2prom_variables.hardware_uuid );     Serial.print(">>1> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.hardware_uuid ));
-  // Serial.print(">>0> x2  second ") ; Serial.println(e2prom_variables.board_model );     Serial.print(">>0> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.board_model ));
-  // Serial.print(">>2> x2  second ") ; Serial.println(e2prom_variables.vender_xc );     Serial.print(">>2> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.vender_xc ));
-  // Serial.print(">>3> x2  second ") ; Serial.println(e2prom_variables.device_xc );     Serial.print(">>3> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.device_xc ));
-  // Serial.print(">>4> x2  second ") ; Serial.println(e2prom_variables.tenant_xc );     Serial.print(">>4> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.tenant_xc ));
-  // Serial.print(">>5> x2  second ") ; Serial.println(e2prom_variables.secure_code_01  );     Serial.print(">>5> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.secure_code_01  ));
-  // Serial.print(">>6> x2  second ") ; Serial.println(e2prom_variables.secure_code_02  );     Serial.print(">>6> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.secure_code_02  ));
-  // Serial.print(">>7> x2  second ") ; Serial.println(e2prom_variables.secure_code_03  );     Serial.print(">>7> length >>>    ") ;  Serial.println(  strlen( e2prom_variables.secure_code_03  ));
-
-
+  ////////////////////////////////////////////////////////////////////////
+  // BLE Initiate
   BluetoothInitiate();
 
 }
 
 
 void loop() {
+  int variableCounter = 0;
+  ////////////////////////////////////////////////////////////////////////
+  // Hardware works
+  constrcut_MCU_ID_fixed = getMacAddress() ;
 
+  ////////////////////////////////////////////////////////////////////////
+  // E2PROM works
+  e2prom_variables = e2promReadAllWorks();
+
+  if ( strlen( e2prom_variables.hardware_uuid ) == 0 || strlen( e2prom_variables.board_model ) == 0) {
+    wipeAllAndReissueAllBasics();
+  }
+  
   while ( true ){
+
+    if ( !bleDeviceConnected && variableCounter > 12000) { // 120 Seconds = 120,000.00 milli-seconds => 120,000.00 / 10 (delay) = 3,000
+      // Reseting device if the counter meets the condition
+      Serial.println("Restarting device");
+      ESP.restart();
+
+    } else if ( bleDeviceConnected && !(variableCounter == 0)){
+      // When device connected reset the counter
+      variableCounter = 0 ;
+
+    } else if ( !bleDeviceConnected ){
+      // Nothing connected - reset counter
+      delay(10);
+      variableCounter = variableCounter + 1 ;
+
+    } 
     BluetoothMainProcess() ;
   }
 }

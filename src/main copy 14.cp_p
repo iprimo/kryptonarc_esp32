@@ -32,8 +32,8 @@ const int ledPin = 17;
 
 BLEServer *pServe_r;
 BLECharacteristic *pCharacteristic;
-bool deviceConnected = false;
-bool oldDeviceConnected = false;
+bool bleDeviceConnected = false;
+bool oldBLEDeviceConnected = false;
 std::string rxValue = "";
 String rxValueCache = "";
 
@@ -69,11 +69,11 @@ if ( receivingString ==  "TI_GetStatus_TI" ) {
     
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServe_r) {
-      deviceConnected = true;
+      bleDeviceConnected = true;
     };
 
     void onDisconnect(BLEServer* pServe_r) {
-      deviceConnected = false;
+      bleDeviceConnected = false;
     }
 };
 
@@ -185,7 +185,7 @@ void loop() {
 
 
   // This hardware does not automatically send out data, it has to be instructed to send data by the device connected
-  if (deviceConnected) {
+  if (bleDeviceConnected) {
     int txValueLength = txValue.length();
 
     if (txValue.length() > 0) {
@@ -211,9 +211,9 @@ void loop() {
     
   }
 
-  if (deviceConnected != oldDeviceConnected) {
-    oldDeviceConnected = deviceConnected;
-    if (!deviceConnected) {
+  if (bleDeviceConnected != oldBLEDeviceConnected) {
+    oldBLEDeviceConnected = bleDeviceConnected;
+    if (!bleDeviceConnected) {
       delay(500); // give the bluetooth stack the chance to get things ready
       pServe_r->startAdvertising();
       Serial.println("Waiting for a device to connect...");

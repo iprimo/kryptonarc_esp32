@@ -83,18 +83,6 @@ struct BROADCAST_GLOBAL_VAR
 #define E2PROM_DATA_FIXED
 struct E2PROM_STORED_DATA_FIXED
 {
-    // const char *cTenant;
-    // const char *cProfile;
-    // const char *cHardware;
-    
-    // char board_model[256] ;
-    // char hardware_uuid[256] ;
-    // char vender_xc[256] ;
-    // char device_xc[256] ;
-    // char tenant_xc[256] ;
-    // char secure_code_01[256] ;
-    // char secure_code_02[256] ;
-    // char secure_code_03[256] ;
     
     char hardware_uuid[255] ;
     char board_model[255] ;
