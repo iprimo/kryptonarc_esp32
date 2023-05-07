@@ -149,6 +149,28 @@ const char* generateUUIDString( ) {
     return uuid;
 }
 
+bool isUUIDValid(char* str) {
+    const int len = strlen(str);
+
+    if (len != 36) {
+        return false;
+    }
+
+    for (int i = 0; i < len; i++) {
+        if (i == 8 || i == 13 || i == 18 || i == 23) {
+            if (str[i] != '-') {
+                return false;
+            }
+        } else {
+            if (!isxdigit(str[i])) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 
 
 
@@ -160,9 +182,9 @@ void wipeAllAndReissueAllBasics( ) {
     // UUID
     e2promWriteWorks(  "hardware_uuid" , generateUUIDString() ) ;
 
-    // Board Model ID
-    const char* board_model_var = "KA_CB_G090V5B";
-    e2promWriteWorks(  "board_model" , board_model_var ) ;
+    // // Board Model ID
+    // const char* board_model_var = "KA_CB_G090V5B";
+    // e2promWriteWorks(  "board_model" , board_model_var ) ;
 
     e2prom_variables = e2promReadAllWorks();
 }

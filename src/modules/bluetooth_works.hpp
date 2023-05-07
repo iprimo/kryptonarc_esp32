@@ -33,14 +33,10 @@ char* tx_DataCache = new char[ TRANSFER_ARRAY_SIZE ](); // () initializes all el
 char* tx_InFlightData = new char[ TRANSFER_ARRAY_SIZE ](); // () initializes all elements to null
 bool tx_Data_InFlight_InProgress = false;
 
-
-
 #define sendingChunkSize 20 //max packet size
 
 //BLE server name
 #define BLE_SVR_NAME "KryptonArc_BLE"
-
-
 
 void sendingChunkData(char* sending_Chunk){
     

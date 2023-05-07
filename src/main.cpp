@@ -66,9 +66,27 @@ void loop() {
   // E2PROM works
   e2prom_variables = e2promReadAllWorks();
 
-  if ( strlen( e2prom_variables.hardware_uuid ) == 0 || strlen( e2prom_variables.board_model ) == 0) {
+  // if ( strlen( e2prom_variables.hardware_uuid ) == 0 || strlen( e2prom_variables.board_model ) == 0 || !isUUIDValid( e2prom_variables.hardware_uuid )) {
+  if ( !isUUIDValid( e2prom_variables.hardware_uuid )) {
     wipeAllAndReissueAllBasics();
   }
+
+  // ////////////////////////////////////////////////////////////////////////
+  // //
+  // Serial.print("e2prom_variables.hardware_uuid  >>> " ) ; Serial.println( e2prom_variables.hardware_uuid );
+  // Serial.print("e2prom_variables.board_model  >>> " ) ; Serial.println( e2prom_variables.board_model );
+  // Serial.print("e2prom_variables.vender_xc  >>> " ) ; Serial.println( e2prom_variables.vender_xc );
+  // Serial.print("e2prom_variables.device_xc  >>> " ) ; Serial.println( e2prom_variables.device_xc );
+  // Serial.print("e2prom_variables.tenant_xc  >>> " ) ; Serial.println( e2prom_variables.tenant_xc );
+  // Serial.print("constrcut_MCU_ID_fixed.cChipModel >>> " ) ; Serial.println(  constrcut_MCU_ID_fixed.cChipModel );
+  // Serial.print("constrcut_MCU_ID_fixed.cChipRevision  >>> " ) ; Serial.println( constrcut_MCU_ID_fixed.cChipRevision );
+  // Serial.print("constrcut_MCU_ID_fixed.cChipCores >>> " ) ; Serial.println(  constrcut_MCU_ID_fixed.cChipCores );
+  // Serial.print("constrcut_MCU_ID_fixed.cChipId  >>> " ) ; Serial.println( constrcut_MCU_ID_fixed.cChipId );
+  // Serial.print("constrcut_MCU_ID_fixed.baseMacChrSOFTAP >>> " ) ; Serial.println(  constrcut_MCU_ID_fixed.baseMacChrSOFTAP );
+  // Serial.print("constrcut_MCU_ID_fixed.baseMacChrBT >>> " ) ; Serial.println(  constrcut_MCU_ID_fixed.baseMacChrBT );
+  // Serial.print("constrcut_MCU_ID_fixed.baseMacChrETH  >>> " ) ; Serial.println( constrcut_MCU_ID_fixed.baseMacChrETH );
+  // Serial.print("constrcut_MCU_ID_fixed.baseMacChrWiFi >>> " ) ; Serial.println(  constrcut_MCU_ID_fixed.baseMacChrWiFi );
+
   
   while ( true ){
 
