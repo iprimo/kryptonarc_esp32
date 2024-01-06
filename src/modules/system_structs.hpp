@@ -111,7 +111,7 @@ struct SOFTWARE_GLOBAL_PARAMETERS_FIXED
 
     const char *url = "https://fota.kryptonarc.com/firmware.bin"; //state url of your firmware image
 
-
+    // this certificate exists on orignal code from Espressif , belongs to "ISRG Root X1" a wide well known CA on the web
     const char *fota_server_fota_certificate = R"(
 -----BEGIN CERTIFICATE-----
 MIIFYDCCBEigAwIBAgIQQAF3ITfU6UK47naqPGQKtzANBgkqhkiG9w0BAQsFADA/

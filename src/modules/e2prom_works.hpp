@@ -9,6 +9,8 @@ extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_MCU_ID_fixed;
 extern E2PROM_STORED_DATA_FIXED e2prom_variables;
 extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
 
+extern HardwareSerial Serial;
+
 #define EEPROM_BLOCKS_SIZE 256
 #define ACTIVE_EEPROM_SIZE 4096 
 
