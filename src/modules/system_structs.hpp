@@ -83,7 +83,6 @@ struct BROADCAST_GLOBAL_VAR
 #define E2PROM_DATA_FIXED
 struct E2PROM_STORED_DATA_FIXED
 {
-    
     char hardware_uuid[255] ;
     char board_model[255] ;
     char vender_xc[255] ;
@@ -92,6 +91,14 @@ struct E2PROM_STORED_DATA_FIXED
     char secure_code_01[255] ;
     char secure_code_02[255] ;
     char secure_code_03[255] ;
+    char product_series[255] ;
+    char product_model[255] ;
+    char hardware_specific_hash_additive[255] ;
+    char tempName03[255] ;
+    char tempName04[255] ;
+    char tempName05[255] ;
+    char tempName06[255] ;
+    char tempName07[255] ;
 };
 #endif
 
@@ -104,6 +111,7 @@ struct SOFTWARE_GLOBAL_PARAMETERS_FIXED
 {
     const char* STANDARD_WIFI_SSID = "KryptonArc2G";
     const char* STANDARD_WIFI_PASSWORD = "PleaseHelpMe";
+    const char* GLOBAL_HASH_ADDITIVE =  "DFJynken3Deal87i9EfbNDK2mPBhthxt";
     const int ledRed = 18;
     const int ledBlue = 17;
     const int ledGreen = 5;

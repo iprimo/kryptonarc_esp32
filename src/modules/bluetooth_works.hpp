@@ -4,6 +4,10 @@
 #include "BLEServer.h"
 #include "BLEUtils.h"
 #include "BLE2902.h"
+#include "modules/md5.hpp"
+#include "iostream"
+#include "cstring"
+
 
 extern BLEServer *pServer;
 extern BLECharacteristic *pCharacteristic;
@@ -293,18 +297,60 @@ void BluetoothMainProcess() {
         tx_Data_InFlight_InProgress = true;
 
         strcpy( tx_InFlightData , tx_DataCache );
+        // Emptying the incoming string
         tx_DataCache[0] = '\0';
-        int tx_InFlightDataLength =  strlen( tx_InFlightData );
         
         // Starting packet
         char starter_block[ sendingChunkSize ] = "100_esp32_000000101";
         sendingChunkData( starter_block );
 
+
+        // Creating hash of data - if device is configred used global hash key, if device is configured use device specific hash key
+        const int deviceXigCodeLengthCheck = strlen( e2prom_variables.device_xc );
+        const int tenantXigCodeLengthCheck = strlen( e2prom_variables.tenant_xc );
+        char hashAdditive[33]  ; //  32 visible characters plus one null-terminated, character \0 (null character) at the end to mark the string's end.
+
+        // if device already configured, it will use the device dedicated HashAdditive. If device is blank, it add the globally known Hash additive.
+        if ( deviceXigCodeLengthCheck != 0 && tenantXigCodeLengthCheck != 0) {
+          strncpy(hashAdditive, e2prom_variables.hardware_specific_hash_additive, 32);  // limiting has additive to just 32 byte
+          hashAdditive[32] = '\0';  // Ensure null termination 
+        } else {
+           strcpy(hashAdditive, software_parameters_fixed.GLOBAL_HASH_ADDITIVE);  
+        }
+
+        // Determine the length of the combined string
+        size_t combinedLength = strlen(tx_InFlightData) + strlen(hashAdditive) + 1; // +1 for the null terminator
+
+        // Create a new char array to hold the combined string
+        char combinedStr[combinedLength];
+
+        // Copy the first string into the combined array
+        strcpy(combinedStr, tx_InFlightData);
+
+        // Concatenate the second string onto the combined array
+        strcat(combinedStr, hashAdditive);
+        
+
+        String iii = generateMD5Hash( combinedStr );
+        Serial.println( "iii  >>> ooooooooo - ooooooooo " );
+        Serial.print( iii );
+
+        // Adding has to the end of sending string
+        strcat(tx_InFlightData, "|");  // Add double quotes
+        strcat(tx_InFlightData, iii.c_str());  // Add the String variable
+
+
+
+        int tx_InFlightDataLength =  strlen( tx_InFlightData );
         // Data packets
         Serial.println("tx_InFlightData :::  ");
         Serial.println( tx_InFlightData );
         Serial.println("tx_InFlightDataLength :::  ");
         Serial.println( tx_InFlightDataLength );
+
+
+
+
         for (int i = 0; i < tx_InFlightDataLength; i += sendingChunkSize) {
           char* mySubstring = extractSubstring( tx_InFlightData, i, i + sendingChunkSize ) ;
           sendingChunkData( mySubstring );
