@@ -23,6 +23,7 @@
 #include "base64.h"
 #include "mbedtls/base64.h"
 
+SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
 SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
 DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_MCU_ID_fixed;
 E2PROM_STORED_DATA_FIXED e2prom_variables;
@@ -66,39 +67,6 @@ void setup() {
 
   ////////////////////////////////////////////////////////////////////////
   
-  // String toEncode = "Test encoding";
-  String toEncode = "Test encoding_Test encoding__Test encoding___Test encoding____Test encoding____Test encoding______Test encoding";
-  Serial.println("toEncode >>> ");
-  Serial.println(toEncode);
-  String encoded = base64::encode( toEncode.c_str());
-  Serial.println("encoded >>> ");
-  Serial.println(encoded);
-
-  char uuu[1024];
-  base64_char_decoding( encoded , uuu );
-  Serial.println("uuu >>> ");
-  Serial.println(uuu);
-
-  
-  // // const char *encodedString = "VGhpcyBpcyB0aGUgZm9ybWF0"; // Base64-encoded string
-  // const char *encodedString = encoded.c_str() ; // Base64-encoded string
-  // size_t decodedLength;
-
-  // unsigned char decodedBuffer[100]; // Adjust buffer size as needed
-
-  // mbedtls_base64_decode(decodedBuffer, sizeof(decodedBuffer), &decodedLength,
-  //                      (const unsigned char*)encodedString, strlen(encodedString));
-
-  // decodedBuffer[decodedLength] = '\0'; // Add null terminator for printing
-
-  // Serial.println("Decoded string:");
-  // Serial.println((char*)decodedBuffer); // Output: This is a test string
-
-
-
-
-  // aesDecryption(encryptedData, encryptionKey, receivedMessage) ;
-  // Serial.print("receivedMessage  >>> " ) ; Serial.println( receivedMessage );
 }
 
 

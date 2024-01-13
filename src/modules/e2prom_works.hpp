@@ -26,10 +26,10 @@ const char *arr[] = {
     "secure_code_01",
     "secure_code_02",
     "secure_code_03",
-    "product_series",
-    "product_model",
+    "tempName01",
+    "tempName02",
     "hardware_specific_hash_salt",
-    "tempName03",
+    "manufacturer_xc",
     "tempName04",
     "tempName05",
     "tempName06",
@@ -113,10 +113,10 @@ E2PROM_STORED_DATA_FIXED e2promReadAllWorks( ) {
     strcpy( temp_construct.secure_code_01, e2promReadWorks( "secure_code_01" ) );
     strcpy( temp_construct.secure_code_02, e2promReadWorks( "secure_code_02" ) );
     strcpy( temp_construct.secure_code_03, e2promReadWorks( "secure_code_03" ) );
-    strcpy( temp_construct.product_series, e2promReadWorks( "product_series" ) );
-    strcpy( temp_construct.product_model, e2promReadWorks( "product_model" ) );
+    strcpy( temp_construct.tempName01, e2promReadWorks( "tempName01" ) );
+    strcpy( temp_construct.tempName02, e2promReadWorks( "tempName02" ) );
     strcpy( temp_construct.hardware_specific_hash_salt, e2promReadWorks( "hardware_specific_hash_salt" ) );
-    strcpy( temp_construct.tempName03, e2promReadWorks( "tempName03" ) );
+    strcpy( temp_construct.manufacturer_xc, e2promReadWorks( "manufacturer_xc" ) );
     strcpy( temp_construct.tempName04, e2promReadWorks( "tempName04" ) );
     strcpy( temp_construct.tempName05, e2promReadWorks( "tempName05" ) );
     strcpy( temp_construct.tempName06, e2promReadWorks( "tempName06" ) );
@@ -195,13 +195,6 @@ void wipeAllAndReissueAllBasics( ) {
     // const char* board_model_var = "KA_CB_G090V5B";
     // e2promWriteWorks(  "board_model" , board_model_var ) ;
     
-
-    const char* product_series_var = "marble series";
-    e2promWriteWorks(  "product_series" , product_series_var ) ;
-
-
-    const char* product_model_var = "marble series";
-    e2promWriteWorks(  "product_model" , product_model_var ) ;
 
     e2promWriteWorks(  "hardware_uuid" , generateUUIDString() ) ;
 

@@ -10,7 +10,7 @@
 // Source: 
 // https://techtutorialsx.com/2018/01/25/esp32-arduino-applying-the-hmac-sha-256-mechanism/
 
-void hashSHA256( char *payload, char* key, char* dataHash ) {
+void hashSHA256( char *payload, const char* key, char* dataHash ) {
 
   byte hmacResult[32];
  

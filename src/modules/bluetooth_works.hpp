@@ -5,7 +5,7 @@
 #include "BLEUtils.h"
 #include "BLE2902.h"
 #include "modules/md5.hpp"
-#include "modules/encryption_works.hpp"
+#include "modules/data_string_builder.hpp"
 #include "modules/sha_hash.hpp"
 #include "iostream"
 #include "cstring"
@@ -18,6 +18,7 @@ extern BLEUUID mUUID;
 extern BLEAdvertising *pAdvertising;
 extern BLEService *pService ;
 
+extern SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
 extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
 extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_MCU_ID_fixed;
 extern E2PROM_STORED_DATA_FIXED e2prom_variables;
@@ -116,90 +117,19 @@ void incomingStringProcessing( char* receivingString ){
       char* sendStr56 = new char[ TRANSFER_ARRAY_SIZE ](); 
       char* tempCache = new char[ TRANSFER_ARRAY_SIZE ](); // () initializes all elements to null
 
-      //////////////////////////////////////////
-      // HU : Hardware UUID
-      strcat(sendStr56, "-HU_");
-      strcat(sendStr56, e2prom_variables.hardware_uuid );
-      strcat(sendStr56, "_HU-");
+      append_config_information( sendStr56 );
+      append_hardware_information( sendStr56 );
+      append_firmware_information( sendStr56 );
+      append_bluetooth_session_sequence( sendStr56 );
 
-      //////////////////////////////////////////
-      // BM: Board Model
-      strcat(sendStr56, "-BM_");
-      strcat(sendStr56, e2prom_variables.board_model );
-      strcat(sendStr56, "_BM-");
 
       //////////////////////////////////////////      
-      // VX: Vender XigCode
-      strcat(sendStr56, "-VX_");
-      strcat(sendStr56, e2prom_variables.vender_xc );
-      strcat(sendStr56, "_VX-");
-
-      //////////////////////////////////////////      
-      // DX: Device XigCode
-      strcat(sendStr56, "-DX_");
-      strcat(sendStr56, e2prom_variables.device_xc );
-      strcat(sendStr56, "_DX-");
-
-      //////////////////////////////////////////      
-      // HWCM: Hardware ChipModel
-      strcat(sendStr56, "-HWCM_");
-      strcat(sendStr56, constrcut_MCU_ID_fixed.cChipModel );
-      strcat(sendStr56, "_HWCM-");
-
-      //////////////////////////////////////////      
-      // HWCR: Hardware ChipRevision
-      strcat(sendStr56, "-HWCR_");
-      strcat(sendStr56, constrcut_MCU_ID_fixed.cChipRevision );
-      strcat(sendStr56, "_HWCR-");
-
-      //////////////////////////////////////////      
-      // HWCC: Hardware ChipCores
-      strcat(sendStr56, "-HWCC_");
-      strcat(sendStr56, constrcut_MCU_ID_fixed.cChipCores );
-      strcat(sendStr56, "_HWCC-");
-
-      //////////////////////////////////////////      
-      // HWCI: Hardware ChipId
-      strcat(sendStr56, "-HWCI_");
-      strcat(sendStr56, constrcut_MCU_ID_fixed.cChipId );
-      strcat(sendStr56, "_HWCI-");
-
-      //////////////////////////////////////////      
-      // HWAP: Hardware baseMacChrSOFTAP
-      strcat(sendStr56, "-HWAP_");
-      strcat(sendStr56, constrcut_MCU_ID_fixed.baseMacChrSOFTAP );
-      strcat(sendStr56, "_HWAP-");
-
-      //////////////////////////////////////////      
-      // HWBT: Hardware baseMacChrBT
-      strcat(sendStr56, "-HWBT_");
-      strcat(sendStr56, constrcut_MCU_ID_fixed.baseMacChrBT );
-      strcat(sendStr56, "_HWBT-");
-
-      //////////////////////////////////////////      
-      // HWETH: Hardware baseMacChrETH
-      strcat(sendStr56, "-HWETH_");
-      strcat(sendStr56, constrcut_MCU_ID_fixed.baseMacChrETH );
-      strcat(sendStr56, "_HWETH-");
-
-      //////////////////////////////////////////      
-      // HWWIFI: Hardware baseMacChrWiFi
-      strcat(sendStr56, "-HWWIFI_");
-      strcat(sendStr56, constrcut_MCU_ID_fixed.baseMacChrWiFi );
-      strcat(sendStr56, "_HWWIFI-");
-
-      //////////////////////////////////////////      
-      // Request session ID 
-      strcat(sendStr56, "-RSID_");
-      strcat(sendStr56, constrcut_MCU_ID_fixed.baseMacChrWiFi );
-      strcat(sendStr56, "_RSID-");
-
-
-      Serial.println("sendStr56>>>>   ");
-      Serial.println(sendStr56);
+      // 
+      // Serial.println("sendStr56>>>>   ");
+      // Serial.println(sendStr56);
       String encoded = base64::encode( sendStr56 );
-      Serial.println("encoded>>>>   ");
-      Serial.println(encoded);
+      // Serial.println("encoded>>>>   ");
+      // Serial.println(encoded);
       
       // Combined strings
       strcat( tempCache, "0x0001" );
@@ -344,110 +274,14 @@ void BluetoothMainProcess() {
         // Creating hash of data - if device is configred used global hash key, if device is configured use device specific hash key
         const int deviceXigCodeLengthCheck = strlen( e2prom_variables.device_xc );
         const int tenantXigCodeLengthCheck = strlen( e2prom_variables.tenant_xc );
-        char hashSalt[33]  ; //  32 visible characters plus one null-terminated, character \0 (null character) at the end to mark the string's end.
 
-        // if device already configured, it will use the device dedicated hashSalt. If device is blank, it add the globally known Hash salt.
-        if ( deviceXigCodeLengthCheck != 0 && tenantXigCodeLengthCheck != 0) {
-          strncpy(hashSalt, e2prom_variables.hardware_specific_hash_salt, 32);  // limiting has salt to just 32 byte
-          hashSalt[32] = '\0';  // Ensure null termination 
-        } else {
-           strcpy(hashSalt, software_parameters_fixed.GLOBAL_HASH_SALT);  
-        }
-
-        // Determine the length of the combined string
-        size_t combinedLength = strlen(tx_InFlightData) + strlen(hashSalt) + 1; // +1 for the null terminator
-
-        // Create a new char array to hold the combined string
-        char combinedStr[ combinedLength ];
-
-        // Copy the first string into the combined array
-        strcpy(combinedStr, tx_InFlightData);
-
-        // Concatenate the second string onto the combined array
-        strcat(combinedStr, hashSalt);
-        
-        Serial.print(" combinedStr >>>  " );
-        Serial.println( combinedStr );
-
-        // String iii = generateMD5Hash( combinedStr );
-        // Serial.print( "iii  >>> ooooooooo - ooooooooo " );
-        // Serial.println( iii );
-
-
-
-//   // https://techtutorialsx.com/2018/01/25/esp32-arduino-applying-the-hmac-sha-256-mechanism/
-//   char* key = "48cf29ea128baf2d";
-//   char *payload = combinedStr; // "Hello HMAC SHA 256!";
-//   byte hmacResult[32];
- 
-//   mbedtls_md_context_t ctx;
-//   mbedtls_md_type_t md_type = MBEDTLS_MD_SHA256;
- 
-//   // const size_t payloadLength = strlen(payload);
-//   const size_t payloadLength = strlen(combinedStr);
-//   const size_t keyLength = strlen(key);            
- 
-//   mbedtls_md_init(&ctx);
-//   mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(md_type), 1);
-//   mbedtls_md_hmac_starts(&ctx, (const unsigned char *) key, keyLength);
-//   mbedtls_md_hmac_update(&ctx, (const unsigned char *) payload, payloadLength);
-//   mbedtls_md_hmac_finish(&ctx, hmacResult);
-//   mbedtls_md_free(&ctx);
- 
-//   Serial.println("!!!   sizeof(hmacResult): ");
- 
-//   char hash256ResultArray[sizeof(hmacResult) * 2 + 1];  // Allocate space for digits and null terminator
-
-// Serial.println(" ---- ");
-// Serial.println("!!!   sizeof(hmacResult): ");
-// Serial.println(sizeof(hmacResult));
-// Serial.println(" ---- ");
-// Serial.println("!!!  sizeof(hmacResult) * 2 + 1: ");
-// Serial.println(sizeof(hmacResult) * 2 + 1);
-// Serial.println(" ---- ");
-
-
-
-
-//   int resultIndex = 0;
-
-//   for (int i = 0; i < sizeof(hmacResult); i++) {
-//       char str[3];
-//       sprintf(str, "%02x", (int)hmacResult[i]);
-
-//       // Append str to the hash256ResultArray
-//       strncpy(hash256ResultArray + resultIndex, str, 2);  // Copy 2 characters from str
-//       resultIndex += 2;  // Move the index for the next append
-//   }
-
-//   // Add null terminator to mark the end of the string
-//   hash256ResultArray[resultIndex] = '\0';
-
-//   Serial.println("");
-//   Serial.println("hashChar >---> ");
-//   Serial.println(hash256ResultArray);
-
-//   Serial.println("");
-//   // Serial.println("hashChar >-2--> ");
-//   // hashChar[ sizeof(hmacResult) ] = '\0';
-//   // Serial.println(hashChar);
-
-//   Serial.println("");
-
-//   Serial.println("!!!   Hash: ");
-//   char* key = "48cf29ea128baf2d";
-//   char *payload = combinedStr; // "Hello HMAC SHA 256!";
-
-    char* key = "48cf29ea128baf2d";
-    char hash256ResultArray[ 65 ];
-    hashSHA256( combinedStr, key, hash256ResultArray );
-
+        char hash256ResultArray[ 65 ];
+        hashSHA256( tx_InFlightData, software_parameters_fixed.GLOBAL_HASH_KEY, hash256ResultArray );
 
 
         // Adding has to the end of sending string
         strcat(tx_InFlightData, "|");  // Add double quotes
         strcat(tx_InFlightData, hash256ResultArray );  // Add the String variable
-
 
 
         int tx_InFlightDataLength =  strlen( tx_InFlightData );

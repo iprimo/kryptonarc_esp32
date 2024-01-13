@@ -1,65 +1,124 @@
 // Helpful example
 // https://www.dfrobot.com/blog-1001.html
-
-
 // Original source - Example of Arduino IDE AES128_Example
+
 #include "string.h"
-#include "Crypto.h"
-#include "AES.h"
+#include "mbedtls/aes.h"
+
+
+// ////////////////////////////////////////////////////////////////////////
+// // Use case example
+
+//   // String toEncode = "Test encoding";
+//   String toEncode = "Test encoding_Test encoding__Test encoding___Test encoding____Test encoding____Test encoding______Test encoding";
+//   Serial.println("toEncode >>> ");
+//   Serial.println(toEncode);
+//   String encoded = base64::encode( toEncode.c_str());
+//   Serial.println("encoded >>> ");
+//   Serial.println(encoded);
+
+//   char uuu[1024];
+//   base64_char_decoding( encoded , uuu );
+//   Serial.println("uuu >>> ");
+//   Serial.println(uuu);
+
+  
+  
+  
+//   char * key = "abcdefghijklmnop";
+
+//   // char *plainText = "Tech tutorials x";
+//   char *plainText = "1234567890123456";
+//   unsigned char cipherTextOutput[16];
+//   unsigned char decipheredTextOutput[16];
+
+//   encrypt(plainText, key, cipherTextOutput);
+//   decrypt(cipherTextOutput, key, decipheredTextOutput);
+
+//   Serial.println("\nOriginal plain text:");
+//   Serial.println(plainText);
+
+
+
+
+//   Serial.println("\nCiphered text:");
+
+//   char encrypted_data[sizeof(cipherTextOutput) * 2 + 1];  // Allocate space for digits and null terminator
+//   int resultIndex = 0;
+
+//   for (int i = 0; i < 16; i++) {
+
+//     char str[3];
+
+//     sprintf(str, "%02x", (int)cipherTextOutput[i]);
+//     Serial.print(str);
+
+//     // Append str to the encrypted_data
+//     strncpy(encrypted_data + resultIndex, str, 2);  // Copy 2 characters from str
+//     resultIndex += 2;  // Move the index for the next append
+//   }
+// // Add null terminator to mark the end of the string
+//   encrypted_data[resultIndex] = '\0';
+//   Serial.println("");
+//   Serial.println("  >>>encrypted_data  >>>:  ");
+//   Serial.println(encrypted_data);
+//   Serial.println("");
+
+
+//   char decrypted_data[17];  // Allocate space for digits and null terminator
+//   Serial.println("\n\nDeciphered text:");
+//   for (int i = 0; i < 16; i++) {
+//     Serial.print((char)decipheredTextOutput[i]);
+//     decrypted_data[i] = (char)decipheredTextOutput[i] ;
+//   }
+//   decrypted_data[ 16 ] = '\0';
+//   Serial.println("");
+//   Serial.println("  >>>decrypted_data  >>>:  ");
+//   Serial.println(decrypted_data);
+//   Serial.println("");
+
+// // Use case example
+// ////////////////////////////////////////////////////////////////////////
+
+
 
 
 
 
 #ifndef AES_ENCRYPTION_HPP
 #define AES_ENCRYPTION_HPP
+// void encrypt(char * plainText, char * key, unsigned char * outputBuffer){
 
-void aesEncryption(char* clearMessage, char* encryptionKey, char* encryptedData ) {
+//   mbedtls_aes_context aes;
 
-  //key[16] cotain 16 byte key(128 bit) for encryption
-  // byte key[16]={0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
-  byte key[16];
-  memcpy(key, encryptionKey, sizeof(encryptionKey)) ;
+//   mbedtls_aes_init( &aes );
+//   mbedtls_aes_setkey_enc( &aes, (const unsigned char*) key, strlen(key) * 8 );
+//   mbedtls_aes_crypt_ecb( &aes, MBEDTLS_AES_ENCRYPT, (const unsigned char*)plainText, outputBuffer);
+//   mbedtls_aes_free( &aes );
+// }
 
-  
-  byte clearMessageInByte[1024];
-  // Convert char array to byte array
-  memcpy(clearMessageInByte, clearMessage, sizeof(clearMessage)) ;
+void encrypt(char *plainText, char *key, unsigned char *outputBuffer) {
+    size_t textLength = strlen(plainText);
+    mbedtls_aes_context aes;
 
+    mbedtls_aes_init(&aes);
+    mbedtls_aes_setkey_enc(&aes, (const unsigned char*)key, strlen(key) * 8);
 
-  //cypher[16] stores the encrypted text
-  byte cypher[1024];
+    // Ensure textLength is a multiple of block size (16 bytes)
+    size_t paddedLength = ((textLength / 16) + 1) * 16;
 
-  //creating an object of AES128 class
-  AES128 aes128;
+    // Pad plaintext if necessary
+    unsigned char paddedPlainText[paddedLength];
+    memcpy(paddedPlainText, plainText, textLength);
+    memset(paddedPlainText + textLength, paddedLength - textLength, paddedLength - textLength);
 
-  aes128.setKey(key,16);// Setting Key for AES
-   
-  aes128.encryptBlock(cypher,clearMessageInByte);//cypher->output block and clearMessageInByte->input block
-    
+    // Encrypt padded plaintext
+    mbedtls_aes_crypt_ecb(&aes, MBEDTLS_AES_ENCRYPT, paddedPlainText, outputBuffer);
 
-char resultArray[sizeof(cypher) * 2 + 1];  // Allocate space for digits and null terminator
-int resultIndex = 0;
-
-
-Serial.print(" --------------------------  " );
-        Serial.print(" sizeof(cypher) >>>  " );
-        Serial.println( sizeof(cypher) );
-    Serial.print(" --------------------------  " );
-
-for (int i = 0; i < sizeof(cypher); i++) {
-    char str[3];
-    sprintf(str, "%02x", (int)cypher[i]);
-
-    // Append str to the resultArray
-    strncpy(resultArray + resultIndex, str, 2);  // Copy 2 characters from str
-    resultIndex += 2;  // Move the index for the next append
+    mbedtls_aes_free(&aes);
 }
 
-    
-  // Convert byte array back to char array
-  memcpy(encryptedData, cypher, sizeof( cypher ));
 
-}
 
 #endif
 
@@ -67,155 +126,16 @@ for (int i = 0; i < sizeof(cypher); i++) {
 #ifndef AES_DECRYPTION_HPP
 #define AES_DECRYPTION_HPP
 
-void aesDecryption(char* encryptedData, char* encryptionKey, char* receivedMessage ) {
+void decrypt(unsigned char * chipherText, char * key, unsigned char * outputBuffer){
 
-  //key[16] cotain 16 byte key(128 bit) for encryption
-  byte key[16]={0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
-  // //clearMessageInByte[1024] contain the text we need to encrypt
-  // byte clearMessageInByte[1024]={0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
+  mbedtls_aes_context aes;
 
-
-  char message[128] = "UrMessageHere";
-  //     Serial.print("message:  ");
-  //     Serial.println(message);
-  
-  byte clearMessageInByte[1024];
-  // Convert char array to byte array
-  memcpy(clearMessageInByte, message, sizeof(message)) ;
-
-
-
-  //     Serial.print("clearMessageInByte:  ");
-  //     Serial.println(clearMessageInByte[0]);
-
-
-
-
-
-  //cypher[16] stores the encrypted text
-  byte cypher[16];
-  //decryptedtext[16] stores decrypted text after decryption
-  byte decryptedtext[16];
-  //creating an object of AES128 class
-  AES128 aes128;
-
-
-
-
-
-
-
-  aes128.setKey(key,16);// Setting Key for AES
-  
-  //     Serial.print("Before Encryption:");
-  for(int i=0; i<sizeof(clearMessageInByte); i++){
-    //     Serial.write(clearMessageInByte[i]);
-   }
-   
-  aes128.encryptBlock(cypher,clearMessageInByte);//cypher->output block and clearMessageInByte->input block
-  //     Serial.println();
-  //     Serial.print("After Encryption:");
-  for(int j=0;j<sizeof(cypher);j++){
-      //     Serial.write(cypher[j]);
-    }
-    
-   aes128.decryptBlock(decryptedtext,cypher);
-   
-  //     Serial.println();
-  //     Serial.print("After Dencryption:");
-  for(int i=0; i<sizeof(decryptedtext); i++){
-    //     Serial.write(decryptedtext[i]);
-   }
-
-   
-  //     Serial.print("decryptedtext:  ");
-  //     Serial.println(decryptedtext[0]);
-
-    // Convert byte array back to char array
-    memcpy(receivedMessage, decryptedtext, sizeof( decryptedtext ));
-   
-  //     Serial.print("receivedMessage >>>>> :  ");
-  //     Serial.println( receivedMessage );
-
+  mbedtls_aes_init( &aes );
+  mbedtls_aes_setkey_dec( &aes, (const unsigned char*) key, strlen(key) * 8 );
+  mbedtls_aes_crypt_ecb(&aes, MBEDTLS_AES_DECRYPT, (const unsigned char*)chipherText, outputBuffer);
+  mbedtls_aes_free( &aes );
 }
-
 #endif
 
 
 
-
-
-#ifndef AES_ENCRYPTION_DECRYPTION_HPP
-#define AES_ENCRYPTION_DECRYPTION_HPP
-void aes_Encryption_Decryption( char* receivedMessage) {
-
-  //key[16] cotain 16 byte key(128 bit) for encryption
-  byte key[16]={0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
-  // //clearMessageInByte[1024] contain the text we need to encrypt
-  // byte clearMessageInByte[1024]={0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
-
-
-  char message[128] = "UrMessageHere";
-  //     Serial.print("message:  ");
-  //     Serial.println(message);
-  
-  byte clearMessageInByte[1024];
-  // Convert char array to byte array
-  memcpy(clearMessageInByte, message, sizeof(message)) ;
-
-
-
-  //     Serial.print("clearMessageInByte:  ");
-  //     Serial.println(clearMessageInByte[0]);
-
-
-
-
-
-  //cypher[16] stores the encrypted text
-  byte cypher[16];
-  //decryptedtext[16] stores decrypted text after decryption
-  byte decryptedtext[16];
-  //creating an object of AES128 class
-  AES128 aes128;
-
-
-
-
-
-
-
-  aes128.setKey(key,16);// Setting Key for AES
-  
-  //     Serial.print("Before Encryption:");
-  for(int i=0; i<sizeof(clearMessageInByte); i++){
-    //     Serial.write(clearMessageInByte[i]);
-   }
-   
-  aes128.encryptBlock(cypher,clearMessageInByte);//cypher->output block and clearMessageInByte->input block
-  //     Serial.println();
-  //     Serial.print("After Encryption:");
-  for(int j=0;j<sizeof(cypher);j++){
-      //     Serial.write(cypher[j]);
-    }
-    
-   aes128.decryptBlock(decryptedtext,cypher);
-   
-  //     Serial.println();
-  //     Serial.print("After Dencryption:");
-  for(int i=0; i<sizeof(decryptedtext); i++){
-    //     Serial.write(decryptedtext[i]);
-   }
-
-   
-  //     Serial.print("decryptedtext:  ");
-  //     Serial.println(decryptedtext[0]);
-
-    // Convert byte array back to char array
-    memcpy(receivedMessage, decryptedtext, sizeof( decryptedtext ));
-   
-  //     Serial.print("receivedMessage >>>>> :  ");
-  //     Serial.println( receivedMessage );
-
-}
-#endif // MD5_HPP
