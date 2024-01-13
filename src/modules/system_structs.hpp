@@ -93,7 +93,7 @@ struct E2PROM_STORED_DATA_FIXED
     char secure_code_03[255] ;
     char product_series[255] ;
     char product_model[255] ;
-    char hardware_specific_hash_additive[255] ;
+    char hardware_specific_hash_salt[255] ;
     char tempName03[255] ;
     char tempName04[255] ;
     char tempName05[255] ;
@@ -111,7 +111,7 @@ struct SOFTWARE_GLOBAL_PARAMETERS_FIXED
 {
     const char* STANDARD_WIFI_SSID = "KryptonArc2G";
     const char* STANDARD_WIFI_PASSWORD = "PleaseHelpMe";
-    const char* GLOBAL_HASH_ADDITIVE =  "DFJynken3Deal87i9EfbNDK2mPBhthxt";
+    const char* GLOBAL_HASH_SALT =  "DFJynken3Deal87i9EfbNDK2mPBhthxt";
     const int ledRed = 18;
     const int ledBlue = 17;
     const int ledGreen = 5;

@@ -1,5 +1,3 @@
-#include "MD5Builder.h"
-
 #include "HardwareSerial.h"
 #include "BLEDevice.h"
 #include "BLEServer.h"
@@ -19,6 +17,11 @@
 #include "modules/system_structs.hpp"
 #include "modules/e2prom_works.hpp"
 #include "modules/bluetooth_works.hpp"
+#include "modules/encryption_works.hpp"
+#include "modules/base64_char_masking.hpp"
+
+#include "base64.h"
+#include "mbedtls/base64.h"
 
 SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
 DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_MCU_ID_fixed;
@@ -53,6 +56,49 @@ void setup() {
   // BLE Initiate
   BluetoothInitiate();
 
+  ////////////////////////////////////////////////////////////////////////
+
+  char clearMessage[1024];
+  char encryptionKey[17] = "1234567890123456";
+  char encryptedData[1024];
+  char receivedMessage[1024];
+
+
+  ////////////////////////////////////////////////////////////////////////
+  
+  // String toEncode = "Test encoding";
+  String toEncode = "Test encoding_Test encoding__Test encoding___Test encoding____Test encoding____Test encoding______Test encoding";
+  Serial.println("toEncode >>> ");
+  Serial.println(toEncode);
+  String encoded = base64::encode( toEncode.c_str());
+  Serial.println("encoded >>> ");
+  Serial.println(encoded);
+
+  char uuu[1024];
+  base64_char_decoding( encoded , uuu );
+  Serial.println("uuu >>> ");
+  Serial.println(uuu);
+
+  
+  // // const char *encodedString = "VGhpcyBpcyB0aGUgZm9ybWF0"; // Base64-encoded string
+  // const char *encodedString = encoded.c_str() ; // Base64-encoded string
+  // size_t decodedLength;
+
+  // unsigned char decodedBuffer[100]; // Adjust buffer size as needed
+
+  // mbedtls_base64_decode(decodedBuffer, sizeof(decodedBuffer), &decodedLength,
+  //                      (const unsigned char*)encodedString, strlen(encodedString));
+
+  // decodedBuffer[decodedLength] = '\0'; // Add null terminator for printing
+
+  // Serial.println("Decoded string:");
+  // Serial.println((char*)decodedBuffer); // Output: This is a test string
+
+
+
+
+  // aesDecryption(encryptedData, encryptionKey, receivedMessage) ;
+  // Serial.print("receivedMessage  >>> " ) ; Serial.println( receivedMessage );
 }
 
 
@@ -92,7 +138,7 @@ void loop() {
 
     if ( !bleDeviceConnected && variableCounter > 12000) { // 120 Seconds = 120,000.00 milli-seconds => 120,000.00 / 10 (delay) = 3,000
       // Reseting device if the counter meets the condition
-      Serial.println("Restarting device");
+      Serial.println("Software controlled device restart");
       ESP.restart();
 
     } else if ( bleDeviceConnected && !(variableCounter == 0)){
