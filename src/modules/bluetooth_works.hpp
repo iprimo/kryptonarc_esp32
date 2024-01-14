@@ -75,23 +75,46 @@ char* extractSubstring(char* input, int startIndex, int endIndex) {
 
 
 void incomingStringProcessing( char* receivingString ){
-
-  
-
-    // Ping Function  
-    // if ( strlen( pointerCharPointer ) == 0 ) { 
-    // const int pingStringExistanceChk = strcmp(receivingString, "0x2000TI_GetStatus_TI" ) ;
-    // const int deviceXigCodeLengthCheck = strlen( e2prom_variables.device_xc );
-    // const int tenantXigCodeLengthCheck = strlen( e2prom_variables.tenant_xc );
-
     Serial.print("receivingString  >>>  ");
     Serial.println(receivingString);
 
+    char dataBefore_data[1024];  // Adjust buffer size as needed
+    char dataAfter_hash[65];  // Adjust buffer size as needed
 
-    char* extractedData = extractDataAfterDelimiter(receivingString, '|');
+    bool hashExists = splitAtLastDelimiter(receivingString, '|', dataBefore_data, dataAfter_hash);
+    if ( !hashExists ) { return; }
 
-    Serial.print("extractedData  >>>  ");
-    Serial.println(extractedData);
+    Serial.print("dataBefore_data  >>>  ");
+    Serial.println(dataBefore_data);
+    Serial.print("dataAfter_hash  >>>  ");
+    Serial.println(dataAfter_hash);
+
+      Serial.print("software_parameters_fixed.GLOBAL_HASH_KEY  >>>  ");
+      Serial.println(software_parameters_fixed.GLOBAL_HASH_KEY);
+
+    // 0x-0	: global hash and enrypton keys used
+    // 0x-1	: device hash and enrypton keys used
+    if ( dataBefore_data[ 4 ] == '1' ){
+      // this matches device specfic hash
+    } else {
+      // Global has used
+      char hash256ResultArray[ 65 ];
+      hashSHA256( dataBefore_data , software_parameters_fixed.GLOBAL_HASH_KEY, hash256ResultArray );
+
+
+      Serial.print("hash256ResultArray  >>>  ");
+      Serial.println(hash256ResultArray);
+      
+      // hash mis-match
+      if ( strcmp( dataAfter_hash, hash256ResultArray ) != 0 ) {
+        Serial.print("  >>>  hash mis-match  >>>  ");
+        return;
+      } 
+    }
+
+
+      Serial.print("  >>>  hash OK !  >>>  ");
+
 
     // Serial.print("pingStringExistanceChk  >>>  ");
     // Serial.println(pingStringExistanceChk);
@@ -100,7 +123,17 @@ void incomingStringProcessing( char* receivingString ){
     // Serial.print("tenantXigCodeLengthCheck  >>>  ");
     // Serial.println(tenantXigCodeLengthCheck);
 
-    if (  strcmp(receivingString, "0x2101TI_GetStatus_TI" ) == 0 && 
+    // const char* subString = "0x2101TI_GetStatus_TI"; // Replace with the substring you want to find
+
+    // if (findSubstring(receivingString, "0x2101TI_GetStatus_TI")) {
+    //   Serial.println(">>>>1111   Substring found in the string.");
+    // } else {
+    //   Serial.println(">>>>1111   Substring not found in the string.");
+    // }
+
+
+
+    if (  findSubstring(receivingString, "0x2101TI_GetStatus_TI" ) && 
           strlen( e2prom_variables.device_xc ) == 0 && 
           strlen( e2prom_variables.tenant_xc ) == 0) {
     // if ( pingStringExistanceChk == 0 && deviceXigCodeLengthCheck == 0 && tenantXigCodeLengthCheck == 0) {

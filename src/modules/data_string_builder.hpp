@@ -19,7 +19,7 @@ void append_bluetooth_session_sequence( char* processingString ) {
 
       //////////////////////////////////////////      
       // Request session Sequence
-      int randomNumber = random(1000, 9998);
+      int randomNumber = random(0, 2147483640);
       software_parameters_variables.data_transfer_sequence_ble = randomNumber ;
       char charArray[5];  // Assuming a 4-digit integer plus the null terminator
       sprintf(charArray, "%d", software_parameters_variables.data_transfer_sequence_ble);
