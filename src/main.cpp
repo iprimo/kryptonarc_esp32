@@ -17,7 +17,6 @@
 #include "modules/system_structs.hpp"
 #include "modules/e2prom_works.hpp"
 #include "modules/bluetooth_works.hpp"
-#include "modules/encryption_works.hpp"
 #include "modules/base64_char_masking.hpp"
 
 #include "base64.h"
@@ -59,10 +58,6 @@ void setup() {
 
   ////////////////////////////////////////////////////////////////////////
 
-  char clearMessage[1024];
-  char encryptionKey[17] = "1234567890123456";
-  char encryptedData[1024];
-  char receivedMessage[1024];
 
 
   ////////////////////////////////////////////////////////////////////////

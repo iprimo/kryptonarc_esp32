@@ -1,6 +1,5 @@
 #include "iostream"
 #include "string.h"
-#include "modules/encryption_works.hpp"
 #include "modules/system_structs.hpp"
 
 extern SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
@@ -85,7 +84,6 @@ void append_firmware_information( char* processingString ) {
 
 }
 #endif
-
 
 #ifndef APPEND_HARDWARE_INFORMATION_HPP
 #define APPEND_HARDWARE_INFORMATION_HPP

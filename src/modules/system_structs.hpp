@@ -104,16 +104,16 @@ struct E2PROM_STORED_DATA_FIXED
     char device_xc[255] ;
 
 
-    char tempName01[255] ;
-    char tempName02[255] ;
+    char hashKey_Internal[255] ;
+    char lastResortKeyOffline02_Internal[255] ;
 
-    char secure_code_01[255] ;
-    char secure_code_02[255] ;
-    char secure_code_03[255] ;
-    char hardware_specific_hash_salt[255] ;
+    char lastResortKeyOffline_Internal[255] ;
+    char keySmithKeyOnline_Internal[255] ;
+    char encryptionKey_Internal[255] ;
+    char keySmithKeyOnline02_Internal[255] ;
 
-    char tempName04[255] ;
-    char tempName05[255] ;
+    char encryptionKey02_Internal[255] ;
+    char hashKey02_Internal[255] ;
     char tempName06[255] ;
     char tempName07[255] ;
 };

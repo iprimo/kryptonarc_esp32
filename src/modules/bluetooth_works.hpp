@@ -80,31 +80,25 @@ void incomingStringProcessing( char* receivingString ){
 
     // Ping Function  
     // if ( strlen( pointerCharPointer ) == 0 ) { 
-    const int pingStringExistanceChk = strcmp(receivingString, "TI_GetStatus_TI" ) ;
-    const int deviceXigCodeLengthCheck = strlen( e2prom_variables.device_xc );
-    const int tenantXigCodeLengthCheck = strlen( e2prom_variables.tenant_xc );
+    // const int pingStringExistanceChk = strcmp(receivingString, "0x2000TI_GetStatus_TI" ) ;
+    // const int deviceXigCodeLengthCheck = strlen( e2prom_variables.device_xc );
+    // const int tenantXigCodeLengthCheck = strlen( e2prom_variables.tenant_xc );
 
     Serial.print("receivingString  >>>  ");
     Serial.println(receivingString);
 
 
-    Serial.print("pingStringExistanceChk  >>>  ");
-    Serial.println(pingStringExistanceChk);
-    Serial.print("deviceXigCodeLengthCheck  >>>  ");
-    Serial.println(deviceXigCodeLengthCheck);
-    Serial.print("tenantXigCodeLengthCheck  >>>  ");
-    Serial.println(tenantXigCodeLengthCheck);
+    // Serial.print("pingStringExistanceChk  >>>  ");
+    // Serial.println(pingStringExistanceChk);
+    // Serial.print("deviceXigCodeLengthCheck  >>>  ");
+    // Serial.println(deviceXigCodeLengthCheck);
+    // Serial.print("tenantXigCodeLengthCheck  >>>  ");
+    // Serial.println(tenantXigCodeLengthCheck);
 
-
-
-      // "0x0000" - public information:
-      //        configured device
-      //        md5 hashing used
-      //        global hashing salt used
-      //        no encryption used
-
-
-    if ( pingStringExistanceChk == 0 && deviceXigCodeLengthCheck == 0 && tenantXigCodeLengthCheck == 0) {
+    if (  strcmp(receivingString, "0x2001TI_GetStatus_TI" ) == 0 && 
+          strlen( e2prom_variables.device_xc ) == 0 && 
+          strlen( e2prom_variables.tenant_xc ) == 0) {
+    // if ( pingStringExistanceChk == 0 && deviceXigCodeLengthCheck == 0 && tenantXigCodeLengthCheck == 0) {
       // Device Not registered
       // "0x0001" - blank device:
       //        md5 hashing used
@@ -141,10 +135,10 @@ void incomingStringProcessing( char* receivingString ){
 
       strcpy( tx_DataCache , tempCache );
       return;
-    } else if ( pingStringExistanceChk == 0 ) {
-      // Device registered - health check
-      strcpy( tx_DataCache , "-DR_200!OK!_DR-");
-      return;
+    // } else if ( pingStringExistanceChk == 0 ) {
+    //   // Device registered - health check
+    //   strcpy( tx_DataCache , "-DR_200!OK!_DR-");
+    //   return;
 
     } else if ( ( 
                   strlen( e2prom_variables.hardware_uuid ) == 0 || 
@@ -167,9 +161,13 @@ void incomingStringProcessing( char* receivingString ){
       delay(1000);
       ESP.restart();
       return;
+    } else {
+      return;
     }
 
     const char* broadcastOutputAValString = find_values_between_substringsV4( receivingString, broadcast_global_variables.broadcastOutputA_SubStringStart , broadcast_global_variables.broadcastOutputA_SubStringEnd );
+    Serial.println("broadcastOutputAValString   >>> ");
+    Serial.println(broadcastOutputAValString);
 
     if ( strcmp(broadcastOutputAValString, "N_A__" ) != 0 ){
       int broadcastOutputAValInt = atoi( broadcastOutputAValString );
@@ -177,7 +175,7 @@ void incomingStringProcessing( char* receivingString ){
       strcpy( tx_DataCache , "-DR_DeviceInSync_DR-");
       return;
     }
-    strcpy( tx_DataCache , "-DR_200!OK!_NoActionMatched_DR-");
+    // strcpy( tx_DataCache , "-DR_200!OK!_NoActionMatched_DR-");
     return;
 };
 

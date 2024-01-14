@@ -5,9 +5,11 @@
 #include "string.h"
 #include "mbedtls/aes.h"
 
+// Note, we had issues with Data Padding
+// C & javascript work independently, but data padding issue presist
 
 // ////////////////////////////////////////////////////////////////////////
-// // Use case example
+
 
 //   // String toEncode = "Test encoding";
 //   String toEncode = "Test encoding_Test encoding__Test encoding___Test encoding____Test encoding____Test encoding______Test encoding";
@@ -79,6 +81,45 @@
 
 // // Use case example
 // ////////////////////////////////////////////////////////////////////////
+// Some Javascript example 
+
+
+                // const key = "2b7e151628aed2a6abf79798096b56d7";
+
+                // // char *plainText = "Tech tutorials x";
+                // const plainText = "1234567890123456";
+
+
+
+                // function pkcs7Padding(text) {
+                //     const blockSize = 16; // AES block size
+                //     const paddingLength = blockSize - (text.length % blockSize);
+                //     const padding = new Array(paddingLength + 1).join(String.fromCharCode(paddingLength));
+                //     return text + padding;
+                //   }
+                  
+                //   function pkcs7Unpadding(text) {
+                //     const paddingLength = text.charCodeAt(text.length - 1);
+                //     return text.slice(0, -paddingLength);
+                //   }
+
+                // function encrypt(plainText, key) {
+                //     const paddedPlainText = pkcs7Padding(plainText);
+                //     const cipherParams = CryptoJS.AES.encrypt(paddedPlainText, key, { mode: CryptoJS.mode.ECB });
+                //     const ciphertext = cipherParams.toString();
+                //     return ciphertext;
+                //   }
+                  
+                //   function decrypt(ciphertext, key) {
+                //     const cipherParams = CryptoJS.AES.decrypt(ciphertext, key, { mode: CryptoJS.mode.ECB });
+                //     const decryptedBytes = cipherParams.toString(CryptoJS.enc.Utf8);
+                //     const plainText = pkcs7Unpadding(decryptedBytes);
+                //     return plainText;
+                //   }
+
+                // const  kkkk = encrypt(plainText, key)
+                //   console.log("encrypt(plainText, key) >>>>    ",kkkk)
+                //   console.log("decrypt(ciphertext, key) >>>>    ",decrypt(kkkk, key))
 
 
 
