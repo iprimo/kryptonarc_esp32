@@ -88,6 +88,11 @@ void incomingStringProcessing( char* receivingString ){
     Serial.println(receivingString);
 
 
+    char* extractedData = extractDataAfterDelimiter(receivingString, '|');
+
+    Serial.print("extractedData  >>>  ");
+    Serial.println(extractedData);
+
     // Serial.print("pingStringExistanceChk  >>>  ");
     // Serial.println(pingStringExistanceChk);
     // Serial.print("deviceXigCodeLengthCheck  >>>  ");

@@ -22,3 +22,23 @@ char convertStringToChar(String str) {
 }
 
 
+
+
+char* extractDataAfterDelimiter(char* inputChar, char delimiter) {
+  // Find the last occurrence of the delimiter
+  char* lastDelimiterPosition = strrchr(inputChar, delimiter);
+
+  // If the delimiter is found, extract the data
+  if (lastDelimiterPosition != nullptr) {
+    // Point to the character after the delimiter
+    char* extractedData = lastDelimiterPosition + 1;
+
+    // Ensure null-termination for safety
+    extractedData[strlen(extractedData)] = '\0';
+
+    return extractedData;
+  } else {
+    // If the delimiter is not found, return nullptr
+    return nullptr;
+  }
+}
