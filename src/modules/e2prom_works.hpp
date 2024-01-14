@@ -11,32 +11,77 @@ extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
 
 extern HardwareSerial Serial;
 
-#define EEPROM_BLOCKS_SIZE 256
+#define EEPROM_BLOCKS_SIZE 64
 #define ACTIVE_EEPROM_SIZE 4096 
 
 // DO NOT CHANGE ORDER OF ARRAY BELOW
 // DO NOT MOVE THE ORDER OR CHANGE THE ORDER OF THIS ARRAY
-// Total E2PROM block4096/256 = 16
+// Total E2PROM block - 4096/64=64
 const char *arr[] = {
     "board_model",
     "hardware_uuid",
     "vender_xc",
     "device_xc",
     "tenant_xc",
-    "manufacturer_xc",
-    
+    "manufacturer_xc",    
     "lastResortKeyOffline_Internal",
     "keySmithKeyOnline_Internal",
     "encryptionKey_Internal",
     "hashKey_Internal",
-
     "lastResortKeyOffline02_Internal",
     "keySmithKeyOnline02_Internal",
     "encryptionKey02_Internal",
-    "hashKey02_Internal",
-
-    "tempName06",
-    "tempName07"
+    "hashKey02_Internal"
+    // "tempName15",
+    // "tempName16",
+    // "tempName17",
+    // "tempName18",
+    // "tempName19",
+    // "tempName20",
+    // "tempName21",
+    // "tempName22",
+    // "tempName23",
+    // "tempName24",
+    // "tempName25",
+    // "tempName26",
+    // "tempName27",
+    // "tempName28",
+    // "tempName29",
+    // "tempName30",
+    // "tempName31",
+    // "tempName32",
+    // "tempName33",
+    // "tempName34",
+    // "tempName35",
+    // "tempName36",
+    // "tempName37",
+    // "tempName38",
+    // "tempName39",
+    // "tempName40",
+    // "tempName41",
+    // "tempName42",
+    // "tempName43",
+    // "tempName44",
+    // "tempName45",
+    // "tempName46",
+    // "tempName47",
+    // "tempName48",
+    // "tempName49",
+    // "tempName50",
+    // "tempName51",
+    // "tempName52",
+    // "tempName53",
+    // "tempName54",
+    // "tempName55",
+    // "tempName56",
+    // "tempName57",
+    // "tempName58",
+    // "tempName59",
+    // "tempName60",
+    // "tempName61",
+    // "tempName62",
+    // "tempName63",
+    // "tempName64"
 };
 
 
@@ -122,8 +167,56 @@ E2PROM_STORED_DATA_FIXED e2promReadAllWorks( ) {
     strcpy( temp_construct.keySmithKeyOnline02_Internal, e2promReadWorks( "keySmithKeyOnline02_Internal" ) );
     strcpy( temp_construct.encryptionKey02_Internal, e2promReadWorks( "encryptionKey02_Internal" ) );
     strcpy( temp_construct.hashKey02_Internal, e2promReadWorks( "hashKey02_Internal" ) );
-    strcpy( temp_construct.tempName06, e2promReadWorks( "tempName06" ) );
-    strcpy( temp_construct.tempName07, e2promReadWorks( "tempName07" ) );
+    // strcpy( temp_construct.tempName15, e2promReadWorks( "tempName15" ) );
+    // strcpy( temp_construct.tempName16, e2promReadWorks( "tempName16" ) );
+    // strcpy( temp_construct.tempName17, e2promReadWorks( "tempName17" ) );
+    // strcpy( temp_construct.tempName18, e2promReadWorks( "tempName18" ) );
+    // strcpy( temp_construct.tempName19, e2promReadWorks( "tempName19" ) );
+    // strcpy( temp_construct.tempName20, e2promReadWorks( "tempName20" ) );
+    // strcpy( temp_construct.tempName21, e2promReadWorks( "tempName21" ) );
+    // strcpy( temp_construct.tempName22, e2promReadWorks( "tempName22" ) );
+    // strcpy( temp_construct.tempName23, e2promReadWorks( "tempName23" ) );
+    // strcpy( temp_construct.tempName24, e2promReadWorks( "tempName24" ) );
+    // strcpy( temp_construct.tempName25, e2promReadWorks( "tempName25" ) );
+    // strcpy( temp_construct.tempName26, e2promReadWorks( "tempName26" ) );
+    // strcpy( temp_construct.tempName27, e2promReadWorks( "tempName27" ) );
+    // strcpy( temp_construct.tempName28, e2promReadWorks( "tempName28" ) );
+    // strcpy( temp_construct.tempName29, e2promReadWorks( "tempName29" ) );
+    // strcpy( temp_construct.tempName30, e2promReadWorks( "tempName30" ) );
+    // strcpy( temp_construct.tempName31, e2promReadWorks( "tempName31" ) );
+    // strcpy( temp_construct.tempName32, e2promReadWorks( "tempName32" ) );
+    // strcpy( temp_construct.tempName33, e2promReadWorks( "tempName33" ) );
+    // strcpy( temp_construct.tempName34, e2promReadWorks( "tempName34" ) );
+    // strcpy( temp_construct.tempName35, e2promReadWorks( "tempName35" ) );
+    // strcpy( temp_construct.tempName36, e2promReadWorks( "tempName36" ) );
+    // strcpy( temp_construct.tempName37, e2promReadWorks( "tempName37" ) );
+    // strcpy( temp_construct.tempName38, e2promReadWorks( "tempName38" ) );
+    // strcpy( temp_construct.tempName39, e2promReadWorks( "tempName39" ) );
+    // strcpy( temp_construct.tempName40, e2promReadWorks( "tempName40" ) );
+    // strcpy( temp_construct.tempName41, e2promReadWorks( "tempName41" ) );
+    // strcpy( temp_construct.tempName42, e2promReadWorks( "tempName42" ) );
+    // strcpy( temp_construct.tempName43, e2promReadWorks( "tempName43" ) );
+    // strcpy( temp_construct.tempName44, e2promReadWorks( "tempName44" ) );
+    // strcpy( temp_construct.tempName45, e2promReadWorks( "tempName45" ) );
+    // strcpy( temp_construct.tempName46, e2promReadWorks( "tempName46" ) );
+    // strcpy( temp_construct.tempName47, e2promReadWorks( "tempName47" ) );
+    // strcpy( temp_construct.tempName48, e2promReadWorks( "tempName48" ) );
+    // strcpy( temp_construct.tempName49, e2promReadWorks( "tempName49" ) );
+    // strcpy( temp_construct.tempName50, e2promReadWorks( "tempName50" ) );
+    // strcpy( temp_construct.tempName51, e2promReadWorks( "tempName51" ) );
+    // strcpy( temp_construct.tempName52, e2promReadWorks( "tempName52" ) );
+    // strcpy( temp_construct.tempName53, e2promReadWorks( "tempName53" ) );
+    // strcpy( temp_construct.tempName54, e2promReadWorks( "tempName54" ) );
+    // strcpy( temp_construct.tempName55, e2promReadWorks( "tempName55" ) );
+    // strcpy( temp_construct.tempName56, e2promReadWorks( "tempName56" ) );
+    // strcpy( temp_construct.tempName57, e2promReadWorks( "tempName57" ) );
+    // strcpy( temp_construct.tempName58, e2promReadWorks( "tempName58" ) );
+    // strcpy( temp_construct.tempName59, e2promReadWorks( "tempName59" ) );
+    // strcpy( temp_construct.tempName60, e2promReadWorks( "tempName60" ) );
+    // strcpy( temp_construct.tempName61, e2promReadWorks( "tempName61" ) );
+    // strcpy( temp_construct.tempName62, e2promReadWorks( "tempName62" ) );
+    // strcpy( temp_construct.tempName63, e2promReadWorks( "tempName63" ) );
+    // strcpy( temp_construct.tempName64, e2promReadWorks( "tempName64" ) );
 
 
 	return temp_construct;

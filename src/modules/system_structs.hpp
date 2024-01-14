@@ -94,28 +94,77 @@ struct SOFTWARE_GLOBAL_PARAMETERS_VAR
 #define E2PROM_DATA_FIXED
 struct E2PROM_STORED_DATA_FIXED
 {
-    char hardware_uuid[255] ;
-    char board_model[255] ;
+    char hardware_uuid[64] ;
+    char board_model[64] ;
 
-    char manufacturer_xc[255] ;
-    char vender_xc[255] ;
+    char manufacturer_xc[64] ;
+    char vender_xc[64] ;
     
-    char tenant_xc[255] ;
-    char device_xc[255] ;
+    char tenant_xc[64] ;
+    char device_xc[64] ;
 
 
-    char hashKey_Internal[255] ;
-    char lastResortKeyOffline02_Internal[255] ;
+    char hashKey_Internal[64] ;
+    char lastResortKeyOffline02_Internal[64] ;
 
-    char lastResortKeyOffline_Internal[255] ;
-    char keySmithKeyOnline_Internal[255] ;
-    char encryptionKey_Internal[255] ;
-    char keySmithKeyOnline02_Internal[255] ;
+    char lastResortKeyOffline_Internal[64] ;
+    char keySmithKeyOnline_Internal[64] ;
+    char encryptionKey_Internal[64] ;
+    char keySmithKeyOnline02_Internal[64] ;
 
-    char encryptionKey02_Internal[255] ;
-    char hashKey02_Internal[255] ;
-    char tempName06[255] ;
-    char tempName07[255] ;
+    char encryptionKey02_Internal[64] ;
+    char hashKey02_Internal[64] ;
+    // char tempName15[64] ;
+    // char tempName16[64] ;
+    // char tempName17[64] ;
+    // char tempName18[64] ;
+    // char tempName19[64] ;
+    // char tempName20[64] ;
+    // char tempName21[64] ;
+    // char tempName22[64] ;
+    // char tempName23[64] ;
+    // char tempName24[64] ;
+    // char tempName25[64] ;
+    // char tempName26[64] ;
+    // char tempName27[64] ;
+    // char tempName28[64] ;
+    // char tempName29[64] ;
+    // char tempName30[64] ;
+    // char tempName31[64] ;
+    // char tempName32[64] ;
+    // char tempName33[64] ;
+    // char tempName34[64] ;
+    // char tempName35[64] ;
+    // char tempName36[64] ;
+    // char tempName37[64] ;
+    // char tempName38[64] ;
+    // char tempName39[64] ;
+    // char tempName40[64] ;
+    // char tempName41[64] ;
+    // char tempName42[64] ;
+    // char tempName43[64] ;
+    // char tempName44[64] ;
+    // char tempName45[64] ;
+    // char tempName46[64] ;
+    // char tempName47[64] ;
+    // char tempName48[64] ;
+    // char tempName49[64] ;
+    // char tempName50[64] ;
+    // char tempName51[64] ;
+    // char tempName52[64] ;
+    // char tempName53[64] ;
+    // char tempName54[64] ;
+    // char tempName55[64] ;
+    // char tempName56[64] ;
+    // char tempName57[64] ;
+    // char tempName58[64] ;
+    // char tempName59[64] ;
+    // char tempName60[64] ;
+    // char tempName61[64] ;
+    // char tempName62[64] ;
+    // char tempName63[64] ;
+    // char tempName64[64] ;
+    
 };
 #endif
 

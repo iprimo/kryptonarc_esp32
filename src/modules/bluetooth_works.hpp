@@ -100,7 +100,7 @@ void incomingStringProcessing( char* receivingString ){
     // Serial.print("tenantXigCodeLengthCheck  >>>  ");
     // Serial.println(tenantXigCodeLengthCheck);
 
-    if (  strcmp(receivingString, "0x2001TI_GetStatus_TI" ) == 0 && 
+    if (  strcmp(receivingString, "0x2101TI_GetStatus_TI" ) == 0 && 
           strlen( e2prom_variables.device_xc ) == 0 && 
           strlen( e2prom_variables.tenant_xc ) == 0) {
     // if ( pingStringExistanceChk == 0 && deviceXigCodeLengthCheck == 0 && tenantXigCodeLengthCheck == 0) {
