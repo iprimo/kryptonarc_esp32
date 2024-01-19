@@ -72,15 +72,15 @@ const byte morse_table[] PROGMEM = {
 const char* message;
 char currSignal = '\0';
 int currMsgIdx = 0;
-uint8_t ledPin = software_parameters_fixed.ledRed ;
+uint8_t ledPin = software_parameters_fixed.LED_PIN_RED ;
 
 void blinkDelay(int duration)
 {
   digitalWrite(ledPin, HIGH);   // turn the LED on (HIGH is the voltage level)
-  tone(software_parameters_fixed.buzzerPassive, 800);
+  tone(software_parameters_fixed.BUZZER_PASSIVE, 800);
   delay(duration);// wait for the set duration
   digitalWrite(ledPin, LOW);    // turn the LED off by making the voltage LOW
-  tone(software_parameters_fixed.buzzerPassive, 0);
+  tone(software_parameters_fixed.BUZZER_PASSIVE, 0);
 }
 
 void sendDot()

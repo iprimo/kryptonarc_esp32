@@ -1,3 +1,6 @@
+
+#ifndef SYSTEM_STRUCTS_HPP
+#define SYSTEM_STRUCTS_HPP
 // https://stackoverflow.com/questions/6882637/using-struct-in-different-cpp-file
 // https://stackoverflow.com/questions/6882637/using-struct-in-different-cpp-file
 // 
@@ -5,8 +8,6 @@
 #include <string>
 using namespace std;
 
-#ifndef PassingDataStruct_H
-#define PassingDataStruct_H
 struct PassingDataStruct
 {
 
@@ -36,12 +37,6 @@ struct PassingDataStruct
     // void f2(); /* Implemented in PassingDataStruct.cpp */
 };
 
-#endif
-
-
-
-#ifndef HTTPWorksReply_H
-#define HTTPWorksReply_H
 struct HTTPWorksReply
 {
     bool bEServerReachableLogic = false;
@@ -55,14 +50,6 @@ struct HTTPWorksReply
 
 };
 
-#endif
-
-
-
-
-
-#ifndef GLOBAL_BROADCAST_VAR
-#define GLOBAL_BROADCAST_VAR
 struct BROADCAST_GLOBAL_VAR
 {
     char* broadcastOutputA = NULL;
@@ -75,23 +62,15 @@ struct BROADCAST_GLOBAL_VAR
     // const char* valueB_SubStringStart = "-BO1AV_";
     // const char* valueB_SubStringEnd = "_BO1AV-";
 };
-#endif
 
-
-#ifndef GLOBAL_SOFTWARE_VAR
-#define GLOBAL_SOFTWARE_VAR
 struct SOFTWARE_GLOBAL_PARAMETERS_VAR
 {
     int data_transfer_sequence_ble = 5749;
+    char incoming_data_time_stamp[64] ;
 
 
 };
-#endif
 
-
-
-#ifndef E2PROM_DATA_FIXED
-#define E2PROM_DATA_FIXED
 struct E2PROM_STORED_DATA_FIXED
 {
     char hardware_uuid[64] ;
@@ -114,7 +93,7 @@ struct E2PROM_STORED_DATA_FIXED
 
     char encryptionKey02_Internal[64] ;
     char hashKey02_Internal[64] ;
-    // char tempName15[64] ;
+    char current_shackle_lock_configuration[64] ;
     // char tempName16[64] ;
     // char tempName17[64] ;
     // char tempName18[64] ;
@@ -166,13 +145,7 @@ struct E2PROM_STORED_DATA_FIXED
     // char tempName64[64] ;
     
 };
-#endif
 
-
-
-
-#ifndef GLOBAL_SOFTWARE_FIXED
-#define GLOBAL_SOFTWARE_FIXED
 struct SOFTWARE_GLOBAL_PARAMETERS_FIXED
 {
     const char* STANDARD_WIFI_SSID = "KryptonArc2G";
@@ -186,11 +159,13 @@ struct SOFTWARE_GLOBAL_PARAMETERS_FIXED
     const char* PRODUCT_SERIES = "Marble Series";
     const char* PRODUCT_MODEL = "MX14";
 
+    const int SHACKLE_UNLOCK_DEGREE = 30;
+    const int SHACKLE_LOCK_DEGREE = 120;
 
-    const int ledRed = 18;
-    const int ledBlue = 17;
-    const int ledGreen = 5;
-    const int buzzerPassive = 19;
+    const int LED_PIN_RED = 18;
+    const int LED_PIN_BLUE = 17;
+    const int LED_PIN_GREEN = 5;
+    const int BUZZER_PASSIVE = 19;
 
     const char *url = "https://fota.kryptonarc.com/firmware.bin"; //state url of your firmware image
 
@@ -256,11 +231,7 @@ Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
                 "-----END CERTIFICATE-----\n" ;
 
 };
-#endif
 
-
-#ifndef GLOBAL_HARDWARE_ID_VAR
-#define GLOBAL_HARDWARE_ID_VAR
 struct DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED 
 {
     // ESP32 Chip model = ESP32-D0WDQ6 Rev 1

@@ -1,3 +1,6 @@
+#ifndef E2PROM_WORKS_HPP
+#define E2PROM_WORKS_HPP
+
 #include <Arduino.h>
 #include <stdio.h>
 #include <string.h>
@@ -167,7 +170,7 @@ E2PROM_STORED_DATA_FIXED e2promReadAllWorks( ) {
     strcpy( temp_construct.keySmithKeyOnline02_Internal, e2promReadWorks( "keySmithKeyOnline02_Internal" ) );
     strcpy( temp_construct.encryptionKey02_Internal, e2promReadWorks( "encryptionKey02_Internal" ) );
     strcpy( temp_construct.hashKey02_Internal, e2promReadWorks( "hashKey02_Internal" ) );
-    // strcpy( temp_construct.tempName15, e2promReadWorks( "tempName15" ) );
+    strcpy( temp_construct.current_shackle_lock_configuration, e2promReadWorks( "current_shackle_lock_configuration" ) );
     // strcpy( temp_construct.tempName16, e2promReadWorks( "tempName16" ) );
     // strcpy( temp_construct.tempName17, e2promReadWorks( "tempName17" ) );
     // strcpy( temp_construct.tempName18, e2promReadWorks( "tempName18" ) );
@@ -296,3 +299,5 @@ void wipeAllAndReissueAllBasics( ) {
 
     e2prom_variables = e2promReadAllWorks();
 }
+
+#endif // SYSTEM_STRUCTS_HPP

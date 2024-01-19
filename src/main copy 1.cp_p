@@ -29,7 +29,7 @@ void setup()
     pinMode (software_parameters_fixed.ledRed, OUTPUT);
     pinMode (software_parameters_fixed.ledBlue, OUTPUT);
     pinMode (software_parameters_fixed.ledGreen, OUTPUT);
-    pinMode( software_parameters_fixed.buzzerPassive, OUTPUT);
+    pinMode( software_parameters_fixed.BUZZER_PASSIVE, OUTPUT);
 
 }
 

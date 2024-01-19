@@ -15,7 +15,7 @@ void append_bluetooth_session_sequence( char* processingString ) {
 
       //////////////////////////////////////////      
       // Session Management
-      strcat(processingString, "|SM");
+      strcat(processingString, "sM_");
 
       //////////////////////////////////////////      
       // Request session Sequence
@@ -25,14 +25,20 @@ void append_bluetooth_session_sequence( char* processingString ) {
       sprintf(charArray, "%d", software_parameters_variables.data_transfer_sequence_ble);
 
 
-      strcat(processingString, "BLESEQ_");  // BLE Session Sequest
+      strcat(processingString, "bLESSEQ_");  // BLE Session Sequest
       strcat(processingString, charArray );
-      strcat(processingString, "_BLESSEQ");
+      strcat(processingString, "_bLESSEQ");
 
 
       //////////////////////////////////////////      
+      // time stamp
+      strcat(processingString, "tS_");  // BLE Session Sequest
+      strcat(processingString, software_parameters_variables.incoming_data_time_stamp );
+      strcat(processingString, "_tS");
+
+      //////////////////////////////////////////      
       // Session Management
-      strcat(processingString, "SM|");
+      strcat(processingString, "_sM");
 }
 #endif
 
@@ -42,23 +48,32 @@ void append_config_information( char* processingString ) {
 
       //////////////////////////////////////////      
       // Hardware Info starter and ender char
-      strcat(processingString, "|cI");
+      strcat(processingString, "cI_");
 
       //////////////////////////////////////////      
-      // TX: Tenant XigCode
-      strcat(processingString, "TX_");
+      // tX: Tenant XigCode
+      strcat(processingString, "tXC_");
       strcat(processingString, e2prom_variables.tenant_xc );
-      strcat(processingString, "_TX");
+      strcat(processingString, "_tXC");
 
       //////////////////////////////////////////      
       // DX: Device XigCode
-      strcat(processingString, "DX_");
+      strcat(processingString, "dXC_");
       strcat(processingString, e2prom_variables.device_xc );
-      strcat(processingString, "_DX");
+      strcat(processingString, "_dXC");
+
+
+
+      //////////////////////////////////////////      
+      // tX: Tenant XigCode
+      strcat(processingString, "cSLC_");
+      strcat(processingString, e2prom_variables.current_shackle_lock_configuration );
+      strcat(processingString, "_cSLC");
+
 
       //////////////////////////////////////////      
       // Hardware Info starter and ender char
-      strcat(processingString, "cI|");
+      strcat(processingString, "_cI");
 
 }
 #endif
@@ -69,18 +84,18 @@ void append_firmware_information( char* processingString ) {
 
       //////////////////////////////////////////      
       // Hardware Info starter and ender char
-      strcat(processingString, "|fI");
+      strcat(processingString, "fI_");
 
       //////////////////////////////////////////      
       // HWCM: Hardware ChipModel
-      strcat(processingString, "FIV_");
+      strcat(processingString, "fIV_");
       strcat(processingString, software_parameters_fixed.FIRMWARE_VERSION );
-      strcat(processingString, "_FIV");
+      strcat(processingString, "_fIV");
 
 
       //////////////////////////////////////////      
       // Hardware Info starter and ender char
-      strcat(processingString, "fI|");
+      strcat(processingString, "_fI");
 
 }
 #endif
@@ -91,95 +106,95 @@ void append_hardware_information( char* processingString ) {
 
       //////////////////////////////////////////      
       // Hardware Info starter and ender char
-      strcat(processingString, "|hI");
+      strcat(processingString, "hI_");
 
       //////////////////////////////////////////
       // HU : Hardware UUID
-      strcat(processingString, "HU_");
+      strcat(processingString, "hU_");
       strcat(processingString, e2prom_variables.hardware_uuid );
-      strcat(processingString, "_HU");
+      strcat(processingString, "_hU");
 
       //////////////////////////////////////////      
       // PS: Product Series XigCode
-      strcat(processingString, "PS_");
+      strcat(processingString, "pS_");
       strcat(processingString, software_parameters_fixed.PRODUCT_SERIES );
-      strcat(processingString, "_PS");
+      strcat(processingString, "_pS");
 
       //////////////////////////////////////////      
       // PM: Product Model XigCode
-      strcat(processingString, "PM_");
+      strcat(processingString, "pM_");
       strcat(processingString, software_parameters_fixed.PRODUCT_MODEL );
-      strcat(processingString, "_PM");
+      strcat(processingString, "_pM");
 
       //////////////////////////////////////////      
       // MX: Manufacturer XigCode
-      strcat(processingString, "MX_");
+      strcat(processingString, "mX_");
       strcat(processingString, e2prom_variables.manufacturer_xc );
-      strcat(processingString, "_MX");
+      strcat(processingString, "_mX");
 
       //////////////////////////////////////////      
       // VX: Vender XigCode
-      strcat(processingString, "VX_");
+      strcat(processingString, "vX_");
       strcat(processingString, e2prom_variables.vender_xc );
-      strcat(processingString, "_VX");
+      strcat(processingString, "_vX");
 
       //////////////////////////////////////////
       // BM: Board Model
-      strcat(processingString, "BM_");
+      strcat(processingString, "bM_");
       strcat(processingString, e2prom_variables.board_model );
-      strcat(processingString, "_BM");
+      strcat(processingString, "_bM");
 
       //////////////////////////////////////////      
       // HWCM: Hardware ChipModel
-      strcat(processingString, "HWCM_");
+      strcat(processingString, "hWCM_");
       strcat(processingString, constrcut_MCU_ID_fixed.cChipModel );
-      strcat(processingString, "_HWCM");
+      strcat(processingString, "_hWCM");
 
       //////////////////////////////////////////      
       // HWCR: Hardware ChipRevision
-      strcat(processingString, "HWCR_");
+      strcat(processingString, "hWCR_");
       strcat(processingString, constrcut_MCU_ID_fixed.cChipRevision );
-      strcat(processingString, "_HWCR");
+      strcat(processingString, "_hWCR");
 
       //////////////////////////////////////////      
       // HWCC: Hardware ChipCores
-      strcat(processingString, "HWCC_");
+      strcat(processingString, "hWCC_");
       strcat(processingString, constrcut_MCU_ID_fixed.cChipCores );
-      strcat(processingString, "_HWCC");
+      strcat(processingString, "_hWCC");
 
       //////////////////////////////////////////      
       // HWCI: Hardware ChipId
-      strcat(processingString, "HWCI_");
+      strcat(processingString, "hWCI_");
       strcat(processingString, constrcut_MCU_ID_fixed.cChipId );
-      strcat(processingString, "_HWCI");
+      strcat(processingString, "_hWCI");
 
       //////////////////////////////////////////      
       // HWAP: Hardware baseMacChrSOFTAP
-      strcat(processingString, "HWAP_");
+      strcat(processingString, "hWAP_");
       strcat(processingString, constrcut_MCU_ID_fixed.baseMacChrSOFTAP );
-      strcat(processingString, "_HWAP");
+      strcat(processingString, "_hWAP");
 
       //////////////////////////////////////////      
       // HWBT: Hardware baseMacChrBT
-      strcat(processingString, "HWBT_");
+      strcat(processingString, "hWBT_");
       strcat(processingString, constrcut_MCU_ID_fixed.baseMacChrBT );
-      strcat(processingString, "_HWBT");
+      strcat(processingString, "_hWBT");
 
       //////////////////////////////////////////      
       // HWETH: Hardware baseMacChrETH
-      strcat(processingString, "HWETH_");
+      strcat(processingString, "hWETH_");
       strcat(processingString, constrcut_MCU_ID_fixed.baseMacChrETH );
-      strcat(processingString, "_HWETH");
+      strcat(processingString, "_hWETH");
 
       //////////////////////////////////////////      
       // HWWIFI: Hardware baseMacChrWiFi
-      strcat(processingString, "HWWIFI_");
+      strcat(processingString, "hWWIFI_");
       strcat(processingString, constrcut_MCU_ID_fixed.baseMacChrWiFi );
-      strcat(processingString, "_HWWIFI");
+      strcat(processingString, "hWETH_");
 
       //////////////////////////////////////////      
       // Hardware Info starter and ender char
-      strcat(processingString, "hI|");
+      strcat(processingString, "_hI");
 
 }
 #endif

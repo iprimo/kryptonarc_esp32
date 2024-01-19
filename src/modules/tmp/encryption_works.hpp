@@ -20,7 +20,7 @@
 //   Serial.println(encoded);
 
 //   char uuu[1024];
-//   base64_char_decoding( encoded , uuu );
+//   base64_string_decoding( encoded , uuu );
 //   Serial.println("uuu >>> ");
 //   Serial.println(uuu);
 

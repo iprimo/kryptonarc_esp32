@@ -1,3 +1,6 @@
+#ifndef BASE64_CHAR_MASKING_HPP
+#define BASE64_CHAR_MASKING_HPP
+
 // Original source - Example of Arduino IDE AES128_Example
 #include "string.h"
 #include "base64.h"
@@ -15,7 +18,7 @@
 //   Serial.println(encoded);
 
 //   char uuu[1024];
-//   base64_char_decoding( encoded , uuu );
+//   base64_string_decoding( encoded , uuu );
 //   Serial.println("uuu >>> ");
 //   Serial.println(uuu);
 
@@ -53,10 +56,8 @@
 
 // #endif
 
-#ifndef BASE64_CHAR_DECODING_HPP
-#define BASE64_CHAR_DECODING_HPP
 // source: https://forum.arduino.cc/t/esp32-base64-decoding/1123601/26
-void base64_char_decoding( String encoded, char* clear_data ) {
+void base64_string_decoding( String encoded, char* unmasked_data ) {
 
   // size_t decodedLength;
 
@@ -70,7 +71,7 @@ void base64_char_decoding( String encoded, char* clear_data ) {
   // // Serial.println("Decoded string:");
   // // Serial.println((char*)decodedBuffer); // Output: This is a test string
 
-  // clear_data = (char*)decodedBuffer ;
+  // unmasked_data = (char*)decodedBuffer ;
   
 
   
@@ -88,7 +89,7 @@ void base64_char_decoding( String encoded, char* clear_data ) {
   // Serial.println("Decoded string:");
   // Serial.println((char*)decodedBuffer); // Output: This is a test string
 
-  strcpy(clear_data, (char*)decodedBuffer);
+  strcpy(unmasked_data, (char*)decodedBuffer);
 
 }
 // source: https://forum.arduino.cc/t/esp32-base64-decoding/1123601/26
@@ -107,5 +108,23 @@ void base64_char_decoding( String encoded, char* clear_data ) {
   // Serial.println("Decoded string:");
   // Serial.println((char*)decodedBuffer); // Output: This is a test string
 
+
+
+
+
+void base64_char_decoding( char *encodedString, char* unmasked_data ) {
+
+  size_t decodedLength;
+
+  unsigned char decodedBuffer[1024]; // Adjust buffer size as needed
+
+  mbedtls_base64_decode(decodedBuffer, sizeof(decodedBuffer), &decodedLength,
+                       (const unsigned char*)encodedString, strlen(encodedString));
+
+  decodedBuffer[decodedLength] = '\0'; // Add null terminator for printing
+
+  strcpy(unmasked_data, (char*)decodedBuffer);
+
+}
 
 #endif

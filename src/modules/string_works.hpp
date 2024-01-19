@@ -1,18 +1,36 @@
+#ifndef STRING_WORKS_HPP
+#define STRING_WORKS_HPP
+
 #include "system_structs.hpp"
 
 const char* find_values_between_substringsV4(char* str, const char* substringA1, const char* substringA2 ) {
     char* p1 = strstr(str, substringA1);
-    if (!p1) return "N_A__" ;
+    if (!p1) return "NA_SUB_STRING_01" ;
 
     p1 += strlen(substringA1);
     char* p2 = strstr(p1, substringA2);
-    if (!p2) return "N_A__" ;
+    if (!p2) return "NA_SUB_STRING_02" ;
     
     *p2 = 0;
     return p1 ;
 }
 
+const char* find_values_between_substringsV5(const char* str, const char* substringA1, const char* substringA2) {
+    const char* p1 = strstr(str, substringA1);
+    if (!p1) return "NA_SUB_STRING_11";
 
+    p1 += strlen(substringA1);
+    const char* p2 = strstr(p1, substringA2);
+    if (!p2) return "NA_SUB_STRING_22";
+
+    // Create a copy of the substring to avoid modifying the original string
+    size_t substring_length = p2 - p1;
+    char* result = new char[substring_length + 1];
+    strncpy(result, p1, substring_length);
+    result[substring_length] = '\0';
+
+    return result;
+}
 
 char convertStringToChar(String str) {
     int str_len = str.length() + 1;
@@ -99,3 +117,31 @@ bool splitAtLastDelimiter(char* inputChar, char delimiter, char* dataBeforeDelim
     return false;
   }
 }
+
+char* extract_substring( int starting_index, const char* original_string) {
+  // Get the length of the original string
+  int length = strlen(original_string);
+
+  // Calculate the starting index (3 in this case)
+  // int starting_index = 3;
+
+  // Ensure the starting index is within bounds
+  if (starting_index >= length) {
+    return NULL;  // Handle invalid index
+  }
+
+  // Allocate memory for the substring, including space for the null terminator
+  char* substring = new char[length - starting_index + 1];
+
+  // Copy the characters from the starting index to the end of the original string
+  strncpy(substring, original_string + starting_index, length - starting_index);
+
+  // Add the null terminator
+  substring[length - starting_index] = '\0';
+
+  return substring;
+}
+
+
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef SERVO_HPP
+#define SERVO_HPP
+
 // https://dronebotworkshop.com/esp32-servo/
 
 /* Sweep
@@ -67,3 +70,4 @@ void servoInitiate() {
 void servoWorksDrive( int target_value  ) {
 	ServoOutputA.write( target_value );
 }
+#endif
