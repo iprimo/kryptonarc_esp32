@@ -92,18 +92,24 @@ struct SOFTWARE_GLOBAL_PARAMETERS_VAR
     bool global_green_flashing_on = false ;
     int global_green_flashing_on_delay = 0 ;
     int global_green_flashing_off_delay = 0 ;
+    int global_green_flashing_target_counter = -1 ;
+    int global_green_flashing_current_counter = -1 ;
 
     unsigned long global_blue_flashing_previous_millis_timer = 0 ;
     bool global_blue_flashing_temp_var = false ;
     bool global_blue_flashing_on = false ;
     int global_blue_flashing_on_delay = 0 ;
     int global_blue_flashing_off_delay = 0 ;
+    int global_blue_flashing_target_counter = -1 ;
+    int global_blue_flashing_current_counter = -1 ;
     
     unsigned long global_red_flashing_previous_millis_timer = 0 ;
     bool global_red_flashing_temp_var = false ;
     bool global_red_flashing_on = false ;
     int global_red_flashing_on_delay = 0 ;
     int global_red_flashing_off_delay = 0 ;
+    int global_red_flashing_target_counter = -1 ;
+    int global_red_flashing_current_counter = -1 ;
 
     unsigned long global_previous_millis_timer_02 = 0 ;
     unsigned long global_previous_millis_timer_03 = 0 ;

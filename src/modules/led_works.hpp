@@ -61,7 +61,24 @@ bool led_static_action( const char* new_status, const char* led_static_x_action 
       return true;   
 }
 
-void flashing_led_green( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false ) {
+void flashing_led_green( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false , int flash_counter = -1) {
+
+      // flashing counter
+      if ( flash_counter != -1 && software_parameters_variables.global_green_flashing_target_counter == -1 ){
+            // counter setup - incoming counter value - counter no already set
+            software_parameters_variables.global_green_flashing_target_counter = flash_counter;
+            software_parameters_variables.global_green_flashing_current_counter = 0 ;
+
+      } else if ( software_parameters_variables.global_green_flashing_target_counter == -1 ){
+            // pass - no counter set - pass
+            
+      } else if ( software_parameters_variables.global_green_flashing_target_counter != -1 &&  
+                  software_parameters_variables.global_green_flashing_current_counter >= software_parameters_variables.global_green_flashing_target_counter ){
+            // counter reached - stop flashing 
+            software_parameters_variables.global_green_flashing_target_counter = -1 ;
+            software_parameters_variables.global_green_flashing_current_counter = -1 ;
+            software_parameters_variables.global_green_flashing_on = false ;
+      }
       
       ///// ///// ///// ///// ///// ///// ///// ///// /////  ///// 
       // Overwriting other flashing
@@ -121,18 +138,41 @@ void flashing_led_green( const char* flashing_action = "continue" , const char* 
             software_parameters_variables.global_green_flashing_temp_var = false ;
             software_parameters_variables.global_green_flashing_previous_millis_timer = software_parameters_variables.global_current_millis ;
             led_static_action( "green", "on" );
+           
+            // flashing counter - counting
+            if ( software_parameters_variables.global_green_flashing_current_counter < software_parameters_variables.global_green_flashing_target_counter ){ software_parameters_variables.global_green_flashing_current_counter++ ; }
 
       } else if ( !software_parameters_variables.global_green_flashing_temp_var && tmp_diff > software_parameters_variables.global_green_flashing_on_delay ) { // delay to stay on
             software_parameters_variables.global_green_flashing_temp_var = true ;
             software_parameters_variables.global_green_flashing_previous_millis_timer = software_parameters_variables.global_current_millis ;
             led_static_action( "green", "off" );
 
+            // flashing counter - counting
+            if ( software_parameters_variables.global_green_flashing_current_counter < software_parameters_variables.global_green_flashing_target_counter ){ software_parameters_variables.global_green_flashing_current_counter++ ; }
       } else {
             // waiting not action taken
       }
 }
 
-void flashing_led_blue( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false ) {
+void flashing_led_blue( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false , int flash_counter = -1) {
+      
+      ///// ///// ///// ///// ///// ///// ///// ///// /////  ///// 
+      // flashing counter
+      if ( flash_counter != -1 && software_parameters_variables.global_blue_flashing_target_counter == -1 ){
+            // counter setup - incoming counter value - counter no already set
+            software_parameters_variables.global_blue_flashing_target_counter = flash_counter;
+            software_parameters_variables.global_blue_flashing_current_counter = 0 ;
+
+      } else if ( software_parameters_variables.global_blue_flashing_target_counter == -1 ){
+            // pass - no counter set - pass
+            
+      } else if ( software_parameters_variables.global_blue_flashing_target_counter != -1 &&  
+                  software_parameters_variables.global_blue_flashing_current_counter >= software_parameters_variables.global_blue_flashing_target_counter ){
+            // counter reached - stop flashing 
+            software_parameters_variables.global_blue_flashing_target_counter = -1 ;
+            software_parameters_variables.global_blue_flashing_current_counter = -1 ;
+            software_parameters_variables.global_blue_flashing_on = false ;
+      }
 
       ///// ///// ///// ///// ///// ///// ///// ///// /////  ///// 
       // Overwriting other flashing
@@ -194,17 +234,41 @@ void flashing_led_blue( const char* flashing_action = "continue" , const char* f
             software_parameters_variables.global_blue_flashing_previous_millis_timer = software_parameters_variables.global_current_millis ;
             led_static_action( "blue", "on" );
 
+            // flashing counter - counting
+            if ( software_parameters_variables.global_blue_flashing_current_counter < software_parameters_variables.global_blue_flashing_target_counter ){ software_parameters_variables.global_blue_flashing_current_counter++ ; }
+
       } else if ( !software_parameters_variables.global_blue_flashing_temp_var && tmp_diff > software_parameters_variables.global_blue_flashing_on_delay ) { // delay to stay on
             software_parameters_variables.global_blue_flashing_temp_var = true ;
             software_parameters_variables.global_blue_flashing_previous_millis_timer = software_parameters_variables.global_current_millis ;
             led_static_action( "blue", "off" );
 
+            // flashing counter - counting
+            if ( software_parameters_variables.global_blue_flashing_current_counter < software_parameters_variables.global_blue_flashing_target_counter ){ software_parameters_variables.global_blue_flashing_current_counter++ ; }
+            
       } else {
             // waiting not action taken
       }
 }
 
-void flashing_led_red( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false ) {
+void flashing_led_red( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false , int flash_counter = -1) {
+      
+      ///// ///// ///// ///// ///// ///// ///// ///// /////  ///// 
+      // flashing counter
+      if ( flash_counter != -1 && software_parameters_variables.global_red_flashing_target_counter == -1 ){
+            // counter setup - incoming counter value - counter no already set
+            software_parameters_variables.global_red_flashing_target_counter = flash_counter;
+            software_parameters_variables.global_red_flashing_current_counter = 0 ;
+
+      } else if ( software_parameters_variables.global_red_flashing_target_counter == -1 ){
+            // pass - no counter set - pass
+            
+      } else if ( software_parameters_variables.global_red_flashing_target_counter != -1 &&  
+                  software_parameters_variables.global_red_flashing_current_counter >= software_parameters_variables.global_red_flashing_target_counter ){
+            // counter reached - stop flashing 
+            software_parameters_variables.global_red_flashing_target_counter = -1 ;
+            software_parameters_variables.global_red_flashing_current_counter = -1 ;
+            software_parameters_variables.global_red_flashing_on = false ;
+      }
 
       ///// ///// ///// ///// ///// ///// ///// ///// /////  ///// 
       // Overwriting other flashing
@@ -266,10 +330,16 @@ void flashing_led_red( const char* flashing_action = "continue" , const char* fl
             software_parameters_variables.global_red_flashing_previous_millis_timer = software_parameters_variables.global_current_millis ;
             led_static_action( "red", "on" );
 
+            // flashing counter - counting
+            if ( software_parameters_variables.global_red_flashing_current_counter < software_parameters_variables.global_red_flashing_target_counter ){ software_parameters_variables.global_red_flashing_current_counter++ ; }
+
       } else if ( !software_parameters_variables.global_red_flashing_temp_var && tmp_diff > software_parameters_variables.global_red_flashing_on_delay ) { // delay to stay on
             software_parameters_variables.global_red_flashing_temp_var = true ;
             software_parameters_variables.global_red_flashing_previous_millis_timer = software_parameters_variables.global_current_millis ;
             led_static_action( "red", "off" );
+
+            // flashing counter - counting
+            if ( software_parameters_variables.global_red_flashing_current_counter < software_parameters_variables.global_red_flashing_target_counter ){ software_parameters_variables.global_red_flashing_current_counter++ ; }
 
       } else {
             // waiting not action taken

@@ -85,8 +85,9 @@ char* extractSubstring(char* input, int startIndex, int endIndex) {
 
 
 void incomingStringProcessing( char* receivingString ){
-    Serial.print("receivingString  >>>  ");
-    Serial.println(receivingString);
+
+    // Serial.print("receivingString  >>>  ");
+    // Serial.println(receivingString);
 
     char dataBefore_data[1024];  // Adjust buffer size as needed
     char dataAfter_hash[65];  // Adjust buffer size as needed
@@ -105,8 +106,8 @@ void incomingStringProcessing( char* receivingString ){
     // Serial.println(dataBefore_data[ 4 ] );
     // Serial.println("dataBefore_data[ 4 ] >>>  ");
     
-    Serial.println("software_parameters_fixed.GLOBAL_HASH_KEY  >>>  ");
-    Serial.println(software_parameters_fixed.GLOBAL_HASH_KEY);
+    // Serial.println("software_parameters_fixed.GLOBAL_HASH_KEY  >>>  ");
+    // Serial.println(software_parameters_fixed.GLOBAL_HASH_KEY);
 
     // 0x-0	: global hash and enrypton keys used
     // 0x-1	: device hash and enrypton keys used
@@ -119,8 +120,8 @@ void incomingStringProcessing( char* receivingString ){
       hashSHA256( dataBefore_data , software_parameters_fixed.GLOBAL_HASH_KEY, hash256ResultArray );
     }
 
-    Serial.print("hash256ResultArray  >>>  ");
-    Serial.println(hash256ResultArray);
+    // Serial.print("hash256ResultArray  >>>  ");
+    // Serial.println(hash256ResultArray);
     
     // hash mis-match
     if ( strcmp( dataAfter_hash, hash256ResultArray ) != 0 ) {
@@ -144,6 +145,14 @@ void incomingStringProcessing( char* receivingString ){
     //   Serial.println(">>>>1111   Substring not found in the string.");
     // }
 
+
+    // LED flash indicator -receiving data from cloud 
+    if ( findSubstring(receivingString, "0x1" )  ) { 
+      flashing_led_green( "on" , "very_fast_flashing"  , false, 10 );
+    }
+
+
+    // Selector data processing
     if (  findSubstring(receivingString, "0x2001tI_GetStatus_tI" ) && 
           strlen( e2prom_variables.device_xc ) == 0 && 
           strlen( e2prom_variables.tenant_xc ) == 0) {
@@ -283,10 +292,6 @@ void incomingStringProcessing( char* receivingString ){
       ESP.restart();
     } else {
     }
-    // led_static_action( "red", "off" );
-    // led_static_action( "green", "off" );
-    // led_static_action( "blue", "off" ); // orange
-    return;
 
     // const char* broadcastOutputAValString = find_values_between_substringsV4( receivingString, broadcast_global_variables.broadcastOutputA_SubStringStart , broadcast_global_variables.broadcastOutputA_SubStringEnd );
     // Serial.println("broadcastOutputAValString   >>> ");
@@ -300,6 +305,15 @@ void incomingStringProcessing( char* receivingString ){
     // }
     // // strcpy( tx_DataCache , "-DR_200!OK!_NoActionMatched_DR-");
     // return;
+
+
+    // led_static_action( "red", "off" );
+    // led_static_action( "green", "off" );
+    // led_static_action( "blue", "off" ); // orange
+    
+
+    return;
+    
 };
 
 class MyServerCallbacks: public BLEServerCallbacks {
