@@ -8,13 +8,22 @@
 #include "modules/servo.hpp"
 #include "modules/led_works.hpp"
 
-
-// extern SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
-// extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
-// extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_mcu_id_fixed;
-// extern E2PROM_STORED_DATA_FIXED e2prom_variables;
-// extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
-
+// LED: 
+//    Blue: (orange)
+//          Flashing slow: 
+//                Bluetooth - Not connected - attemping to connect
+//          Solid: 
+//                Bluetooth - Connected
+//          Flashing fast: 
+//                Bluetooth - Disconnected - trying to reconnect
+//    Green:
+//          Flashing Slow:
+//                WiFi - Not connected - attemping to connect
+//          Solid: 
+//                WiFi - Connected
+//    Red:
+//          Fast flashing - limited to 10x times (with Solid Blue)
+//                Data receving from Cloud "0x1"
 
 void turns_off_all_led() {
       software_parameters_variables.global_red_flashing_on = false ;

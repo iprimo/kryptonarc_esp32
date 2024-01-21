@@ -148,7 +148,7 @@ void incomingStringProcessing( char* receivingString ){
 
     // LED flash indicator -receiving data from cloud 
     if ( findSubstring(receivingString, "0x1" )  ) { 
-      flashing_led_green( "on" , "very_fast_flashing"  , false, 10 );
+      flashing_led_red( "on" , "very_fast_flashing"  , false, 10 );
     }
 
 
