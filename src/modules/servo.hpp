@@ -42,16 +42,25 @@
  */
 
 #include "ESP32Servo.h"
+#include "modules/e2prom_works.hpp"
+#include "modules/system_structs.hpp"
 
 extern Servo ServoOutputA;
+
+// extern SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
+// extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
+// extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_mcu_id_fixed;
+// extern E2PROM_STORED_DATA_FIXED e2prom_variables;
+// extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
 
 // Servo myservo;  // create servo object to control a servo
 // 16 servo objects can be created on the ESP32
 
-int pos = 0;    // variable to store the servo position
+// int pos = ;    // variable to store the servo position
 // Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
 // int servoPin = 18;
-static const int servoPin = 18;
+// static const int servoPin = 18;
+static const int servoPin = software_parameters_fixed.SERVO_PIN;
 
 void servoInitiate() {
 	// Allow allocation of all timers

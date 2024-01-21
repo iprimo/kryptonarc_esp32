@@ -18,13 +18,15 @@
 #include "modules/e2prom_works.hpp"
 #include "modules/bluetooth_works.hpp"
 #include "modules/base64_char_masking.hpp"
+#include "modules/timer_works.hpp"
+#include "modules/led_works.hpp"
 
 #include "base64.h"
 #include "mbedtls/base64.h"
 
 SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
 SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
-DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_MCU_ID_fixed;
+DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_mcu_id_fixed;
 E2PROM_STORED_DATA_FIXED e2prom_variables;
 BROADCAST_GLOBAL_VAR broadcast_global_variables;
 
@@ -57,7 +59,7 @@ void setup() {
   BluetoothInitiate();
 
   ////////////////////////////////////////////////////////////////////////
-
+  led_mcu_hw_initiation();
 
 
   ////////////////////////////////////////////////////////////////////////
@@ -66,10 +68,11 @@ void setup() {
 
 
 void loop() {
+  led_action_startup();
   int variableCounter = 0;
   ////////////////////////////////////////////////////////////////////////
   // Hardware works
-  constrcut_MCU_ID_fixed = getMacAddress() ;
+  constrcut_mcu_id_fixed = getMacAddress() ;
 
   ////////////////////////////////////////////////////////////////////////
   // E2PROM works
@@ -87,17 +90,20 @@ void loop() {
   // Serial.print("e2prom_variables.vender_xc  >>> " ) ; Serial.println( e2prom_variables.vender_xc );
   // Serial.print("e2prom_variables.device_xc  >>> " ) ; Serial.println( e2prom_variables.device_xc );
   // Serial.print("e2prom_variables.tenant_xc  >>> " ) ; Serial.println( e2prom_variables.tenant_xc );
-  // Serial.print("constrcut_MCU_ID_fixed.cChipModel >>> " ) ; Serial.println(  constrcut_MCU_ID_fixed.cChipModel );
-  // Serial.print("constrcut_MCU_ID_fixed.cChipRevision  >>> " ) ; Serial.println( constrcut_MCU_ID_fixed.cChipRevision );
-  // Serial.print("constrcut_MCU_ID_fixed.cChipCores >>> " ) ; Serial.println(  constrcut_MCU_ID_fixed.cChipCores );
-  // Serial.print("constrcut_MCU_ID_fixed.cChipId  >>> " ) ; Serial.println( constrcut_MCU_ID_fixed.cChipId );
-  // Serial.print("constrcut_MCU_ID_fixed.baseMacChrSOFTAP >>> " ) ; Serial.println(  constrcut_MCU_ID_fixed.baseMacChrSOFTAP );
-  // Serial.print("constrcut_MCU_ID_fixed.baseMacChrBT >>> " ) ; Serial.println(  constrcut_MCU_ID_fixed.baseMacChrBT );
-  // Serial.print("constrcut_MCU_ID_fixed.baseMacChrETH  >>> " ) ; Serial.println( constrcut_MCU_ID_fixed.baseMacChrETH );
-  // Serial.print("constrcut_MCU_ID_fixed.baseMacChrWiFi >>> " ) ; Serial.println(  constrcut_MCU_ID_fixed.baseMacChrWiFi );
+  // Serial.print("constrcut_mcu_id_fixed.cChipModel >>> " ) ; Serial.println(  constrcut_mcu_id_fixed.cChipModel );
+  // Serial.print("constrcut_mcu_id_fixed.cChipRevision  >>> " ) ; Serial.println( constrcut_mcu_id_fixed.cChipRevision );
+  // Serial.print("constrcut_mcu_id_fixed.cChipCores >>> " ) ; Serial.println(  constrcut_mcu_id_fixed.cChipCores );
+  // Serial.print("constrcut_mcu_id_fixed.cChipId  >>> " ) ; Serial.println( constrcut_mcu_id_fixed.cChipId );
+  // Serial.print("constrcut_mcu_id_fixed.baseMacChrSOFTAP >>> " ) ; Serial.println(  constrcut_mcu_id_fixed.baseMacChrSOFTAP );
+  // Serial.print("constrcut_mcu_id_fixed.baseMacChrBT >>> " ) ; Serial.println(  constrcut_mcu_id_fixed.baseMacChrBT );
+  // Serial.print("constrcut_mcu_id_fixed.baseMacChrETH  >>> " ) ; Serial.println( constrcut_mcu_id_fixed.baseMacChrETH );
+  // Serial.print("constrcut_mcu_id_fixed.baseMacChrWiFi >>> " ) ; Serial.println(  constrcut_mcu_id_fixed.baseMacChrWiFi );
 
-  
+  // flashing_led_green( "on", "fix_light_on" );
   while ( true ){
+    timer_global_action();
+    led_global_action();
+    
 
     if ( !bleDeviceConnected && variableCounter > 12000) { // 120 Seconds = 120,000.00 milli-seconds => 120,000.00 / 10 (delay) = 3,000
       // Reseting device if the counter meets the condition

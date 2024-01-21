@@ -1,15 +1,16 @@
+#ifndef DATA_STRING_BUILDER_HPP
+#define DATA_STRING_BUILDER_HPP
+
 #include "iostream"
 #include "string.h"
 #include "modules/system_structs.hpp"
 
-extern SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
-extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
-extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_MCU_ID_fixed;
-extern E2PROM_STORED_DATA_FIXED e2prom_variables;
-extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
+// extern SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
+// extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
+// extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_mcu_id_fixed;
+// extern E2PROM_STORED_DATA_FIXED e2prom_variables;
+// extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
 
-#ifndef APPEND_BLE_SESSION_SEQUENCE_HPP
-#define APPEND_BLE_SESSION_SEQUENCE_HPP
 void append_bluetooth_session_sequence( char* processingString ) {
 
 
@@ -40,10 +41,7 @@ void append_bluetooth_session_sequence( char* processingString ) {
       // Session Management
       strcat(processingString, "_sM");
 }
-#endif
 
-#ifndef APPEND_CONFIG_INFORMATION_HPP
-#define APPEND_CONFIG_INFORMATION_HPP
 void append_config_information( char* processingString ) {
 
       //////////////////////////////////////////      
@@ -76,10 +74,7 @@ void append_config_information( char* processingString ) {
       strcat(processingString, "_cI");
 
 }
-#endif
 
-#ifndef APPEND_FIRMWARE_INFORMATION_HPP
-#define APPEND_FIRMWARE_INFORMATION_HPP
 void append_firmware_information( char* processingString ) {
 
       //////////////////////////////////////////      
@@ -98,10 +93,7 @@ void append_firmware_information( char* processingString ) {
       strcat(processingString, "_fI");
 
 }
-#endif
 
-#ifndef APPEND_HARDWARE_INFORMATION_HPP
-#define APPEND_HARDWARE_INFORMATION_HPP
 void append_hardware_information( char* processingString ) {
 
       //////////////////////////////////////////      
@@ -147,49 +139,49 @@ void append_hardware_information( char* processingString ) {
       //////////////////////////////////////////      
       // HWCM: Hardware ChipModel
       strcat(processingString, "hWCM_");
-      strcat(processingString, constrcut_MCU_ID_fixed.cChipModel );
+      strcat(processingString, constrcut_mcu_id_fixed.cChipModel );
       strcat(processingString, "_hWCM");
 
       //////////////////////////////////////////      
       // HWCR: Hardware ChipRevision
       strcat(processingString, "hWCR_");
-      strcat(processingString, constrcut_MCU_ID_fixed.cChipRevision );
+      strcat(processingString, constrcut_mcu_id_fixed.cChipRevision );
       strcat(processingString, "_hWCR");
 
       //////////////////////////////////////////      
       // HWCC: Hardware ChipCores
       strcat(processingString, "hWCC_");
-      strcat(processingString, constrcut_MCU_ID_fixed.cChipCores );
+      strcat(processingString, constrcut_mcu_id_fixed.cChipCores );
       strcat(processingString, "_hWCC");
 
       //////////////////////////////////////////      
       // HWCI: Hardware ChipId
       strcat(processingString, "hWCI_");
-      strcat(processingString, constrcut_MCU_ID_fixed.cChipId );
+      strcat(processingString, constrcut_mcu_id_fixed.cChipId );
       strcat(processingString, "_hWCI");
 
       //////////////////////////////////////////      
       // HWAP: Hardware baseMacChrSOFTAP
       strcat(processingString, "hWAP_");
-      strcat(processingString, constrcut_MCU_ID_fixed.baseMacChrSOFTAP );
+      strcat(processingString, constrcut_mcu_id_fixed.baseMacChrSOFTAP );
       strcat(processingString, "_hWAP");
 
       //////////////////////////////////////////      
       // HWBT: Hardware baseMacChrBT
       strcat(processingString, "hWBT_");
-      strcat(processingString, constrcut_MCU_ID_fixed.baseMacChrBT );
+      strcat(processingString, constrcut_mcu_id_fixed.baseMacChrBT );
       strcat(processingString, "_hWBT");
 
       //////////////////////////////////////////      
       // HWETH: Hardware baseMacChrETH
       strcat(processingString, "hWETH_");
-      strcat(processingString, constrcut_MCU_ID_fixed.baseMacChrETH );
+      strcat(processingString, constrcut_mcu_id_fixed.baseMacChrETH );
       strcat(processingString, "_hWETH");
 
       //////////////////////////////////////////      
       // HWWIFI: Hardware baseMacChrWiFi
       strcat(processingString, "hWWIFI_");
-      strcat(processingString, constrcut_MCU_ID_fixed.baseMacChrWiFi );
+      strcat(processingString, constrcut_mcu_id_fixed.baseMacChrWiFi );
       strcat(processingString, "hWETH_");
 
       //////////////////////////////////////////      
@@ -198,5 +190,4 @@ void append_hardware_information( char* processingString ) {
 
 }
 #endif
-
 

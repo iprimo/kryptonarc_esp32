@@ -1,3 +1,7 @@
+#ifndef BLUETOOTH_WORKS_HPP
+#define BLUETOOTH_WORKS_HPP
+
+
 #include "HardwareSerial.h"
 #include "Arduino.h"
 #include "BLEDevice.h"
@@ -10,6 +14,9 @@
 #include "modules/base64_char_masking.hpp"
 #include "modules/string_works.hpp"
 #include "modules/lock_shackle_actions.hpp"
+#include "modules/led_works.hpp"
+#include "modules/timer_works.hpp"
+#include "modules/system_structs.hpp"
 #include "iostream"
 #include "cstring"
 #include "base64.h"
@@ -21,11 +28,11 @@ extern BLEUUID mUUID;
 extern BLEAdvertising *pAdvertising;
 extern BLEService *pService ;
 
-extern SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
-extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
-extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_MCU_ID_fixed;
-extern E2PROM_STORED_DATA_FIXED e2prom_variables;
-extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
+// extern SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
+// extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
+// extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_mcu_id_fixed;
+// extern E2PROM_STORED_DATA_FIXED e2prom_variables;
+// extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
 
 extern bool bleDeviceConnected ;
 extern bool oldBLEDeviceConnected;
@@ -112,7 +119,6 @@ void incomingStringProcessing( char* receivingString ){
       hashSHA256( dataBefore_data , software_parameters_fixed.GLOBAL_HASH_KEY, hash256ResultArray );
     }
 
-
     Serial.print("hash256ResultArray  >>>  ");
     Serial.println(hash256ResultArray);
     
@@ -121,9 +127,7 @@ void incomingStringProcessing( char* receivingString ){
       Serial.print("  >>>  hash mis-match  >>>  ");
       return;
     } 
-
     Serial.print("  >>>  hash OK !  >>>  ");
-
 
     // Serial.print("pingStringExistanceChk  >>>  ");
     // Serial.println(pingStringExistanceChk);
@@ -139,8 +143,6 @@ void incomingStringProcessing( char* receivingString ){
     // } else {
     //   Serial.println(">>>>1111   Substring not found in the string.");
     // }
-
-
 
     if (  findSubstring(receivingString, "0x2001tI_GetStatus_tI" ) && 
           strlen( e2prom_variables.device_xc ) == 0 && 
@@ -177,11 +179,7 @@ void incomingStringProcessing( char* receivingString ){
       strcat( tempCache, encoded.c_str() );
       // strcat( tempCache, (base64::encode( sendStr56.c_str() ) ).c_str() );
 
-
-
-
       strcpy( tx_DataCache , tempCache );
-      return;
     // } else if ( pingStringExistanceChk == 0 ) {
     //   // Device registered - health check
     //   strcpy( tx_DataCache , "-DR_200!OK!_DR-");
@@ -194,7 +192,6 @@ void incomingStringProcessing( char* receivingString ){
       // Serial.println("configuraed device - 0x2001tI_GetStatus_tI >111>>>   ");
       // Serial.println("e2prom_variables.device_xc  >111>>  ");
       // Serial.println(e2prom_variables.device_xc);
-
 
       //////////////////////////////////////////
       // Sending Current details
@@ -220,7 +217,6 @@ void incomingStringProcessing( char* receivingString ){
       // strcat( tempCache, (base64::encode( sendStr56.c_str() ) ).c_str() );
 
       strcpy( tx_DataCache , tempCache );
-      return;
     } else if ( findSubstring(receivingString, "0x1102" )  ) {
         
       //  0x1102dFhDXzAwMDAxXzAwMDAxXzAwMDAxXzAwMDAxX3RlbmFudGFjY291bnRfdFhDZFhDXzIzOGI1Y19mNjk1NWNfZGY4YThhX2FjMzBhNmExZDgxX2hhcmR3YXJldHdpbl9kWENzSV9iTEVTU0VRX05hTl9iTEVTU0VRdFNfMjAyNC0wMS0xOVQwNToyODoxOS4xMDNaX3RTX3NJaFdBY3Rpb25fdW5sb2NrX2hXQWN0aW9u|413565c688bb4336c0e54d478daedd39f0aa7e321df8abafbbbed545a3e1bde
@@ -256,12 +252,9 @@ void incomingStringProcessing( char* receivingString ){
         Serial.print("  >>>  tenant mis-match  >>>  ");
         return;
       }
-
-
       strcpy( software_parameters_variables.incoming_data_time_stamp , find_values_between_substringsV5( unmasked_data, "tS_" , "_tS" ) );
       // Serial.println("software_parameters_variables.incoming_data_time_stamp: ");
       // Serial.println( software_parameters_variables.incoming_data_time_stamp );
-
 
       const char* incoming_action_instruction = find_values_between_substringsV5( unmasked_data, "hWAction_" , "_hWAction" );
       Serial.println("incoming_action_instruction: ");
@@ -288,10 +281,12 @@ void incomingStringProcessing( char* receivingString ){
       Serial.println("Restarting in 1 seconds");
       delay(1000);
       ESP.restart();
-      return;
     } else {
-      return;
     }
+    // led_static_action( "red", "off" );
+    // led_static_action( "green", "off" );
+    // led_static_action( "blue", "off" ); // orange
+    return;
 
     // const char* broadcastOutputAValString = find_values_between_substringsV4( receivingString, broadcast_global_variables.broadcastOutputA_SubStringStart , broadcast_global_variables.broadcastOutputA_SubStringEnd );
     // Serial.println("broadcastOutputAValString   >>> ");
@@ -310,10 +305,12 @@ void incomingStringProcessing( char* receivingString ){
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       bleDeviceConnected = true;
+      flashing_led_blue( "on" , "fix_light_on" , true );
     };
 
     void onDisconnect(BLEServer* pServer) {
       bleDeviceConnected = false;
+      flashing_led_blue( "on" , "normal_flashing" , true );
     }
 };
 
@@ -373,6 +370,8 @@ void BluetoothInitiate() {
   pAdvertising->setMinPreferred(0x0);  // set value to 0x00 to not advertise this parameter
   // BLEUUID mUUID = BLEUUID::fromString(SERVICE_UUID);
   mUUID = BLEUUID::fromString(SERVICE_UUID);
+  
+  flashing_led_blue( "on" , "normal_flashing" , true );
   delay(500); // give the bluetooth stack the chance to get things ready
   pAdvertising->start();
   Serial.println("Waiting for a device to connect...");
@@ -439,9 +438,13 @@ void BluetoothMainProcess() {
     if ( bleDeviceConnected != oldBLEDeviceConnected ) {
       oldBLEDeviceConnected = bleDeviceConnected;
       if ( !bleDeviceConnected ) {
+        flashing_led_blue( "on" , "very_fast_flashing" , true );
         pServer->startAdvertising();
         Serial.println("Waiting for a device to connect... ...");
       }
     }
   
 }
+
+#endif
+

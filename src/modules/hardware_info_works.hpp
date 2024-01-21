@@ -1,3 +1,7 @@
+#ifndef HARDWARE_INFO_HPP
+#define HARDWARE_INFO_HPP
+
+
 #include <Arduino.h>
 #include "esp_system.h"
 #include <cstring>
@@ -67,3 +71,4 @@ DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED getMacAddress() {
 	return HardwareID ;
 }
 
+#endif

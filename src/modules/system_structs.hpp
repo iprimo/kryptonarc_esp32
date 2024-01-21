@@ -1,6 +1,6 @@
 
-#ifndef SYSTEM_STRUCTS_HPP
-#define SYSTEM_STRUCTS_HPP
+#ifndef GLOBAL_VAR_DEFINITIONS_HPP
+#define GLOBAL_VAR_DEFINITIONS_HPP
 // https://stackoverflow.com/questions/6882637/using-struct-in-different-cpp-file
 // https://stackoverflow.com/questions/6882637/using-struct-in-different-cpp-file
 // 
@@ -67,6 +67,53 @@ struct SOFTWARE_GLOBAL_PARAMETERS_VAR
 {
     int data_transfer_sequence_ble = 5749;
     char incoming_data_time_stamp[64] ;
+    unsigned long global_current_millis = 0 ;
+
+    const int global_very_fast_flashing_on_delay = 50 ;
+    const int global_very_fast_flashing_off_delay = 100 ;
+    
+    const int global_fast_flashing_on_delay = 125 ;
+    const int global_fast_flashing_off_delay = 250 ;
+    
+    const int global_normal_flashing_on_delay = 250 ;
+    const int global_normal_flashing_off_delay = 500 ;
+    
+    const int global_slow_flashing_on_delay = 750 ;
+    const int global_slow_flashing_off_delay = 1500 ;
+
+    const int global_very_slow_flashing_on_delay = 2000 ;
+    const int global_very_slow_flashing_off_delay = 3000 ;
+    
+    const int global_fix_flashing_on_delay = 1000 ;
+    const int global_fix_flashing_off_delay = 0 ;
+    
+    unsigned long global_green_flashing_previous_millis_timer = 0 ;
+    bool global_green_flashing_temp_var = false ;
+    bool global_green_flashing_on = false ;
+    int global_green_flashing_on_delay = 0 ;
+    int global_green_flashing_off_delay = 0 ;
+
+    unsigned long global_blue_flashing_previous_millis_timer = 0 ;
+    bool global_blue_flashing_temp_var = false ;
+    bool global_blue_flashing_on = false ;
+    int global_blue_flashing_on_delay = 0 ;
+    int global_blue_flashing_off_delay = 0 ;
+    
+    unsigned long global_red_flashing_previous_millis_timer = 0 ;
+    bool global_red_flashing_temp_var = false ;
+    bool global_red_flashing_on = false ;
+    int global_red_flashing_on_delay = 0 ;
+    int global_red_flashing_off_delay = 0 ;
+
+    unsigned long global_previous_millis_timer_02 = 0 ;
+    unsigned long global_previous_millis_timer_03 = 0 ;
+    unsigned long global_previous_millis_timer_04 = 0 ;
+    unsigned long global_previous_millis_timer_05 = 0 ;
+    unsigned long global_previous_millis_timer_06 = 0 ;
+    unsigned long global_previous_millis_timer_07 = 0 ;
+    unsigned long global_previous_millis_timer_08 = 0 ;
+    unsigned long global_previous_millis_timer_09 = 0 ;
+    unsigned long global_previous_millis_timer_10 = 0 ;
 
 
 };
@@ -161,10 +208,11 @@ struct SOFTWARE_GLOBAL_PARAMETERS_FIXED
 
     const int SHACKLE_UNLOCK_DEGREE = 30;
     const int SHACKLE_LOCK_DEGREE = 120;
+    const int LED_PIN_BLUE = 5;
+    const int LED_PIN_GREEN = 17;
+    const int LED_PIN_RED = 16;
 
-    const int LED_PIN_RED = 18;
-    const int LED_PIN_BLUE = 17;
-    const int LED_PIN_GREEN = 5;
+    const int SERVO_PIN = 18;
     const int BUZZER_PASSIVE = 19;
 
     const char *url = "https://fota.kryptonarc.com/firmware.bin"; //state url of your firmware image
@@ -248,4 +296,11 @@ struct DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED
     char baseMacChrETH[18] = {0};
     char baseMacChrWiFi[18] = {0};
 } ;
+
+extern SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
+extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
+extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_mcu_id_fixed;
+extern E2PROM_STORED_DATA_FIXED e2prom_variables;
+extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
+
 #endif

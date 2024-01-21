@@ -1,11 +1,11 @@
+#ifndef HASH_SHA_256_HPP
+#define HASH_SHA_256_HPP
+
 // Original source - Example of Arduino IDE AES128_Example
 #include "string.h"
 #include "Crypto.h"
 #include "AES.h"
 #include "mbedtls/md.h"
-
-#ifndef HASH_SHA_256_HPP
-#define HASH_SHA_256_HPP
 
 // Source: 
 // https://techtutorialsx.com/2018/01/25/esp32-arduino-applying-the-hmac-sha-256-mechanism/

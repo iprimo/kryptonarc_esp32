@@ -27,9 +27,6 @@
 
 
 
-// #ifndef BASE64_CHAR_ENCODING_HPP
-// #define BASE64_CHAR_ENCODING_HPP
-
 // // Source: 
 // // https://forum.arduino.cc/t/esp32-base64-decoding/1123601/26
 
@@ -54,7 +51,6 @@
 
 // }
 
-// #endif
 
 // source: https://forum.arduino.cc/t/esp32-base64-decoding/1123601/26
 void base64_string_decoding( String encoded, char* unmasked_data ) {

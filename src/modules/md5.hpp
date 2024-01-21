@@ -1,8 +1,7 @@
-#include "MD5Builder.h"
-
 #ifndef MD5_HPP
 #define MD5_HPP
 
+#include "MD5Builder.h"
 
 String generateMD5Hash(const char* str) {
   MD5Builder md5;
