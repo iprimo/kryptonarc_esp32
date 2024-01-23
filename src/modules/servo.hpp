@@ -42,6 +42,7 @@
  */
 
 #include "ESP32Servo.h"
+#include "ESP32PWM.h"
 #include "modules/e2prom_works.hpp"
 #include "modules/system_structs.hpp"
 
@@ -62,7 +63,7 @@ extern Servo ServoOutputA;
 // static const int servoPin = 18;
 static const int servoPin = software_parameters_fixed.SERVO_PIN;
 
-void servoInitiate() {
+void servo_initialization () {
 	// Allow allocation of all timers
 	ESP32PWM::allocateTimer(0);
 	ESP32PWM::allocateTimer(1);

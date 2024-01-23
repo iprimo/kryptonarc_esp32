@@ -128,7 +128,7 @@ void incomingStringProcessing( char* receivingString ){
       Serial.print("  >>>  hash mis-match  >>>  ");
       return;
     } 
-    Serial.print("  >>>  hash OK !  >>>  ");
+    // Serial.print("  >>>  hash OK !  >>>  ");
 
     // Serial.print("pingStringExistanceChk  >>>  ");
     // Serial.println(pingStringExistanceChk);
@@ -148,7 +148,7 @@ void incomingStringProcessing( char* receivingString ){
 
     // LED flash indicator -receiving data from cloud 
     if ( findSubstring(receivingString, "0x1" )  ) { 
-      flashing_led_red( "on" , "very_fast_flashing"  , false, 10 );
+      flashing_led_blue( "on" , "very_fast_flashing"  , false, 10 , true);
     }
 
 
@@ -354,7 +354,7 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     }
 };
 
-void BluetoothInitiate() {
+void bluetooth_initialization () {
 
   ////////////////////////////////////////////////////////////////////////
   //
@@ -411,8 +411,8 @@ void BluetoothMainProcess() {
 
 
         // Creating hash of data - if device is configred used global hash key, if device is configured use device specific hash key
-        const int deviceXigCodeLengthCheck = strlen( e2prom_variables.device_xc );
-        const int tenantXigCodeLengthCheck = strlen( e2prom_variables.tenant_xc );
+        // const int deviceXigCodeLengthCheck = strlen( e2prom_variables.device_xc );
+        // const int tenantXigCodeLengthCheck = strlen( e2prom_variables.tenant_xc );
         char hash256ResultArray[ 65 ];
         if ( strlen( e2prom_variables.device_xc ) > 10 && strlen( e2prom_variables.tenant_xc ) > 10 ){
           hashSHA256( tx_InFlightData, e2prom_variables.hashKey_Internal, hash256ResultArray );

@@ -144,4 +144,20 @@ char* extract_substring( int starting_index, const char* original_string) {
 
 
 
+void removeSubstring(char* original, const char* substringToRemove, char* result) {
+    char* start = strstr(original, substringToRemove);
+
+    if (start != NULL) {
+        int length = start - original;
+        strncpy(result, original, length);
+        result[length] = '\0';
+
+        strcat(result, start + strlen(substringToRemove));
+    } else {
+        // If substring not found, copy the original to result
+        strcpy(result, original);
+    }
+}
+
+
 #endif

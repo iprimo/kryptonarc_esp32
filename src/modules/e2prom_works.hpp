@@ -104,7 +104,7 @@ int find_string_in_array(const char* str_var) {
 }
 
 
-const char* e2promInitiate() {
+const char* e2prom_initialization () {
     if ( EEPROM.begin( ACTIVE_EEPROM_SIZE ) ) {
         const char* return_var = "EEPROM initized";
         return return_var;
@@ -298,6 +298,7 @@ void wipeAllAndReissueAllBasics( ) {
     
 
     e2promWriteWorks(  "hardware_uuid" , generateUUIDString() ) ;
+    // e2promWriteWorks(  "current_shackle_lock_configuration" ,"na" ) ;
 
     e2prom_variables = e2promReadAllWorks();
 }

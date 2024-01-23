@@ -100,7 +100,7 @@
 ////// .        void loop()
 ////// .        {
 ////// .        
-////// .            e2promInitiate();
+////// .            e2prom_initialization ();
 ////// .            e2promWriteWorks("padlock_addr", "padlock_____0000000000000000002233333333334444444448_____padlock" );
 ////// .            // Serial.println( "padlock_addr");
 ////// .            // Serial.println( e2promReadWorks("padlock_addr")   );

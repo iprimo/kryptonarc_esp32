@@ -6,6 +6,8 @@
 // 
 #include "cstddef"
 #include <string>
+#include "WiFi.h"
+
 using namespace std;
 
 struct PassingDataStruct
@@ -94,6 +96,7 @@ struct SOFTWARE_GLOBAL_PARAMETERS_VAR
     int global_green_flashing_off_delay = 0 ;
     int global_green_flashing_target_counter = -1 ;
     int global_green_flashing_current_counter = -1 ;
+    bool global_green_leave_on_after_flashing = false ;
 
     unsigned long global_blue_flashing_previous_millis_timer = 0 ;
     bool global_blue_flashing_temp_var = false ;
@@ -102,6 +105,7 @@ struct SOFTWARE_GLOBAL_PARAMETERS_VAR
     int global_blue_flashing_off_delay = 0 ;
     int global_blue_flashing_target_counter = -1 ;
     int global_blue_flashing_current_counter = -1 ;
+    bool global_blue_leave_on_after_flashing = false ;
     
     unsigned long global_red_flashing_previous_millis_timer = 0 ;
     bool global_red_flashing_temp_var = false ;
@@ -110,6 +114,7 @@ struct SOFTWARE_GLOBAL_PARAMETERS_VAR
     int global_red_flashing_off_delay = 0 ;
     int global_red_flashing_target_counter = -1 ;
     int global_red_flashing_current_counter = -1 ;
+    bool global_red_leave_on_after_flashing = false ;
 
     unsigned long global_previous_millis_timer_02 = 0 ;
     unsigned long global_previous_millis_timer_03 = 0 ;
@@ -201,6 +206,7 @@ struct E2PROM_STORED_DATA_FIXED
 
 struct SOFTWARE_GLOBAL_PARAMETERS_FIXED
 {
+    const bool serial_debug = true;
     const char* STANDARD_WIFI_SSID = "KryptonArc2G";
     const char* STANDARD_WIFI_PASSWORD = "PleaseHelpMe";
 
@@ -303,10 +309,20 @@ struct DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED
     char baseMacChrWiFi[18] = {0};
 } ;
 
+struct WiFiInfo {
+  bool found;
+  char ssid[32] ;
+  int32_t channel;
+  int32_t rssi;
+  wifi_auth_mode_t auth_mode;
+} wifi_info;
+
+
 extern SOFTWARE_GLOBAL_PARAMETERS_VAR software_parameters_variables;
 extern SOFTWARE_GLOBAL_PARAMETERS_FIXED software_parameters_fixed;
 extern DEVICE_GLOBAL_HARDWARE_PARAMETERS_FIXED constrcut_mcu_id_fixed;
 extern E2PROM_STORED_DATA_FIXED e2prom_variables;
 extern BROADCAST_GLOBAL_VAR broadcast_global_variables;
+extern WiFiInfo wifi_info;
 
 #endif

@@ -31,7 +31,7 @@ void turns_off_all_led() {
       software_parameters_variables.global_green_flashing_on = false ;
 }
 
-void led_mcu_hw_initiation() {
+void led_initialization () {
       pinMode ( software_parameters_fixed.LED_PIN_RED, OUTPUT );
       pinMode ( software_parameters_fixed.LED_PIN_BLUE, OUTPUT );
       pinMode ( software_parameters_fixed.LED_PIN_GREEN, OUTPUT );
@@ -70,13 +70,14 @@ bool led_static_action( const char* new_status, const char* led_static_x_action 
       return true;   
 }
 
-void flashing_led_green( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false , int flash_counter = -1) {
+void flashing_led_green( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false , int flash_counter = -1 , bool leave_on_after_flashing = false) {
 
       // flashing counter
       if ( flash_counter != -1 && software_parameters_variables.global_green_flashing_target_counter == -1 ){
             // counter setup - incoming counter value - counter no already set
             software_parameters_variables.global_green_flashing_target_counter = flash_counter;
             software_parameters_variables.global_green_flashing_current_counter = 0 ;
+            software_parameters_variables.global_green_leave_on_after_flashing = leave_on_after_flashing ;
 
       } else if ( software_parameters_variables.global_green_flashing_target_counter == -1 ){
             // pass - no counter set - pass
@@ -86,7 +87,17 @@ void flashing_led_green( const char* flashing_action = "continue" , const char* 
             // counter reached - stop flashing 
             software_parameters_variables.global_green_flashing_target_counter = -1 ;
             software_parameters_variables.global_green_flashing_current_counter = -1 ;
-            software_parameters_variables.global_green_flashing_on = false ;
+            // software_parameters_variables.global_green_flashing_on = false ;
+            
+            if ( software_parameters_variables.global_green_leave_on_after_flashing ) {
+                  // turns on after flashing
+                  flashing_action = "on" ;
+                  flashing_speed = "fix_light_on";
+                  software_parameters_variables.global_green_leave_on_after_flashing = false;
+            } else {
+                  // turns off after flashing
+                  software_parameters_variables.global_green_flashing_on = false ;
+            }
       }
       
       ///// ///// ///// ///// ///// ///// ///// ///// /////  ///// 
@@ -163,7 +174,7 @@ void flashing_led_green( const char* flashing_action = "continue" , const char* 
       }
 }
 
-void flashing_led_blue( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false , int flash_counter = -1) {
+void flashing_led_blue( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false , int flash_counter = -1 , bool leave_on_after_flashing = false) {
       
       ///// ///// ///// ///// ///// ///// ///// ///// /////  ///// 
       // flashing counter
@@ -171,6 +182,7 @@ void flashing_led_blue( const char* flashing_action = "continue" , const char* f
             // counter setup - incoming counter value - counter no already set
             software_parameters_variables.global_blue_flashing_target_counter = flash_counter;
             software_parameters_variables.global_blue_flashing_current_counter = 0 ;
+            software_parameters_variables.global_blue_leave_on_after_flashing = leave_on_after_flashing ;
 
       } else if ( software_parameters_variables.global_blue_flashing_target_counter == -1 ){
             // pass - no counter set - pass
@@ -180,7 +192,17 @@ void flashing_led_blue( const char* flashing_action = "continue" , const char* f
             // counter reached - stop flashing 
             software_parameters_variables.global_blue_flashing_target_counter = -1 ;
             software_parameters_variables.global_blue_flashing_current_counter = -1 ;
-            software_parameters_variables.global_blue_flashing_on = false ;
+            // software_parameters_variables.global_blue_flashing_on = false ;
+            
+            if ( software_parameters_variables.global_blue_leave_on_after_flashing ) {
+                  // turns on after flashing
+                  flashing_action = "on" ;
+                  flashing_speed = "fix_light_on";
+                  software_parameters_variables.global_blue_leave_on_after_flashing = false;
+            } else {
+                  // turns off after flashing
+                  software_parameters_variables.global_blue_flashing_on = false ;
+            }
       }
 
       ///// ///// ///// ///// ///// ///// ///// ///// /////  ///// 
@@ -259,7 +281,7 @@ void flashing_led_blue( const char* flashing_action = "continue" , const char* f
       }
 }
 
-void flashing_led_red( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false , int flash_counter = -1) {
+void flashing_led_red( const char* flashing_action = "continue" , const char* flashing_speed = "continue" , const bool over_write_others = false , int flash_counter = -1 , bool leave_on_after_flashing = false) {
       
       ///// ///// ///// ///// ///// ///// ///// ///// /////  ///// 
       // flashing counter
@@ -267,6 +289,7 @@ void flashing_led_red( const char* flashing_action = "continue" , const char* fl
             // counter setup - incoming counter value - counter no already set
             software_parameters_variables.global_red_flashing_target_counter = flash_counter;
             software_parameters_variables.global_red_flashing_current_counter = 0 ;
+            software_parameters_variables.global_red_leave_on_after_flashing = leave_on_after_flashing ;
 
       } else if ( software_parameters_variables.global_red_flashing_target_counter == -1 ){
             // pass - no counter set - pass
@@ -276,7 +299,16 @@ void flashing_led_red( const char* flashing_action = "continue" , const char* fl
             // counter reached - stop flashing 
             software_parameters_variables.global_red_flashing_target_counter = -1 ;
             software_parameters_variables.global_red_flashing_current_counter = -1 ;
-            software_parameters_variables.global_red_flashing_on = false ;
+
+            if ( software_parameters_variables.global_red_leave_on_after_flashing ) {
+                  // turns on after flashing
+                  flashing_action = "on" ;
+                  flashing_speed = "fix_light_on";
+                  software_parameters_variables.global_red_leave_on_after_flashing = false;
+            } else {
+                  // turns off after flashing
+                  software_parameters_variables.global_red_flashing_on = false ;
+            }
       }
 
       ///// ///// ///// ///// ///// ///// ///// ///// /////  ///// 

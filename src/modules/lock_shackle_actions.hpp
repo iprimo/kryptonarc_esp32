@@ -19,12 +19,11 @@
 //       return current_shackle_lock_configuration;
 // }
 
-bool write_shackle_lock_status( const char* new_status) {
-
-      if ( strcmp( new_status, "lock" ) == 0 ) {
-            e2promWriteWorks("current_shackle_lock_configuration", "lock" );
-            strcpy( e2prom_variables.current_shackle_lock_configuration, "lock" );
-            servoWorksDrive( software_parameters_fixed.SHACKLE_LOCK_DEGREE );       // servo action 
+bool write_shackle_lock_status( const char* new_status, bool force_re_excecute = false) {
+      if (  strcmp( new_status, "lock" ) == 0 ){
+                  e2promWriteWorks("current_shackle_lock_configuration", "lock" );
+                  strcpy( e2prom_variables.current_shackle_lock_configuration, "lock" );
+                  servoWorksDrive( software_parameters_fixed.SHACKLE_LOCK_DEGREE );       // servo action 
 
       } else if ( strcmp( new_status, "unlock" ) == 0 ) {
             e2promWriteWorks("current_shackle_lock_configuration", "unlock" );
