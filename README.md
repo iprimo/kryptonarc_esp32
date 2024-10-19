@@ -1,4 +1,56 @@
+    // APIs: hardwareCheckInCentral - publicAPI_hardwareProxied
+    // +----------+-----------+-------------------------------------+
+    // |        Code          | Code Description                    |
+    // +----------+-----------+-------------------------------------+
+    // |          |    0x0    | Device originated                   |
+    // +          +-----------+-------------------------------------+
+    // |  0x0001  |    0      | Global hash - no encryption         | 
+    // +          +-----------+-------------------------------------+
+    // |          |    01     | From blank device                   | 
+    // +----------+-----------+-------------------------------------+
+    // +----------+-----------+-------------------------------------+
+    // |          |    0x0    | Device originated                   |
+    // +          +-----------+-------------------------------------+
+    // |  0x0102  |    1      | Device hash01 - no ecncryption      | 
+    // +          +-----------+-------------------------------------+
+    // |          |    02     | Configured device                   | 
+    // +----------+-----------+-------------------------------------+
+    // +----------+-----------+-------------------------------------+
+    // |  0x1001  |           |     Cloud originated ?              |
+    // +----------+-----------+-------------------------------------+
+    // |  0x1102  |           |     Cloud originated ?              |
+    // +----------+-----------+-------------------------------------+
+    // |          |    0x2    |     Smart App Originated            |
+    // +          +-----------+-------------------------------------+
+    // |  0x2001  |    0      |     No hash                         |
+    // +          +-----------+-------------------------------------+
+    // |          |    01     |     Reboot                          |
+    // |          |    02     |     Uppdate OS                      |
+    // +----------+-----------+-------------------------------------+
+    // |          |           |                                     |
+    // +----------+-----------+-------------------------------------+
 
+
+
+_+_+_
+Uni test 
+<!-- https://github.com/platformio/platformio-examples/tree/develop/unit-testing/calculator -->
+
+# Test project
+> platformio test
+
+# Test specific environment (check platformIO.ini)
+> platformio test -e test_desktop
+> platformio test -e esp32dev
+> platformio test -e uno
+
+# Process test on native desktop machine (check platformIO.ini)
+> platformio test -e native
+
+_+_+_
+Windows OS - install PlatfromIO Cli for UniTest
+pip install platformio
+platformio --version
 
 _+_+_ Generate Certificate
 

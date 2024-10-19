@@ -115,9 +115,78 @@ void find_wifi_last_resort_key_and_take_action() {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void wifi_health_check() {
+    // Check if WiFi is still connected
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("WiFi disconnected. Reconnecting...");
+        flashing_led_green( "on" , "very_fast_flashing" , true );
+        software_parameters_variables.wifi_device_connected = false;
+        WiFi.reconnect();
+        Serial.println("Connecting... ...");
+        // delay(1000);
+    }
+}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void wifi_initialization() {
   // Set WiFi to station mode and disconnect from an AP if it was previously connected
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+void wifi_connect(  const char *targetSsid = software_parameters_fixed.STANDARD_WIFI_SSID , 
+                    const char *targetPassword = software_parameters_fixed.STANDARD_WIFI_PASSWORD  ) {
+
+  // Set WiFi to station mode and disconnect from an AP if it was previously connected
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+
+  flashing_led_green( "on" , "normal_flashing" , true );  
+
+  Serial.println("Scanning for WiFi networks...");
+
+  int networkCount = WiFi.scanNetworks();
+
+  if (networkCount == 0) {
+    Serial.println("No WiFi networks found.");
+  } else {
+    Serial.print("Found ");
+    Serial.print(networkCount);
+    Serial.println(" WiFi networks:");
+
+    for (int i = 0; i < networkCount; ++i) {
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (");
+      Serial.print(WiFi.RSSI(i));
+      Serial.println(" dBm)");
+    }
+
+    // Attempt to connect to the target WiFi network
+    Serial.print("Connecting to ");
+    Serial.println(targetSsid);
+
+    for (int i = 0; i < networkCount; ++i) {
+      if (WiFi.SSID(i) == targetSsid) {
+        WiFi.begin(targetSsid, targetPassword);
+
+        while (WiFi.status() != WL_CONNECTED) {
+          flashing_led_green( "on" , "slow_flashing" , true );
+          software_parameters_variables.wifi_device_connected = false;
+          delay(1000);
+          Serial.println("Connecting...");
+        }
+
+        flashing_led_green( "on" , "fix_light_on" , true );
+        Serial.println("Connected to WiFi");
+        software_parameters_variables.wifi_device_connected = true;
+        break;
+      }
+    }
+  }
+}
+
+

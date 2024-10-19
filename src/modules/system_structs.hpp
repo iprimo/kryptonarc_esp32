@@ -67,6 +67,7 @@ struct BROADCAST_GLOBAL_VAR
 
 struct SOFTWARE_GLOBAL_PARAMETERS_VAR
 {
+    bool wifi_device_connected = false;
     int data_transfer_sequence_ble = 5749;
     char incoming_data_time_stamp[64] ;
     unsigned long global_current_millis = 0 ;
@@ -210,8 +211,8 @@ struct SOFTWARE_GLOBAL_PARAMETERS_FIXED
     const char* STANDARD_WIFI_SSID = "KryptonArc2G";
     const char* STANDARD_WIFI_PASSWORD = "PleaseHelpMe";
 
-    const char* GLOBAL_MASK_KEY = "vjhdi378DiO21oh"; // This is to 
-    const char* GLOBAL_HASH_KEY = "48cf29ea128baf2d";
+    const char* GLOBAL_SHARED_MASK_KEY = "vjhdi378DiO21oh"; // This is to 
+    const char* GLOBAL_SHARED_HASH_KEY = "48cf29ea128baf2d";
     // const char* GLOBAL_HASH_SALT = "DFJynken3Deal87i9EfbNDK2mPBhthxt";
     const char* FIRMWARE_VERSION = "3.19";
 

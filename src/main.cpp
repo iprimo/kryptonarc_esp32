@@ -21,6 +21,7 @@
 #include "modules/timer_works.hpp"
 #include "modules/led_works.hpp"
 #include "modules/wifi_works.hpp"
+#include "modules/ntp_works.hpp"
 
 #include "base64.h"
 #include "mbedtls/base64.h"
@@ -50,28 +51,11 @@ bool oldBLEDeviceConnected = false;
 
 void setup() {
   Serial.begin(115200);
-
-  ////////////////////////////////////////////////////////////////////////
-  // Servo Initiate
   servo_initialization ();
-  
-  ////////////////////////////////////////////////////////////////////////
-  // E2PROM Initiate
   e2prom_initialization ();
-  
-  ////////////////////////////////////////////////////////////////////////
-  // BLE Initiate
   bluetooth_initialization ();
-
-  ////////////////////////////////////////////////////////////////////////
-  // LED Initiate
   led_initialization ();
-  
-  ////////////////////////////////////////////////////////////////////////
-  // WiFi Initiate
   wifi_initialization();
-  
-  
 }
 
 
@@ -89,45 +73,27 @@ void loop() {
   // E2PROM works
   e2prom_variables = e2promReadAllWorks();
 
-  // if ( strlen( e2prom_variables.hardware_uuid ) == 0 || strlen( e2prom_variables.board_model ) == 0 || !isUUIDValid( e2prom_variables.hardware_uuid )) {
   if ( !isUUIDValid( e2prom_variables.hardware_uuid )) {
     wipeAllAndReissueAllBasics();
   }
+  Serial.println();
+  Serial.print(">>>  e2prom_variables.hardware_uuid  :    ");
+  Serial.print( e2prom_variables.hardware_uuid );
+  Serial.println();
+  Serial.print(">>>  e2prom_variables.device_xc  :    ");
+  Serial.print( e2prom_variables.device_xc );
+  Serial.println();
+  Serial.print(">>>  e2prom_variables.tenant_xc  :    ");
+  Serial.print( e2prom_variables.tenant_xc );
 
-
-  bool wifiDeviceConnected = false ;
   while ( true ){
-
-
     timer_global_action();
     led_global_action();
-    
-
-
-
-
-    // if ( !bleDeviceConnected && variableCounter > 12000) { // 120 Seconds = 120,000.00 milli-seconds => 120,000.00 / 10 (delay) = 3,000
-    //   // Attempt 
-
-    // } else if ( !bleDeviceConnected && variableCounter > 24000) { // 240 Seconds = 240,000.00 milli-seconds => 240,000.00 / 10 (delay) = 3,000
-    //   // Reseting device if the counter meets the condition
-    //   Serial.println("Software controlled device restart");
-    //   ESP.restart();
-
-    // } else if ( bleDeviceConnected && !(variableCounter == 0)){
-    //   // When device connected reset the counter
-    //   variableCounter = 0 ;
-
-    // } else if ( !bleDeviceConnected ){
-    //   // Nothing connected - reset counter
-    //   delay(10);
-    //   variableCounter = variableCounter + 1 ;
-
-    // } 
-    // BluetoothMainProcess() ;
 
     if ( strlen( e2prom_variables.device_xc ) > 10 && strlen( e2prom_variables.tenant_xc ) > 10 ){ 
         // device configured 
+        Serial.println();
+        Serial.print(">>>  device configured     ");
 
         if ( seconds_counter > 3.5*60 ){ // reboot after 3.5 mins if no connection WiFi or Bluetooth
             Serial.println(">>>Software controlled device restart - Device configured");
@@ -140,26 +106,27 @@ void loop() {
             delay(5000);
 
         } else if ( seconds_counter >= 2* 60 ) { // Attempt to connect to WiFi
-            Serial.println(">>>WiFi Process In Progress - Device configured");
-            flashing_led_green( "on" , "normal_flashing" , true );  
-            if ( wifiDeviceConnected ){ seconds_counter = 2.5*60; }       // Stay here if wifi connected
-
-            if ( strlen( e2prom_variables.device_xc ) > 10 && strlen( e2prom_variables.tenant_xc ) > 10 ){ // connect to HW_Direct - Tenenat exists: HW_Direct
-
-            } else {  // Firmware upgrade - Device is blank: Firmware upgrade
-
-            }
+            // Serial.println(">>>WiFi Process In Progress - Device configured");
+            if ( software_parameters_variables.wifi_device_connected ){ 
+                seconds_counter = 2.5*60; // Stay here if wifi connected
+                wifi_health_check();
+            } else { 
+                disable_bluetooth();
+                ntp_initialization(); 
+                wifi_connect(); // connect to HW_Direct - Tenenat exists: HW_Direct
+                ntp_process(); // device connected at this time
+            } 
 
         } else if ( seconds_counter >= 0* 60 ) {  // Attempt to connect to BLE - Blue LED
+            // Serial.println(">>>Bluetooth Process In Progress - Device configured");
             if ( bleDeviceConnected ){ seconds_counter = 0; } // Stay here if BLE connected - Timer
             BluetoothMainProcess() ;
         }
         
     } else { 
-
         // Device not configured    
         if ( seconds_counter > 3.5*60 ){ // reboot after 3.5 mins 
-            Serial.println(">>>Software controlled device restart - Device Blank");
+            Serial.println(">>> Device Blank - Software controlled device restart");
             ESP.restart();
 
         } else if ( seconds_counter >= 2* 60 ) {
@@ -167,7 +134,7 @@ void loop() {
              flashing_led_red( "on" , "very_fast_flashing" , true );
 
         }else if ( seconds_counter >= 0* 60 ) {  // Attempt to connect to BLE
-            Serial.println(">>>BLE Process In Progress - Device Blank");
+            // Serial.println(">>> Device Blank - BLE Process In Progress");
             flashing_led_blue( "on" , "normal_flashing" , true );
             if ( bleDeviceConnected ){ seconds_counter = 0; } // Stay here if BLE connected - Timer
             BluetoothMainProcess() ;

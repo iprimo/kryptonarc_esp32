@@ -7,3 +7,11 @@ TEST(add, test_add_adds_two_values) {
 
     ASSERT_EQ(expected, actual);
 }
+
+void setup() {
+    // Define setup for Google Test
+}
+
+void loop() {
+    // Define loop for Google Test
+}

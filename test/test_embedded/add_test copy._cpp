@@ -1,0 +1,125 @@
+#include <mbedtls/rsa.h>
+
+#include <ArduinoECCX08.h>
+
+// 1. Public key and encrypted data storage (replace with actual values retrieved from flash memory or other sources)
+const char publicKeyPem[] = "-----BEGIN PUBLIC KEY-----\nPEM_ENCODED_PUBLIC_KEY_STRING\n-----END PUBLIC KEY-----\n";
+const char encryptedDataStr[] = "ENCRYPTED_DATA_STRING"; // Replace with actual encrypted data string
+
+// 2. Function to convert PEM-encoded public key string to a format usable by ECCX08 library
+ECCX08PublicKey publicKey;
+bool parsePublicKey(const char* publicKeyPemString) {
+  String publicKeyString = publicKeyPemString;
+  publicKeyString.replace("\n", ""); // Remove line breaks for parsing
+  return publicKey.loadFromPem(publicKeyString.c_str());
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  // Parse the public key string
+  if (!parsePublicKey(publicKeyPem)) {
+    Serial.println("Error parsing public key");
+    while (1); // Handle error
+  }
+
+  // Convert encrypted data string to a byte array (adjust size based on expected data)
+  unsigned char encryptedData[544]; // Adjust size based on expected data length
+  int dataLength = strlen(encryptedDataStr);
+  for (int i = 0; i < dataLength; i++) {
+    encryptedData[i] = (unsigned char)encryptedDataStr[i];
+  }
+
+  // Decrypt the data using ECCX08 library
+  String decryptedText;
+  bool success = ECCX08.decrypt(encryptedData, dataLength, decryptedText);
+
+  if (success) {
+    Serial.println("Decryption successful:");
+    Serial.println(decryptedText);
+  } else {
+    Serial.println("Decryption failed");
+  }
+
+  Serial.end();
+  while (1); // Loop here (or implement further actions)
+}
+
+void loop() {
+  // No further actions needed in this example (loop removed)
+}
+
+
+
+
+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_
+
+#include <modules/add.hpp>
+#include <modules/encryption.hpp>
+#include <gtest/gtest.h>
+
+// TEST(add, test_add_adds_two_values) {
+//     int expected = 2 + 3;
+//     int actual = add (2, 3);
+
+//     ASSERT_EQ(expected, actual);
+// }
+
+TEST(generateKeys, generate_certificate_private_and_public)  {
+    char substr1[2048];
+    char substr2[2048];
+    Serial.begin(115200);
+    generateKeys(substr1, substr2) ;
+    Serial.println(">>>substr1 ");
+    Serial.println(substr1);
+    Serial.println(">>>substr2 ");
+    Serial.println(substr2);
+    
+    // int expected = 2 + 3;
+    // int actual = add (2, 3);
+
+    // ASSERT_EQ(expected, actual);
+}
+
+
+
+
+
+#if defined(ARDUINO)
+#include <Arduino.h>
+
+void setup()
+{
+    // should be the same value as for the `test_speed` option in "platformio.ini"
+    // default value is test_speed=115200
+    Serial.begin(115200);
+
+    ::testing::InitGoogleTest();
+    // if you plan to use GMock, replace the line above with
+    // ::testing::InitGoogleMock();
+}
+
+void loop()
+{
+  // Run tests
+  if (RUN_ALL_TESTS())
+  ;
+
+  // sleep for 1 sec
+  delay(1000);
+}
+
+#else
+int main(int argc, char **argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    // if you plan to use GMock, replace the line above with
+    // ::testing::InitGoogleMock(&argc, argv);
+
+    if (RUN_ALL_TESTS())
+    ;
+
+    // Always return zero-code and allow PlatformIO to parse results
+    return 0;
+}
+#endif

@@ -56,6 +56,12 @@ bool tx_Data_InFlight_InProgress = false;
 //BLE server name
 #define BLE_SVR_NAME "KryptonArc_BLE"
 
+void disable_bluetooth(){
+  // Disable Bluetooth
+  Serial.println("Disabling Bluetooth...");
+  btStop();
+};
+
 void sendingChunkData(char* sending_Chunk){
     
   pCharacteristic->setValue( sending_Chunk );
@@ -86,8 +92,8 @@ char* extractSubstring(char* input, int startIndex, int endIndex) {
 
 void incomingStringProcessing( char* receivingString ){
 
-    // Serial.print("receivingString  >>>  ");
-    // Serial.println(receivingString);
+    Serial.print("receivingString>###>>  ");
+    Serial.println(receivingString);
 
     char dataBefore_data[1024];  // Adjust buffer size as needed
     char dataAfter_hash[65];  // Adjust buffer size as needed
@@ -106,8 +112,8 @@ void incomingStringProcessing( char* receivingString ){
     // Serial.println(dataBefore_data[ 4 ] );
     // Serial.println("dataBefore_data[ 4 ] >>>  ");
     
-    // Serial.println("software_parameters_fixed.GLOBAL_HASH_KEY  >>>  ");
-    // Serial.println(software_parameters_fixed.GLOBAL_HASH_KEY);
+    // Serial.println("software_parameters_fixed.GLOBAL_SHARED_HASH_KEY  >>>  ");
+    // Serial.println(software_parameters_fixed.GLOBAL_SHARED_HASH_KEY);
 
     // 0x-0	: global hash and enrypton keys used
     // 0x-1	: device hash and enrypton keys used
@@ -117,7 +123,7 @@ void incomingStringProcessing( char* receivingString ){
       hashSHA256( dataBefore_data, e2prom_variables.hashKey_Internal, hash256ResultArray );
     } else {
       // Global has used 
-      hashSHA256( dataBefore_data , software_parameters_fixed.GLOBAL_HASH_KEY, hash256ResultArray );
+      hashSHA256( dataBefore_data , software_parameters_fixed.GLOBAL_SHARED_HASH_KEY, hash256ResultArray );
     }
 
     // Serial.print("hash256ResultArray  >>>  ");
@@ -125,7 +131,7 @@ void incomingStringProcessing( char* receivingString ){
     
     // hash mis-match
     if ( strcmp( dataAfter_hash, hash256ResultArray ) != 0 ) {
-      Serial.print("  >>>  hash mis-match  >>>  ");
+
       return;
     } 
     // Serial.print("  >>>  hash OK !  >>>  ");
@@ -226,6 +232,20 @@ void incomingStringProcessing( char* receivingString ){
       // strcat( tempCache, (base64::encode( sendStr56.c_str() ) ).c_str() );
 
       strcpy( tx_DataCache , tempCache );
+    } else if (  findSubstring(receivingString, "0x2002tI_Reboot_tI" ) && 
+          strlen( e2prom_variables.device_xc ) == 0 && 
+          strlen( e2prom_variables.tenant_xc ) == 0
+          ) {
+      strcpy( tx_DataCache , "0x0001_Error_Occured" );
+
+    } else if (  findSubstring(receivingString, "0x2002tI_Reboot_tI" ) ) {
+
+      Serial.println("Restarting in 1 seconds");
+      delay(1000);
+      ESP.restart();
+
+
+
     } else if ( findSubstring(receivingString, "0x1102" )  ) {
         
       //  0x1102dFhDXzAwMDAxXzAwMDAxXzAwMDAxXzAwMDAxX3RlbmFudGFjY291bnRfdFhDZFhDXzIzOGI1Y19mNjk1NWNfZGY4YThhX2FjMzBhNmExZDgxX2hhcmR3YXJldHdpbl9kWENzSV9iTEVTU0VRX05hTl9iTEVTU0VRdFNfMjAyNC0wMS0xOVQwNToyODoxOS4xMDNaX3RTX3NJaFdBY3Rpb25fdW5sb2NrX2hXQWN0aW9u|413565c688bb4336c0e54d478daedd39f0aa7e321df8abafbbbed545a3e1bde
@@ -286,10 +306,7 @@ void incomingStringProcessing( char* receivingString ){
     //   wipeAllAndReissueAllBasics();
     //   return;
       
-    } else if (  strcmp(receivingString, "tI_HardwareDeviceReload_tI" ) == 0 ) {
-      Serial.println("Restarting in 1 seconds");
-      delay(1000);
-      ESP.restart();
+
     } else {
     }
 
@@ -332,9 +349,9 @@ class MyCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
       uint8_t* received_data = pCharacteristic->getData();
       char* pointerCharPointer = (char*) received_data;
-      
-    Serial.print("pointerCharPointer  >>>  ");
-    Serial.println(pointerCharPointer);
+        
+      Serial.print("pointerCharPointer  >>>  ");
+      Serial.println(pointerCharPointer);
 
       if ( strlen( pointerCharPointer ) == 0 ) { 
         return; 
@@ -417,7 +434,7 @@ void BluetoothMainProcess() {
         if ( strlen( e2prom_variables.device_xc ) > 10 && strlen( e2prom_variables.tenant_xc ) > 10 ){
           hashSHA256( tx_InFlightData, e2prom_variables.hashKey_Internal, hash256ResultArray );
         } else {
-          hashSHA256( tx_InFlightData, software_parameters_fixed.GLOBAL_HASH_KEY, hash256ResultArray );
+          hashSHA256( tx_InFlightData, software_parameters_fixed.GLOBAL_SHARED_HASH_KEY, hash256ResultArray );
         }
 
         // Adding has to the end of sending string
