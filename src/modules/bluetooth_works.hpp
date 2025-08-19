@@ -39,8 +39,8 @@ extern bool oldBLEDeviceConnected;
 
 extern HardwareSerial Serial;
 
-#define SERVICE_UUID        "4fafc102-1fb5-432e-8fcc-c5c2c331914b" // random UUID
-#define CHARACTERISTIC_UUID "beb593b3-3e61-4a78-7f5b-e861ba07a826" // random UUID
+#define SERVICE_UUID        "0002eeff-0000-1000-8000-00805fab94fb" // random UUID
+#define CHARACTERISTIC_UUID "5fafc502-0000-1000-8000-00105f9b14fb" // random UUID
 
 
 #define RECIEVE_ARRAY_SIZE 1024
@@ -52,6 +52,11 @@ char* tx_InFlightData = new char[ TRANSFER_ARRAY_SIZE ](); // () initializes all
 bool tx_Data_InFlight_InProgress = false;
 
 #define sendingChunkSize 20 //max packet size
+
+//////////////////////////////////////////
+// DR ?(HC: HealthCheck): Device Response
+char* sendStr56 = new char[ TRANSFER_ARRAY_SIZE ](); 
+char* tempCache = new char[ TRANSFER_ARRAY_SIZE ](); // () initializes all elements to null
 
 //BLE server name
 #define BLE_SVR_NAME "KryptonArc_BLE"
@@ -70,24 +75,40 @@ void sendingChunkData(char* sending_Chunk){
   delay(15);
 };
 
-char* extractSubstring(char* input, int startIndex, int endIndex) {
 
-    int len = strlen(input);
+char* extractSubstring(const char* source, int start, int end) {
+  // Ensure start and end are within bounds
+  int length = strlen(source);
+  if (start >= length) return nullptr; // Nothing to extract
+  if (end > length) end = length;
 
-    char* subStringDivided = new char[ sendingChunkSize ](); // () initializes all elements to null
+  // Calculate substring length
+  int subLength = end - start;
+  char* substring = new char[subLength + 1]; // +1 for null terminator
 
-    if (startIndex < 0 || startIndex >= len) {
-        // return NULL; // invalid start index
-      return subStringDivided ;
-    }
-    if (endIndex < 0 || endIndex >= len) {
-        endIndex = len - 1; // adjust end index to last character of the array
-    }
-    int subStrLen = endIndex - startIndex + 1;
-    strncpy(subStringDivided, input + startIndex, subStrLen); // copy the substring to the newly allocated memory
-    subStringDivided[subStrLen] = '\0'; // add null terminator to the end of the substring
-    return subStringDivided;
+  strncpy(substring, source + start, subLength);
+  substring[subLength] = '\0'; // Null-terminate the string
+  return substring;
 }
+
+// char* extractSubstring(char* input, int startIndex, int endIndex) {
+
+//     int len = strlen(input);
+
+//     char* subStringDivided = new char[ sendingChunkSize ](); // () initializes all elements to null
+
+//     if (startIndex < 0 || startIndex >= len) {
+//         // return NULL; // invalid start index
+//       return subStringDivided ;
+//     }
+//     if (endIndex < 0 || endIndex >= len) {
+//         endIndex = len - 1; // adjust end index to last character of the array
+//     }
+//     int subStrLen = endIndex - startIndex + 1;
+//     strncpy(subStringDivided, input + startIndex, subStrLen); // copy the substring to the newly allocated memory
+//     subStringDivided[subStrLen] = '\0'; // add null terminator to the end of the substring
+//     return subStringDivided;
+// }
 
 
 void incomingStringProcessing( char* receivingString ){
@@ -168,13 +189,18 @@ void incomingStringProcessing( char* receivingString ){
       //        md5 hashing used
       //        global hashing salt used
       //        no encryption used
-      
 
       //////////////////////////////////////////
       // DR ?(HC: HealthCheck): Device Response
-      char* sendStr56 = new char[ TRANSFER_ARRAY_SIZE ](); 
-      char* tempCache = new char[ TRANSFER_ARRAY_SIZE ](); // () initializes all elements to null
+      delete[] sendStr56;
+      sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
 
+      delete[] tempCache;
+      tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
+
+
+      append_status_information( sendStr56 );
+      append_secret_config_information( sendStr56 );
       append_config_information( sendStr56 );
       append_hardware_information( sendStr56 );
       append_firmware_information( sendStr56 );
@@ -207,12 +233,15 @@ void incomingStringProcessing( char* receivingString ){
       // Serial.println("configuraed device - 0x2001tI_GetStatus_tI >111>>>   ");
       // Serial.println("e2prom_variables.device_xc  >111>>  ");
       // Serial.println(e2prom_variables.device_xc);
-
       //////////////////////////////////////////
-      // Sending Current details
-      char* sendStr56 = new char[ TRANSFER_ARRAY_SIZE ](); 
-      char* tempCache = new char[ TRANSFER_ARRAY_SIZE ](); // () initializes all elements to null
+      // DR ?(HC: HealthCheck): Device Response
+      delete[] sendStr56;
+      sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
 
+      delete[] tempCache;
+      tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
+
+      append_status_information( sendStr56 );
       append_config_information( sendStr56 );
       // append_hardware_information( sendStr56 );
       append_firmware_information( sendStr56 );
@@ -226,6 +255,7 @@ void incomingStringProcessing( char* receivingString ){
       // Serial.println("encoded>444444>>>   ");
       // Serial.println(encoded);
       
+      
       // Combined strings
       strcat( tempCache, "0x0102" );
       strcat( tempCache, encoded.c_str() );
@@ -236,26 +266,23 @@ void incomingStringProcessing( char* receivingString ){
           strlen( e2prom_variables.device_xc ) == 0 && 
           strlen( e2prom_variables.tenant_xc ) == 0
           ) {
-      strcpy( tx_DataCache , "0x0001_Error_Occured" );
-
-    } else if (  findSubstring(receivingString, "0x2002tI_Reboot_tI" ) ) {
-
       Serial.println("Restarting in 1 seconds");
       delay(1000);
       ESP.restart();
 
-
-
+    } else if (  findSubstring(receivingString, "0x2002tI_Reboot_tI" ) ) {
+      strcpy( tx_DataCache , "0x0001_Error_Occured" );
+      
     } else if ( findSubstring(receivingString, "0x1102" )  ) {
         
       //  0x1102dFhDXzAwMDAxXzAwMDAxXzAwMDAxXzAwMDAxX3RlbmFudGFjY291bnRfdFhDZFhDXzIzOGI1Y19mNjk1NWNfZGY4YThhX2FjMzBhNmExZDgxX2hhcmR3YXJldHdpbl9kWENzSV9iTEVTU0VRX05hTl9iTEVTU0VRdFNfMjAyNC0wMS0xOVQwNToyODoxOS4xMDNaX3RTX3NJaFdBY3Rpb25fdW5sb2NrX2hXQWN0aW9u|413565c688bb4336c0e54d478daedd39f0aa7e321df8abafbbbed545a3e1bde
-      // Serial.println("0x1102>444    matched 444>>>   dataBefore_data: ");
-      // Serial.println( dataBefore_data );
+      Serial.println("0x1102>444    matched 444>>>   dataBefore_data: ");
+      Serial.println( dataBefore_data );
 
       // extracting masked data
       char* masked_data = extract_substring( 6 , dataBefore_data ) ;
-      // Serial.println("masked_data: ");
-      // Serial.println( masked_data );
+      Serial.println("masked_data: ");
+      Serial.println( masked_data );
 
       char* unmasked_data = new char[ TRANSFER_ARRAY_SIZE ](); 
       base64_char_decoding( masked_data,  unmasked_data );
@@ -365,11 +392,27 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 
       } else {
         strcat(rx_DataCache_Assembled, pointerCharPointer); // concatenate str2 to str1
-
-      }
-      
+      }      
     }
 };
+
+
+void stopBLE() {
+  Serial.println("Stopping BLE stack...");
+  pAdvertising->stop();
+}
+
+void deinitBLE() {
+  Serial.println("deinit BLE stack...");
+  BLEDevice::deinit(); // Deinitialize BLE stack
+}
+
+void restartBLE() {
+  Serial.println("Restarting BLE stack...");
+  BLEDevice::deinit(); // Deinitialize BLE stack
+  BLEDevice::init( BLE_SVR_NAME ); // Reinitialize
+}
+
 
 void bluetooth_initialization () {
 
@@ -377,10 +420,12 @@ void bluetooth_initialization () {
   //
   BLEDevice::init( BLE_SVR_NAME );
   pServer = BLEDevice::createServer();
+  if (!pServer) throw "Failed to create BLE server - 1.";
   pServer->setCallbacks(new MyServerCallbacks());
 
   // BLEService *pService = pServer->createService(SERVICE_UUID);
   pService = pServer->createService(SERVICE_UUID);
+  if (!pService) throw "Failed to create BLE service - 2.";
   pCharacteristic = pService->createCharacteristic(
                                          CHARACTERISTIC_UUID,
                                          BLECharacteristic::PROPERTY_NOTIFY |
@@ -388,6 +433,7 @@ void bluetooth_initialization () {
                                          BLECharacteristic::PROPERTY_READ |
                                          BLECharacteristic::PROPERTY_INDICATE
                                        );
+  if (!pCharacteristic) throw "Failed to create BLE characteristic.";
 
   pCharacteristic->addDescriptor(new BLE2902());
   pCharacteristic->setCallbacks(new MyCallbacks());
@@ -396,6 +442,8 @@ void bluetooth_initialization () {
 
   // BLEAdvertising *pAdvertising = pServer->getAdvertising();
   pAdvertising = pServer->getAdvertising();
+  if (!pAdvertising) throw "Failed to get BLE advertising instance.";
+
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x0);  // set value to 0x00 to not advertise this parameter
@@ -453,7 +501,17 @@ void BluetoothMainProcess() {
 
         for (int i = 0; i < tx_InFlightDataLength; i += sendingChunkSize) {
           char* mySubstring = extractSubstring( tx_InFlightData, i, i + sendingChunkSize ) ;
+          
+          // Check if extraction succeeded
+          if (mySubstring == nullptr) {
+            Serial.println("Error: Failed to extract substring.");
+            continue; // Skip this iteration
+          }
+
           sendingChunkData( mySubstring );
+
+          // Free dynamically allocated memory (if extractSubstring allocates)
+          delete[] mySubstring; // or free(mySubstring) if malloc was used
         }
 
         // Finishing packet

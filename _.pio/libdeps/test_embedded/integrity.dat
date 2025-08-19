@@ -1,0 +1,23 @@
+ArduinoJson
+mbedtls
+Base64
+Arduino
+ESP32Servo
+NTPClient
+Crypto
+esp32FOTA
+BLE
+FS
+marian-craciunescu/ESP32Ping @ ^1.7
+WiFiClientSecure
+ESP32
+ArduinoECCX08
+base64
+WiFi
+HTTPClient
+SPI
+SHA512
+Update
+Wire
+google/googletest@^1.12.1
+EEPROM

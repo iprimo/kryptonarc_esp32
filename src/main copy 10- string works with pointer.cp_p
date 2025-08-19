@@ -19,8 +19,8 @@ using namespace std;
 
 const int ledPin = 17;
 
-#define SERVICE_UUID        "4fafc102-1fb5-432e-8fcc-c5c2c331914b" // random UUID
-#define CHARACTERISTIC_UUID "beb593b3-3e61-4a78-7f5b-e861ba07a826" // random UUID
+#define SERVICE_UUID        "0002eeff-0000-1000-8000-00805fab94fb" // random UUID
+#define CHARACTERISTIC_UUID "5fafc502-0000-1000-8000-00105f9b14fb" // random UUID
 
 BLEServer *pServe_r;
 BLECharacteristic *pCharacteristic;

@@ -42,6 +42,32 @@ void append_bluetooth_session_sequence( char* processingString ) {
       strcat(processingString, "_sM");
 }
 
+void append_status_information( char* processingString ) {
+
+      //////////////////////////////////////////      
+      // Hardware Status
+      strcat(processingString, "sI_");
+
+      //////////////////////////////////////////      
+      // currnet lock state
+      strcat(processingString, "cSLC_");
+      strcat(processingString, e2prom_variables.current_shackle_lock_configuration );
+      strcat(processingString, "_cSLC");
+
+
+      //////////////////////////////////////////      
+      // temperture
+      strcat(processingString, "tmp_");
+      strcat(processingString, "0.0" );
+      strcat(processingString, "_tmp");
+
+
+      //////////////////////////////////////////      
+      // Hardware Info starter and ender char
+      strcat(processingString, "_sI");
+
+}
+
 void append_config_information( char* processingString ) {
 
       //////////////////////////////////////////      
@@ -63,15 +89,46 @@ void append_config_information( char* processingString ) {
 
 
       //////////////////////////////////////////      
-      // tX: Tenant XigCode
-      strcat(processingString, "cSLC_");
-      strcat(processingString, e2prom_variables.current_shackle_lock_configuration );
-      strcat(processingString, "_cSLC");
-
-
-      //////////////////////////////////////////      
       // Hardware Info starter and ender char
       strcat(processingString, "_cI");
+
+}
+
+void append_secret_config_information( char* processingString ) {
+
+      // hashKey_Internal
+      strcat(processingString, "scHK_");
+      strcat(processingString, "00000_abc123abc1" );
+      strcat(processingString, "_scHK");
+      // encryptionKey_Internal
+      strcat(processingString, "scEnI_");
+      strcat(processingString, "00001_abc123abc1" );
+      strcat(processingString, "_scEnI");
+      // keySmithKeyOnline_Internal
+      strcat(processingString, "scKSO_");
+      strcat(processingString, "00002_abc123abc1" );
+      strcat(processingString, "_scKSO");
+      // lastResortKeyOffline_Internal
+      strcat(processingString, "scLRKO_");
+      strcat(processingString, "00003_abc123abc1" );
+      strcat(processingString, "_scLRKO");
+
+      // hashKey02_Internal
+      strcat(processingString, "scHK02_");
+      strcat(processingString, "00004_abc123abc1" );
+      strcat(processingString, "_scHK02");
+      // encryptionKey02_Internal
+      strcat(processingString, "scEnI02_");
+      strcat(processingString, "00005_abc123abc1" );
+      strcat(processingString, "_scEnI02");
+      // keySmithKeyOnline02_Internal
+      strcat(processingString, "scKSO02_");
+      strcat(processingString, "00006_abc123abc1" );
+      strcat(processingString, "_scKSO02");
+      // lastResortKeyOffline02_Internal
+      strcat(processingString, "scLRKO02_");
+      strcat(processingString, "00007_abc123abc1" );
+      strcat(processingString, "_scLRKO02");
 
 }
 
