@@ -22,7 +22,7 @@ extern HardwareSerial Serial;
 // DO NOT CHANGE ORDER OF ARRAY BELOW
 // DO NOT MOVE THE ORDER OR CHANGE THE ORDER OF THIS ARRAY
 // Total E2PROM block - 4096/64=64
-const char *arr[] = {
+const char *storage_array_content_index[] = {
     "storage_version"      ,
     "storage_config_version", 
     "hardware_uuid",
@@ -43,7 +43,7 @@ const char *arr[] = {
 
     "hashKey_Internal",
     "hashKey02_Internal"
-    
+
     // "tempName17",
     // "tempName18",
     // "tempName19",
@@ -95,13 +95,13 @@ const char *arr[] = {
 };
 
 
-const int arr_len = sizeof(arr) / sizeof(arr[0]);
+const int arr_len = sizeof(storage_array_content_index) / sizeof(storage_array_content_index[0]);
 
 
 int find_string_in_array(const char* str_var) {
     int i;
     for (i = 0; i < arr_len; i++) {
-        if ( strcmp( str_var ,  arr[i] ) == 0  ) {
+        if ( strcmp( str_var ,  storage_array_content_index[i] ) == 0  ) {
             return i; // return the index of the match
         }
     }
@@ -163,22 +163,32 @@ E2PROM_STORED_DATA_FIXED e2promReadAllWorks( ) {
     E2PROM_STORED_DATA_FIXED temp_construct;
     
     // Define 
+
+    strcpy( temp_construct.storage_version, e2promReadWorks( "storage_version" )  );
+    
+    strcpy( temp_construct.storage_config_version, e2promReadWorks( "storage_config_version" )  );
+
     strcpy( temp_construct.board_model, e2promReadWorks( "board_model" )  );
     strcpy( temp_construct.hardware_uuid, e2promReadWorks( "hardware_uuid" )  );
     strcpy( temp_construct.vender_xc, e2promReadWorks( "vender_xc" ) );
     strcpy( temp_construct.device_xc, e2promReadWorks( "device_xc" ) );
     strcpy( temp_construct.tenant_xc, e2promReadWorks( "tenant_xc" ) );
     strcpy( temp_construct.manufacturer_xc, e2promReadWorks( "manufacturer_xc" ) );
+
     strcpy( temp_construct.lastResortKeyOffline_Internal, e2promReadWorks( "lastResortKeyOffline_Internal" ) );
-    strcpy( temp_construct.keySmithKeyOnline_Internal, e2promReadWorks( "keySmithKeyOnline_Internal" ) );
-    strcpy( temp_construct.encryptionKey_Internal, e2promReadWorks( "encryptionKey_Internal" ) );
-    strcpy( temp_construct.hashKey_Internal, e2promReadWorks( "hashKey_Internal" ) );
     strcpy( temp_construct.lastResortKeyOffline02_Internal, e2promReadWorks( "lastResortKeyOffline02_Internal" ) );
-    strcpy( temp_construct.keySmithKeyOnline02_Internal, e2promReadWorks( "keySmithKeyOnline02_Internal" ) );
+
+    strcpy( temp_construct.encryptionKey_Internal, e2promReadWorks( "encryptionKey_Internal" ) );
     strcpy( temp_construct.encryptionKey02_Internal, e2promReadWorks( "encryptionKey02_Internal" ) );
+    
+    strcpy( temp_construct.hashKey_Internal, e2promReadWorks( "hashKey_Internal" ) );
     strcpy( temp_construct.hashKey02_Internal, e2promReadWorks( "hashKey02_Internal" ) );
+
+    strcpy( temp_construct.keySmithKeyOnline_Internal, e2promReadWorks( "keySmithKeyOnline_Internal" ) );
+    strcpy( temp_construct.keySmithKeyOnline02_Internal, e2promReadWorks( "keySmithKeyOnline02_Internal" ) );
+
     strcpy( temp_construct.current_shackle_lock_configuration, e2promReadWorks( "current_shackle_lock_configuration" ) );
-    // strcpy( temp_construct.tempName16, e2promReadWorks( "tempName16" ) );
+    
     // strcpy( temp_construct.tempName17, e2promReadWorks( "tempName17" ) );
     // strcpy( temp_construct.tempName18, e2promReadWorks( "tempName18" ) );
     // strcpy( temp_construct.tempName19, e2promReadWorks( "tempName19" ) );

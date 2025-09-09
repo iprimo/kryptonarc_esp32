@@ -51,10 +51,10 @@ bool oldBLEDeviceConnected = false;
 
 void setup() {
   Serial.begin(115200);
-  servo_initialization ();
-  e2prom_initialization ();
-  bluetooth_initialization ();
-  led_initialization ();
+  servo_initialization();
+  e2prom_initialization();
+  bluetooth_initialization();
+  led_initialization();
   wifi_initialization();
 }
 
