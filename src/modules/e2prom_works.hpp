@@ -23,22 +23,27 @@ extern HardwareSerial Serial;
 // DO NOT MOVE THE ORDER OR CHANGE THE ORDER OF THIS ARRAY
 // Total E2PROM block - 4096/64=64
 const char *arr[] = {
-    "board_model",
+    "storage_version"      ,
+    "storage_config_version", 
     "hardware_uuid",
+    "board_model",
     "vender_xc",
     "device_xc",
     "tenant_xc",
     "manufacturer_xc",    
+
     "lastResortKeyOffline_Internal",
-    "keySmithKeyOnline_Internal",
-    "encryptionKey_Internal",
-    "hashKey_Internal",
     "lastResortKeyOffline02_Internal",
+
+    "keySmithKeyOnline_Internal",
     "keySmithKeyOnline02_Internal",
+
+    "encryptionKey_Internal",
     "encryptionKey02_Internal",
+
+    "hashKey_Internal",
     "hashKey02_Internal"
-    // "tempName15",
-    // "tempName16",
+    
     // "tempName17",
     // "tempName18",
     // "tempName19",

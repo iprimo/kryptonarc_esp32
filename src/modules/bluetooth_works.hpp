@@ -17,6 +17,7 @@
 #include "modules/led_works.hpp"
 #include "modules/timer_works.hpp"
 #include "modules/system_structs.hpp"
+#include "modules/crypto_utils.h"
 #include "iostream"
 #include "cstring"
 #include "base64.h"
@@ -182,7 +183,9 @@ void incomingStringProcessing( char* receivingString ){
     // Selector data processing
     if (  findSubstring(receivingString, "0x2001tI_GetStatus_tI" ) && 
           strlen( e2prom_variables.device_xc ) == 0 && 
-          strlen( e2prom_variables.tenant_xc ) == 0) {
+          strlen( e2prom_variables.tenant_xc ) == 0) { 
+      Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  ");
+
     // if ( pingStringExistanceChk == 0 && deviceXigCodeLengthCheck == 0 && tenantXigCodeLengthCheck == 0) {
       // Device Not registered
       // "0x0001" - blank device:
@@ -205,6 +208,18 @@ void incomingStringProcessing( char* receivingString ){
       append_hardware_information( sendStr56 );
       append_firmware_information( sendStr56 );
       append_bluetooth_session_sequence( sendStr56 );
+
+      Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  11111 ");
+
+      const char *plain = "Hello, ESP32!";
+      char encrypted[512];
+      if (encrypt_with_public_key(plain, encrypted, sizeof(encrypted)) == 0) {
+          Serial.print("Encrypted: ");
+          Serial.println(encrypted);
+      }
+      Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  22222");
+      Serial.println(encrypt_with_public_key(plain, encrypted, sizeof(encrypted)));
+      Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  33333");
 
 
       //////////////////////////////////////////      

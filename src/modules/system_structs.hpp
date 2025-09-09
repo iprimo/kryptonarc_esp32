@@ -143,9 +143,9 @@ struct E2PROM_STORED_DATA_FIXED
 
 
     char hashKey_Internal[64] ;
+    char lastResortKeyOffline_Internal[64] ;
     char lastResortKeyOffline02_Internal[64] ;
 
-    char lastResortKeyOffline_Internal[64] ;
     char keySmithKeyOnline_Internal[64] ;
     char encryptionKey_Internal[64] ;
     char keySmithKeyOnline02_Internal[64] ;
@@ -264,6 +264,23 @@ he8Y4IWS6wY7bCkjCWDcRQJMEhg76fsO3txE+FiYruq9RUWhiF1myv4Q6W+CyBFC
 Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
 -----END CERTIFICATE-----
 )";
+
+
+    const char *cloud_comms_rsa_certificate_development = R"(
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwVl+32cbc17TVxqe8QSA
+52yUHyVuX88HzRhdxgBs63pmX8CbcE83UdMjqeZY0PF5KtBq4s6h18H9XmyAEOGY
+NFava2S7UwOaIIHV2r4SUdx2STU+P+8ruwQX8tBWBRqv/AcJhUCKdbTjeh/997EX
+cqsaTB7YJtQItH7ztpGjLLtTO/36wNcADqUHACqmJ+UsSB2M7x+GBhvjiWrQrxBl
+o7ILLJfzZuNR/heCt0nBL+ys/Ecs61VLP0Z/YZVQKDmpXX92jxV+pEH8/pBh7PA8
+wBOhvYyqrR0CSeHFbRIHSJ7PnXz60xKWH7FfVaRvBiWba0aG/Vo4nNbP4Tc3vA1w
+LwIDAQAB
+-----END PUBLIC KEY-----
+)";
+
+
+
+
 
     const char *server_hardware_direct_ca_domain = "hw_direct.dev.kryptonarc.com";
     const char *server_hardware_direct_ca_path = "/raw_hw_check";
