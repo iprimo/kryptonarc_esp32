@@ -278,25 +278,34 @@ void incomingStringProcessing( char* receivingString ){
       
 
       // Concatenate all key fields into a single buffer
-      const char *plain = "Hello, ESP32!";
+      // const char *plain = "Hello, ESP32!";
 
-      // char plain[512] = ""; // 8 fields, each up to 64 bytes
-      // strcat(plain, "encKey_");
-      // strcat(plain, e2prom_variables.encryptionKey_Internal);
-      // strcat(plain, "_encKey-hashKey_");
-      // strcat(plain, e2prom_variables.hashKey_Internal);
-      // strcat(plain, "_hashKey-ts_");
-      // strcat(plain, software_parameters_variables.incoming_data_time_stamp);
-      // strcat(plain, "_ts");
+    char *plain = (char*)malloc(512);
+    if (!plain) {
+      Serial.println("Failed to allocate memory for plain buffer!");
+    } else {
+      plain[0] = '\0';
+      strcat(plain, "encKey_");
+      strcat(plain, e2prom_variables.encryptionKey_Internal);
+      strcat(plain, "_encKey-hashKey_");
+      strcat(plain, e2prom_variables.hashKey_Internal);
+      strcat(plain, "_hashKey-ts_");
+      strcat(plain, software_parameters_variables.incoming_data_time_stamp);
+      strcat(plain, "_ts");
+
+      Serial.print("Plain: ");
+      Serial.println(plain);
 
       int plain_len = strlen(plain);
-      Serial.print("Plainx: ");
-      Serial.println(plain);
+      Serial.print("plain_len: ");
+      Serial.println(plain_len);
+    }
 
 
     char *encrypted = (char*)malloc(400);
-    if (!encrypted) {
-      Serial.println("Failed to allocate memory for encryption buffer!");
+    if (!plain || !encrypted) {
+      if (!plain) Serial.println("Failed to allocate memory for plain buffer!");
+      if (!encrypted) Serial.println("Failed to allocate memory for encryption buffer!");
     } else {
       encrypted[0] = '\0';
       int enc_result = encrypt_with_public_key(plain, encrypted, 400);
@@ -309,8 +318,9 @@ void incomingStringProcessing( char* receivingString ){
         Serial.print("Encrypted buffer (may be garbage): ");
         Serial.println(encrypted);
       }
-      free(encrypted);
     }
+    if (plain) free(plain);
+    if (encrypted) free(encrypted);
 
 
       // if (encrypt_with_public_key(plain, encrypted, sizeof(encrypted)) == 0) {
