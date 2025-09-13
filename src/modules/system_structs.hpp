@@ -67,6 +67,7 @@ struct BROADCAST_GLOBAL_VAR
 
 struct SOFTWARE_GLOBAL_PARAMETERS_VAR
 {
+    bool timeStampSetUsingFristTimeStamp = false;
     bool wifi_device_connected = false;
     int data_transfer_sequence_ble = 5749;
     char incoming_data_time_stamp[64] ;

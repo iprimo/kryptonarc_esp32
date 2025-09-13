@@ -18,6 +18,7 @@
 #include "modules/timer_works.hpp"
 #include "modules/system_structs.hpp"
 #include "modules/crypto_utils.h"
+#include "modules/esp32_time_utils.hpp"
 #include "iostream"
 #include "cstring"
 #include "base64.h"
@@ -44,9 +45,9 @@ extern HardwareSerial Serial;
 #define CHARACTERISTIC_UUID "5fafc502-0000-1000-8000-00105f9b14fb" // random UUID
 
 
-#define RECIEVE_ARRAY_SIZE 1024
+#define RECIEVE_ARRAY_SIZE 4096
 char* rx_DataCache_Assembled = new char[RECIEVE_ARRAY_SIZE](); // () initializes all elements to null
-#define TRANSFER_ARRAY_SIZE 1024
+#define TRANSFER_ARRAY_SIZE 4096
 char* tx_DataCache = new char[ TRANSFER_ARRAY_SIZE ](); // () initializes all elements to null
 
 char* tx_InFlightData = new char[ TRANSFER_ARRAY_SIZE ](); // () initializes all elements to null
@@ -117,7 +118,7 @@ void incomingStringProcessing( char* receivingString ){
     Serial.print("receivingString>###>>  ");
     Serial.println(receivingString);
 
-    char dataBefore_data[1024];  // Adjust buffer size as needed
+    char dataBefore_data[4096];  // Adjust buffer size as needed
     char dataAfter_hash[65];  // Adjust buffer size as needed
 
     bool hashExists = splitAtLastDelimiter(receivingString, '|', dataBefore_data, dataAfter_hash);
@@ -153,10 +154,31 @@ void incomingStringProcessing( char* receivingString ){
     
     // hash mis-match
     if ( strcmp( dataAfter_hash, hash256ResultArray ) != 0 ) {
-
       return;
     } 
-    // Serial.print("  >>>  hash OK !  >>>  ");
+
+    Serial.print("  >>>  hash OK !  >>>  ");
+
+
+    if ( !software_parameters_variables.timeStampSetUsingFristTimeStamp ){
+      Serial.println("999999 set first time  >>>  ");
+      // Setting time stamp using incoming data time stamp
+      const char* found_ts = find_values_between_substringsV5(receivingString, "tS_", "_tS");
+      if (found_ts && strlen(found_ts) > 0) {
+          strcpy(software_parameters_variables.incoming_data_time_stamp, found_ts);
+          set_esp32_time_from_string(software_parameters_variables.incoming_data_time_stamp);
+          software_parameters_variables.timeStampSetUsingFristTimeStamp = true;
+      } else {
+          Serial.println("No valid timestamp found in incoming string!");
+      }
+    }
+    Serial.println("999999 read time  >>>  ");
+    char timebuf[32];
+    get_esp32_time_string(timebuf, sizeof(timebuf));
+    Serial.println(timebuf); // Prints: 2025-09-10T20:53:19Z
+
+
+
 
     // Serial.print("pingStringExistanceChk  >>>  ");
     // Serial.println(pingStringExistanceChk);
@@ -211,16 +233,6 @@ void incomingStringProcessing( char* receivingString ){
 
       Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  11111 ");
 
-      const char *plain = "Hello, ESP32!";
-      char encrypted[512];
-      if (encrypt_with_public_key(plain, encrypted, sizeof(encrypted)) == 0) {
-          Serial.print("Encrypted: ");
-          Serial.println(encrypted);
-      }
-      Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  22222");
-      Serial.println(encrypt_with_public_key(plain, encrypted, sizeof(encrypted)));
-      Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  33333");
-
 
       //////////////////////////////////////////      
       // 
@@ -262,7 +274,63 @@ void incomingStringProcessing( char* receivingString ){
       append_firmware_information( sendStr56 );
       append_bluetooth_session_sequence( sendStr56 );
 
-      //////////////////////////////////////////      
+      //////////////////////////////////////////
+      
+
+      // Concatenate all key fields into a single buffer
+      const char *plain = "Hello, ESP32!";
+
+      // char plain[512] = ""; // 8 fields, each up to 64 bytes
+      // strcat(plain, "encKey_");
+      // strcat(plain, e2prom_variables.encryptionKey_Internal);
+      // strcat(plain, "_encKey-hashKey_");
+      // strcat(plain, e2prom_variables.hashKey_Internal);
+      // strcat(plain, "_hashKey-ts_");
+      // strcat(plain, software_parameters_variables.incoming_data_time_stamp);
+      // strcat(plain, "_ts");
+
+      int plain_len = strlen(plain);
+      Serial.print("Plainx: ");
+      Serial.println(plain);
+
+
+    char *encrypted = (char*)malloc(400);
+    if (!encrypted) {
+      Serial.println("Failed to allocate memory for encryption buffer!");
+    } else {
+      encrypted[0] = '\0';
+      int enc_result = encrypt_with_public_key(plain, encrypted, 400);
+      if (enc_result == 0) {
+        Serial.print("Encrypted: ");
+        Serial.println(encrypted);
+      } else {
+        Serial.print("Encryption failed! Error code: ");
+        Serial.println(enc_result);
+        Serial.print("Encrypted buffer (may be garbage): ");
+        Serial.println(encrypted);
+      }
+      free(encrypted);
+    }
+
+
+      // if (encrypt_with_public_key(plain, encrypted, sizeof(encrypted)) == 0) {
+      //     Serial.print("Encrypted: ");
+      //     Serial.println(encrypted);
+      // }
+      Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  33333");
+      //////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
       // 
       // Serial.println("sendStr56>>44444>>   ");
       // Serial.println(sendStr56);

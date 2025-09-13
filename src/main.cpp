@@ -71,11 +71,28 @@ void loop() {
 
   ////////////////////////////////////////////////////////////////////////
   // E2PROM works
-  e2prom_variables = e2promReadAllWorks();
+    e2prom_variables = e2promReadAllWorks();
 
-  if ( !isUUIDValid( e2prom_variables.hardware_uuid )) {
-    wipeAllAndReissueAllBasics();
-  }
+    // Validate UUID and integer fields
+    bool valid_uuid = isUUIDValid(e2prom_variables.hardware_uuid);
+    int storage_version_int = atoi(e2prom_variables.storage_version);
+    int storage_config_version_int = atoi(e2prom_variables.storage_config_version);
+
+    
+  Serial.print(">>>  storage_version_int  :    ");
+  Serial.print( storage_version_int );
+    
+  Serial.print(">>>  storage_config_version_int  :    ");
+  Serial.print( storage_config_version_int );
+
+    bool valid_storage_version = (storage_version_int > 0);
+    bool valid_storage_config_version = (storage_config_version_int > 0);
+
+    if (!valid_uuid || !valid_storage_version || !valid_storage_config_version) {
+        wipeAllAndReissueAllBasics();
+          Serial.print(">>>  wipe E2PROM and restarting everything  :    ");
+
+    }
   Serial.println();
   Serial.print(">>>  e2prom_variables.hardware_uuid  :    ");
   Serial.print( e2prom_variables.hardware_uuid );
@@ -92,8 +109,8 @@ void loop() {
 
     if ( strlen( e2prom_variables.device_xc ) > 10 && strlen( e2prom_variables.tenant_xc ) > 10 ){ 
         // device configured 
-        Serial.println();
-        Serial.print(">>>  device configured     ");
+        // Serial.println();
+        // Serial.print(">>>  device configured     ");
 
         if ( seconds_counter > 3.5*60 ){ // reboot after 3.5 mins if no connection WiFi or Bluetooth
             Serial.println(">>>Software controlled device restart - Device configured");

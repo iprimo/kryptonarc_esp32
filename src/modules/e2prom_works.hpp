@@ -44,7 +44,8 @@ const char *storage_array_content_index[] = {
     "hashKey_Internal",
     "hashKey02_Internal"
 
-    // "tempName17",
+    "current_shackle_lock_configuration",
+    
     // "tempName18",
     // "tempName19",
     // "tempName20",
@@ -310,12 +311,34 @@ void wipeAllAndReissueAllBasics( ) {
     // // Board Model ID
     // const char* board_model_var = "KA_CB_G090V5B";
     // e2promWriteWorks(  "board_model" , board_model_var ) ;
-    
 
-    e2promWriteWorks(  "hardware_uuid" , generateUUIDString() ) ;
+    e2promWriteWorks(  "storage_version" , "2" );
+    e2promWriteWorks(  "storage_config_version" , "1" );
+
+    e2promWriteWorks( "hardware_uuid" , generateUUIDString() ) ;
+    e2promWriteWorks( "board_model" , generateUUIDString() ) ;
+    e2promWriteWorks( "vender_xc" , generateUUIDString() ) ;
+    e2promWriteWorks( "device_xc" , generateUUIDString() ) ;
+    e2promWriteWorks( "tenant_xc" , generateUUIDString() ) ;
+    e2promWriteWorks( "manufacturer_xc" , generateUUIDString() ) ;
+
+    e2promWriteWorks( "lastResortKeyOffline_Internal" , generateUUIDString() ) ;
+    e2promWriteWorks( "lastResortKeyOffline02_Internal" , generateUUIDString() ) ;
+
+    e2promWriteWorks( "keySmithKeyOnline_Internal" , generateUUIDString() ) ;
+    e2promWriteWorks( "keySmithKeyOnline02_Internal" , generateUUIDString() ) ;
+
+    e2promWriteWorks( "encryptionKey_Internal" , generateUUIDString() ) ;
+    e2promWriteWorks( "encryptionKey02_Internal" , generateUUIDString() ) ;
+
+    e2promWriteWorks( "hashKey_Internal" , generateUUIDString() ) ;
+    e2promWriteWorks( "hashKey02_Internal" , generateUUIDString() ) ;
+
+
+
     // e2promWriteWorks(  "current_shackle_lock_configuration" ,"na" ) ;
 
     e2prom_variables = e2promReadAllWorks();
 }
 
-#endif 
+#endif
