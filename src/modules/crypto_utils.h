@@ -17,8 +17,8 @@
 "LwIDAQAB\n" \
 "-----END PUBLIC KEY-----\n"
 
-
 #define PRIVATE_KEY "-----BEGIN PRIVATE KEY-----\n...replace_with_actual_key...\n-----END PRIVATE KEY-----"
+
 
 #ifdef __cplusplus
 extern "C" {

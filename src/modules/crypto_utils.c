@@ -73,12 +73,25 @@ int decrypt_with_private_key(const char *input, char *output, size_t output_len)
     mbedtls_init(&pk, &ctr_drbg, &entropy);
     int ret = mbedtls_pk_parse_key(&pk, (const unsigned char*)PRIVATE_KEY, strlen(PRIVATE_KEY)+1, NULL, 0);
     if (ret != 0) return -1;
-    unsigned char encrypted[256];
+    unsigned char *encrypted = (unsigned char*)malloc(512);
+    if (!encrypted) {
+        mbedtls_pk_free(&pk);
+        mbedtls_ctr_drbg_free(&ctr_drbg);
+        mbedtls_entropy_free(&entropy);
+        return -10;
+    }
     size_t enc_len = 0;
-    ret = mbedtls_base64_decode(encrypted, sizeof(encrypted), &enc_len, (const unsigned char*)input, strlen(input));
-    if (ret != 0) return -2;
+    ret = mbedtls_base64_decode(encrypted, 512, &enc_len, (const unsigned char*)input, strlen(input));
+    if (ret != 0) {
+        free(encrypted);
+        mbedtls_pk_free(&pk);
+        mbedtls_ctr_drbg_free(&ctr_drbg);
+        mbedtls_entropy_free(&entropy);
+        return -2;
+    }
     size_t olen = 0;
     ret = mbedtls_pk_decrypt(&pk, encrypted, enc_len, (unsigned char*)output, &olen, output_len, mbedtls_ctr_drbg_random, &ctr_drbg);
+    free(encrypted);
     mbedtls_pk_free(&pk);
     mbedtls_ctr_drbg_free(&ctr_drbg);
     mbedtls_entropy_free(&entropy);

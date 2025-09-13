@@ -115,14 +115,24 @@ char* extractSubstring(const char* source, int start, int end) {
 
 void incomingStringProcessing( char* receivingString ){
 
-    Serial.print("receivingString>###>>  ");
-    Serial.println(receivingString);
+  Serial.print("receivingString>###>>  ");
+  Serial.println(receivingString);
 
-    char dataBefore_data[4096];  // Adjust buffer size as needed
-    char dataAfter_hash[65];  // Adjust buffer size as needed
+  char* dataBefore_data = (char*)malloc(4096);
+  char* dataAfter_hash = (char*)malloc(65);
+  if (!dataBefore_data || !dataAfter_hash) {
+    Serial.println("Failed to allocate memory for incomingStringProcessing buffers!");
+    if (dataBefore_data) free(dataBefore_data);
+    if (dataAfter_hash) free(dataAfter_hash);
+    return;
+  }
 
-    bool hashExists = splitAtLastDelimiter(receivingString, '|', dataBefore_data, dataAfter_hash);
-    if ( !hashExists ) { return; }
+  bool hashExists = splitAtLastDelimiter(receivingString, '|', dataBefore_data, dataAfter_hash);
+  if ( !hashExists ) {
+    free(dataBefore_data);
+    free(dataAfter_hash);
+    return;
+  }
 
     // Serial.print("dataBefore_data  >>>  ");
     // Serial.println(dataBefore_data);
@@ -140,6 +150,7 @@ void incomingStringProcessing( char* receivingString ){
 
     // 0x-0	: global hash and enrypton keys used
     // 0x-1	: device hash and enrypton keys used
+
     char hash256ResultArray[ 65 ];
     if ( dataBefore_data[ 3 ] == '1' ){
       // this matches device specfic hash
@@ -153,7 +164,10 @@ void incomingStringProcessing( char* receivingString ){
     // Serial.println(hash256ResultArray);
     
     // hash mis-match
+
     if ( strcmp( dataAfter_hash, hash256ResultArray ) != 0 ) {
+      free(dataBefore_data);
+      free(dataAfter_hash);
       return;
     } 
 
@@ -302,16 +316,32 @@ void incomingStringProcessing( char* receivingString ){
     }
 
 
-    char *encrypted = (char*)malloc(400);
-    if (!plain || !encrypted) {
+    char *encrypted = (char*)malloc(1024);
+  if (!plain || !encrypted) {
       if (!plain) Serial.println("Failed to allocate memory for plain buffer!");
       if (!encrypted) Serial.println("Failed to allocate memory for encryption buffer!");
     } else {
-      encrypted[0] = '\0';
-      int enc_result = encrypt_with_public_key(plain, encrypted, 400);
+  encrypted[0] = '\0';
+  int enc_result = encrypt_with_public_key(plain, encrypted, 1024);
       if (enc_result == 0) {
         Serial.print("Encrypted: ");
         Serial.println(encrypted);
+        // // Decrypt for testing
+        // char *decrypted = (char*)malloc(1024); // Increased buffer size to match encrypted
+        // if (!decrypted) {
+        //   Serial.println("Failed to allocate memory for decrypted buffer!");
+        // } else {
+        //   decrypted[0] = '\0';
+        //   int dec_result = decrypt_with_private_key(encrypted, decrypted, 1024);
+        //   if (dec_result == 0) {
+        //     Serial.print("Decrypted: ");
+        //     Serial.println(decrypted);
+        //   } else {
+        //     Serial.print("Decryption failed! Error code: ");
+        //     Serial.println(dec_result);
+        //   }
+        //   free(decrypted);
+        // }
       } else {
         Serial.print("Encryption failed! Error code: ");
         Serial.println(enc_result);
@@ -449,7 +479,9 @@ void incomingStringProcessing( char* receivingString ){
     // led_static_action( "blue", "off" ); // orange
     
 
-    return;
+  free(dataBefore_data);
+  free(dataAfter_hash);
+  return;
     
 };
 
