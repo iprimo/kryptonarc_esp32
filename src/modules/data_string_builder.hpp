@@ -82,14 +82,13 @@ struct DataStringCodeOptions {
       std::string hwConfigState = "";
       std::string traffOrigin = "";
       std::string md5Hashing = "";
-      bool globalHashingSalt = true;
-      bool encryption = false;
+      std::string encryption = "";
 };
 
 void append_data_string_code(char* processingString, const DataStringCodeOptions& opts) {
 
       if (  opts.versionCode == 1 && opts.hwConfigState == "unregisteredDevice" && opts.md5Hashing == "global" && 
-                  opts.globalHashingSalt == true && opts.encryption == false ) {
+            opts.encryption == "none" ) {
         // ---------------------- Device originated ----------------------
         // ++-----------+-------------------------++
         // ||   Code    | Code Description        ||
@@ -105,11 +104,14 @@ void append_data_string_code(char* processingString, const DataStringCodeOptions
         // ||     1     | From blank device    
         // ||     2     | Configured device    
         // ++-----------+-------------------------++
-        strcat(processingString, "0x0001");
+        std::string info = std::string("v1_0x0001") + 
+                    "_hwConfigState:" + opts.hwConfigState +
+                    "_md5Hashing:" + opts.md5Hashing +
+                    "_encryption:" + opts.encryption + "_v1";
+        strcat(processingString, info.c_str());
 
     } else if (  opts.versionCode == 1 && opts.traffOrigin == "hwDevice" && opts.md5Hashing == "hwDevice" &&
-            opts.encryption == false && opts.hwConfigState == "configuredDevice"
-        ) {
+            opts.encryption == "none" && opts.hwConfigState == "configuredDevice" ) {
 
         // ---------------------- Device originated ----------------------
         // ++-----------+-------------------------+
@@ -123,13 +125,15 @@ void append_data_string_code(char* processingString, const DataStringCodeOptions
         // ++-----------+-------------------------+
         // ||     0     | No ecncryption          |
         // ++-----------+-------------------------+
-        // ||                                     |   
-        // ||                                     |   
+        // ||     2     | Configured device       |   
         // ++-----------+-------------------------+
-        
-        strcat(processingString, "0x0102");
 
-
+        std::string info = std::string("v1_0x0102") + 
+                    "_traffOrigin:" + opts.traffOrigin +
+                    "_md5Hashing:" + opts.md5Hashing +
+                    "_encryption:" + opts.encryption +
+                    "_hwConfigState:" + opts.hwConfigState + "_v1";
+        strcat(processingString, info.c_str());
       }
 }
 

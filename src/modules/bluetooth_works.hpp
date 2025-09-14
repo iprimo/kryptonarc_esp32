@@ -229,14 +229,13 @@ void incomingStringProcessing( char* receivingString ){
 
       delete[] tempCache;
       tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
+      
+      std::string info = std::string("v01__0x0001") + 
+            "_hwConfigState:" + "unregisteredDevice" +
+            "_md5Hashing:" + "none" +
+            "_encryption:" + "none" + "__v01";
+      strcat(sendStr56, info.c_str());
 
-      DataStringCodeOptions opts;
-      opts.versionCode = 1;
-      opts.hwConfigState = "unregisteredDevice";
-      opts.md5Hashing = "";
-      opts.globalHashingSalt = true;
-      opts.encryption = false;
-      append_data_string_code(sendStr56, opts);
 
       Serial.print("sendStr56:22222 ");
       Serial.println(sendStr56);
@@ -274,122 +273,118 @@ void incomingStringProcessing( char* receivingString ){
           findSubstring(receivingString, "0x2001tI_GetStatus_tI" ) && 
           strlen( e2prom_variables.device_xc ) > 10 && 
           strlen( e2prom_variables.tenant_xc ) > 10 ) {
-      // Serial.println("configuraed device - 0x2001tI_GetStatus_tI >111>>>   ");
-      // Serial.println("e2prom_variables.device_xc  >111>>  ");
-      // Serial.println(e2prom_variables.device_xc);
-      //////////////////////////////////////////
-      // DR ?(HC: HealthCheck): Device Response
-      delete[] sendStr56;
-      sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
+        //////////////////////////////////////////
+        // DR ?(HC: HealthCheck): Device Response
+        delete[] sendStr56;
+        sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
 
-      delete[] tempCache;
-      tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
+        delete[] tempCache;
+        tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
 
-      DataStringCodeOptions opts56;
-      opts56.versionCode = 1;
-      opts56.traffOrigin = "hwDevice";
-      opts56.md5Hashing = "hwDevice";
-      opts56.hwConfigState = "configuredDevice";
-      opts56.encryption = false;
-      append_data_string_code(sendStr56, opts56);
+        std::string info = std::string("v01__0x0102") + 
+                    "_traffOrigin:" + "hwDevice" +
+                    "_md5Hashing:" + "hwDevice" +
+                    "_encryption:" + "none" +
+                    "_hwConfigState:" + "registeredDevice" + "__v01";
 
+        strcat(sendStr56, info.c_str());
 
-      Serial.print("sendStr56:111111 ");
-      Serial.println(sendStr56);
+        Serial.print("sendStr56:111111 ");
+        Serial.println(sendStr56);
 
-      append_status_information( sendStr56 );
-      append_config_information( sendStr56 );
-      // append_hardware_information( sendStr56 );
-      append_firmware_information( sendStr56 );
-      append_bluetooth_session_sequence( sendStr56 );
+        append_status_information( sendStr56 );
+        append_config_information( sendStr56 );
+        // append_hardware_information( sendStr56 );
+        append_firmware_information( sendStr56 );
+        append_bluetooth_session_sequence( sendStr56 );
 
-      //////////////////////////////////////////
-      
+        Serial.print("sendStr56:333333 ");
+        Serial.println(sendStr56);
 
-      // Concatenate all key fields into a single buffer
-      // const char *plain = "Hello, ESP32!";
+        // Build the full response in a std::string
+        std::string fullResponse = std::string(sendStr56);
 
-    char *plain = (char*)malloc(512);
-    if (!plain) {
-      Serial.println("Failed to allocate memory for plain buffer!");
-    } else {
-      plain[0] = '\0';
-      strcat(plain, "encKey_");
-      strcat(plain, e2prom_variables.encryptionKey_Internal);
-      strcat(plain, "_encKey-hashKey_");
-      strcat(plain, e2prom_variables.hashKey_Internal);
-      strcat(plain, "_hashKey-ts_");
-      strcat(plain, software_parameters_variables.incoming_data_time_stamp);
-      strcat(plain, "_ts");
+        Serial.print("sendStr56:444444 ");
+        Serial.println(sendStr56);
+        //////////////////////////////////////////
+        // RSA Encryption of encKey, hashKey and timeStamp
+          
+        char *plain = (char*)malloc(512);
+        if (!plain) {
+          Serial.println("Failed to allocate memory for plain buffer!");
+        } else {
+          plain[0] = '\0';
+          strcat(plain, "encKey_");
+          strcat(plain, e2prom_variables.encryptionKey_Internal);
+          strcat(plain, "_encKey-hashKey_");
+          strcat(plain, e2prom_variables.hashKey_Internal);
+          strcat(plain, "_hashKey-ts_");
+          strcat(plain, software_parameters_variables.incoming_data_time_stamp);
+          strcat(plain, "_ts");
 
-      Serial.print("Plain: ");
-      Serial.println(plain);
+          Serial.print("Plain: ");
+          Serial.println(plain);
 
-      int plain_len = strlen(plain);
-      Serial.print("plain_len: ");
-      Serial.println(plain_len);
-    }
+          int plain_len = strlen(plain);
+          Serial.print("plain_len: ");
+          Serial.println(plain_len);
+        }
 
-
-    char *encrypted = (char*)malloc(1024);
-  if (!plain || !encrypted) {
-      if (!plain) Serial.println("Failed to allocate memory for plain buffer!");
-      if (!encrypted) Serial.println("Failed to allocate memory for encryption buffer!");
-    } else {
-  encrypted[0] = '\0';
-  int enc_result = encrypt_with_public_key(plain, encrypted, 1024);
-      if (enc_result == 0) {
-        Serial.print("Encrypted: ");
-        Serial.println(encrypted);
-        // // Decrypt for testing
-        // char *decrypted = (char*)malloc(1024); // Increased buffer size to match encrypted
-        // if (!decrypted) {
-        //   Serial.println("Failed to allocate memory for decrypted buffer!");
-        // } else {
-        //   decrypted[0] = '\0';
-        //   int dec_result = decrypt_with_private_key(encrypted, decrypted, 1024);
-        //   if (dec_result == 0) {
-        //     Serial.print("Decrypted: ");
-        //     Serial.println(decrypted);
-        //   } else {
-        //     Serial.print("Decryption failed! Error code: ");
-        //     Serial.println(dec_result);
-        //   }
-        //   free(decrypted);
-        // }
-      } else {
-        Serial.print("Encryption failed! Error code: ");
-        Serial.println(enc_result);
-        Serial.print("Encrypted buffer (may be garbage): ");
-        Serial.println(encrypted);
-      }
-    }
-    if (plain) free(plain);
-    if (encrypted) free(encrypted);
-
-
-      // if (encrypt_with_public_key(plain, encrypted, sizeof(encrypted)) == 0) {
-      //     Serial.print("Encrypted: ");
-      //     Serial.println(encrypted);
-      // }
-      Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  33333");
-      //////////////////////////////////////////
+        // RSA encryption
+        char *encrypted = (char*)malloc(1024);
+        if (!plain || !encrypted) {
+            if (!plain) Serial.println("Failed to allocate memory for plain buffer!");
+            if (!encrypted) Serial.println("Failed to allocate memory for encryption buffer!");
+        } else {
+          encrypted[0] = '\0';
+          int enc_result = encrypt_with_public_key(plain, encrypted, 1024);
+          if (enc_result == 0) {
+            Serial.print("Encrypted: ");
+            Serial.println(encrypted);
+            // // Decrypt for testing
+            // char *decrypted = (char*)malloc(1024); // Increased buffer size to match encrypted
+            // if (!decrypted) {
+            //   Serial.println("Failed to allocate memory for decrypted buffer!");
+            // } else {
+            //   decrypted[0] = '\0';
+            //   int dec_result = decrypt_with_private_key(encrypted, decrypted, 1024);
+            //   if (dec_result == 0) {
+            //     Serial.print("Decrypted: ");
+            //     Serial.println(decrypted);
+            //   } else {
+            //     Serial.print("Decryption failed! Error code: ");
+            //     Serial.println(dec_result);
+            //   }
+            //   free(decrypted);
+            // }
+          } else {
+            Serial.print("Encryption failed! Error code: ");
+            Serial.println(enc_result);
+            Serial.print("Encrypted buffer (may be garbage): ");
+            Serial.println(encrypted);
+          }
+        }
 
 
-      // 
-      // Serial.println("sendStr56>>44444>>   ");
-      // Serial.println(sendStr56);
-      String encoded = base64::encode( sendStr56 );
-      // Serial.println("encoded>444444>>>   ");
-      // Serial.println(encoded);
-      
-      
-      // Combined strings
-      strcat( tempCache, "0x0102" );
-      strcat( tempCache, encoded.c_str() );
-      // strcat( tempCache, (base64::encode( sendStr56.c_str() ) ).c_str() );
+        Serial.print("sendStr56:555555 ");
+        Serial.println(sendStr56);
 
-      strcpy( tx_DataCache , tempCache );
+        // Append the encrypted block to the full response
+        fullResponse += "publicKeyEnc_";
+        if (encrypted) fullResponse += encrypted;
+        fullResponse += "_publicKeyEnc";
+        // Copy the result to tx_DataCache
+        strncpy(tx_DataCache, fullResponse.c_str(), TRANSFER_ARRAY_SIZE - 1);
+        tx_DataCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
+
+        if (plain) free(plain);
+        if (encrypted) free(encrypted);
+
+        
+
+        Serial.print("tx_DataCache:777777 ");
+        Serial.println(tx_DataCache);
+        
     } else if (  findSubstring(receivingString, "0x2002tI_Reboot_tI" ) && 
           strlen( e2prom_variables.device_xc ) == 0 && 
           strlen( e2prom_variables.tenant_xc ) == 0
