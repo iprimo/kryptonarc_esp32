@@ -222,13 +222,6 @@ void incomingStringProcessing( char* receivingString ){
           strlen( e2prom_variables.tenant_xc ) == 0) { 
       Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  ");
 
-    // if ( pingStringExistanceChk == 0 && deviceXigCodeLengthCheck == 0 && tenantXigCodeLengthCheck == 0) {
-      // Device Not registered
-      // "0x0001" - blank device:
-      //        md5 hashing used
-      //        global hashing salt used
-      //        no encryption used
-
       //////////////////////////////////////////
       // DR ?(HC: HealthCheck): Device Response
       delete[] sendStr56;
@@ -237,6 +230,16 @@ void incomingStringProcessing( char* receivingString ){
       delete[] tempCache;
       tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
 
+      DataStringCodeOptions opts;
+      opts.versionCode = 1;
+      opts.hwConfigState = "unregisteredDevice";
+      opts.md5Hashing = "";
+      opts.globalHashingSalt = true;
+      opts.encryption = false;
+      append_data_string_code(sendStr56, opts);
+
+      Serial.print("sendStr56:22222 ");
+      Serial.println(sendStr56);
 
       append_status_information( sendStr56 );
       append_secret_config_information( sendStr56 );
@@ -281,6 +284,18 @@ void incomingStringProcessing( char* receivingString ){
 
       delete[] tempCache;
       tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
+
+      DataStringCodeOptions opts56;
+      opts56.versionCode = 1;
+      opts56.traffOrigin = "hwDevice";
+      opts56.md5Hashing = "hwDevice";
+      opts56.hwConfigState = "configuredDevice";
+      opts56.encryption = false;
+      append_data_string_code(sendStr56, opts56);
+
+
+      Serial.print("sendStr56:111111 ");
+      Serial.println(sendStr56);
 
       append_status_information( sendStr56 );
       append_config_information( sendStr56 );
@@ -359,16 +374,6 @@ void incomingStringProcessing( char* receivingString ){
       // }
       Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  33333");
       //////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
 
 
       // 
