@@ -104,14 +104,17 @@ void append_data_string_code(char* processingString, const DataStringCodeOptions
         // ||     1     | From blank device    
         // ||     2     | Configured device    
         // ++-----------+-------------------------++
-        std::string info = std::string("v1_0x0001") + 
-                    "_hwConfigState:" + opts.hwConfigState +
-                    "_md5Hashing:" + opts.md5Hashing +
-                    "_encryption:" + opts.encryption + "_v1";
+
+        std::string info = std::string("") + 
+            "ver:" + "1" + "::" + 
+            "code:" + "0x0001" + "::" + 
+            "hwConfigState:" + opts.hwConfigState + "::" +
+            "md5Hashing:" + opts.md5Hashing + "::" +
+            "encryption:" + opts.encryption +  "::" +"_v1";
         strcat(processingString, info.c_str());
 
     } else if (  opts.versionCode == 1 && opts.traffOrigin == "hwDevice" && opts.md5Hashing == "hwDevice" &&
-            opts.encryption == "none" && opts.hwConfigState == "configuredDevice" ) {
+            opts.encryption == "none" && opts.hwConfigState == "registeredDevice" ) {
 
         // ---------------------- Device originated ----------------------
         // ++-----------+-------------------------+
@@ -128,11 +131,13 @@ void append_data_string_code(char* processingString, const DataStringCodeOptions
         // ||     2     | Configured device       |   
         // ++-----------+-------------------------+
 
-        std::string info = std::string("v1_0x0102") + 
-                    "_traffOrigin:" + opts.traffOrigin +
-                    "_md5Hashing:" + opts.md5Hashing +
-                    "_encryption:" + opts.encryption +
-                    "_hwConfigState:" + opts.hwConfigState + "_v1";
+        std::string info = std::string("") + 
+            "ver:" + "1" + "::" + 
+            "code:" + "0x0102" + "::" + 
+            "traffOrigin:" + opts.traffOrigin + "::" +
+            "md5Hashing:" + opts.md5Hashing + "::" +
+            "encryption:" + opts.encryption + "::" +
+            "hwConfigState:" + opts.hwConfigState + "_v1";
         strcat(processingString, info.c_str());
       }
 }
@@ -144,10 +149,6 @@ void append_bluetooth_session_sequence( char* processingString ) {
 
 
       //////////////////////////////////////////      
-      // Session Management
-      strcat(processingString, "sM_");
-
-      //////////////////////////////////////////      
       // Request session Sequence
       int randomNumber = random(0, 2147483640);
       software_parameters_variables.data_transfer_sequence_ble = randomNumber ;
@@ -155,225 +156,231 @@ void append_bluetooth_session_sequence( char* processingString ) {
       sprintf(charArray, "%d", software_parameters_variables.data_transfer_sequence_ble);
 
 
-      strcat(processingString, "bLESSEQ_");  // BLE Session Sequest
+      strcat(processingString, "BLESessionSeq:");  // BLE Session Sequest
       strcat(processingString, charArray );
-      strcat(processingString, "_bLESSEQ");
+      strcat(processingString, "::");
 
 
       //////////////////////////////////////////      
       // time stamp
-      strcat(processingString, "tS_");  // BLE Session Sequest
+      strcat(processingString, "timeStamp:");  // BLE Session Sequest
       strcat(processingString, software_parameters_variables.incoming_data_time_stamp );
-      strcat(processingString, "_tS");
+      strcat(processingString, "::");
 
-      //////////////////////////////////////////      
-      // Session Management
-      strcat(processingString, "_sM");
 }
 
 void append_status_information( char* processingString ) {
-
-      //////////////////////////////////////////      
-      // Hardware Status
-      strcat(processingString, "sI_");
-
-      //////////////////////////////////////////      
-      // currnet lock state
-      strcat(processingString, "cSLC_");
+      strcat(processingString, "shackleCurrentState:"); // cSLC_ : shackleCurrentState
       strcat(processingString, e2prom_variables.current_shackle_lock_configuration );
-      strcat(processingString, "_cSLC");
-
-
-      //////////////////////////////////////////      
-      // temperture
-      strcat(processingString, "tmp_");
-      strcat(processingString, "0.0" );
-      strcat(processingString, "_tmp");
-
-
-      //////////////////////////////////////////      
-      // Hardware Info starter and ender char
-      strcat(processingString, "_sI");
+      strcat(processingString, "::"); // cSLC_ : shackleCurrentState
 
 }
 
 void append_config_information( char* processingString ) {
 
       //////////////////////////////////////////      
-      // Hardware Info starter and ender char
-      strcat(processingString, "cI_");
-
-      //////////////////////////////////////////      
       // tX: Tenant XigCode
-      strcat(processingString, "tXC_");
+      strcat(processingString, "tenantXC:"); // _tXC
       strcat(processingString, e2prom_variables.tenant_xc );
-      strcat(processingString, "_tXC");
+      strcat(processingString, "::"); // _tXC
 
       //////////////////////////////////////////      
       // DX: Device XigCode
-      strcat(processingString, "dXC_");
+      strcat(processingString, "deviceXC:");   // "dXC_"
       strcat(processingString, e2prom_variables.device_xc );
-      strcat(processingString, "_dXC");
-
-
-
-      //////////////////////////////////////////      
-      // Hardware Info starter and ender char
-      strcat(processingString, "_cI");
+      strcat(processingString, "::");
 
 }
 
 void append_secret_config_information( char* processingString ) {
 
       // hashKey_Internal
-      strcat(processingString, "scHK_");
+      strcat(processingString, "hashKeyInternal:");      // scHK - hashKey_Internal
       strcat(processingString, "00000_abc123abc1" );
-      strcat(processingString, "_scHK");
+      strcat(processingString, "::");
       // encryptionKey_Internal
-      strcat(processingString, "scEnI_");
+      strcat(processingString, "encryptionKeyInternal:"); // scEnI
       strcat(processingString, "00001_abc123abc1" );
-      strcat(processingString, "_scEnI");
+      strcat(processingString, "::");
       // keySmithKeyOnline_Internal
-      strcat(processingString, "scKSO_");
+      strcat(processingString, "keySmithKeyOnline02Internal:"); // scKSO
       strcat(processingString, "00002_abc123abc1" );
-      strcat(processingString, "_scKSO");
+      strcat(processingString, "::");
       // lastResortKeyOffline_Internal
-      strcat(processingString, "scLRKO_");
+      strcat(processingString, "lastResortKeyOfflineInternal:"); // scLRKO_
       strcat(processingString, "00003_abc123abc1" );
-      strcat(processingString, "_scLRKO");
+      strcat(processingString, "::");
 
       // hashKey02_Internal
-      strcat(processingString, "scHK02_");
+      strcat(processingString, "hashKeyInternal02:"); // scHK 
       strcat(processingString, "00004_abc123abc1" );
-      strcat(processingString, "_scHK02");
+      strcat(processingString, "::");
       // encryptionKey02_Internal
-      strcat(processingString, "scEnI02_");
+      strcat(processingString, "encryptionKeyInternal02:");
       strcat(processingString, "00005_abc123abc1" );
-      strcat(processingString, "_scEnI02");
+      strcat(processingString, "::");
       // keySmithKeyOnline02_Internal
-      strcat(processingString, "scKSO02_");
+      strcat(processingString, "keySmithKeyOnline02Internal02:");
       strcat(processingString, "00006_abc123abc1" );
-      strcat(processingString, "_scKSO02");
+      strcat(processingString, "::");
       // lastResortKeyOffline02_Internal
-      strcat(processingString, "scLRKO02_");
+      strcat(processingString, "lastResortKeyOfflineInternal02:");
       strcat(processingString, "00007_abc123abc1" );
-      strcat(processingString, "_scLRKO02");
+      strcat(processingString, "::");
 
 }
 
 void append_firmware_information( char* processingString ) {
-
-      //////////////////////////////////////////      
-      // Hardware Info starter and ender char
-      strcat(processingString, "fI_");
-
-      //////////////////////////////////////////      
       // HWCM: Hardware ChipModel
-      strcat(processingString, "fIV_");
+      strcat(processingString, "firmwareVersion:");
       strcat(processingString, software_parameters_fixed.FIRMWARE_VERSION );
-      strcat(processingString, "_fIV");
-
-
-      //////////////////////////////////////////      
-      // Hardware Info starter and ender char
-      strcat(processingString, "_fI");
-
+      strcat(processingString, "::");
 }
 
 void append_hardware_information( char* processingString ) {
 
-      //////////////////////////////////////////      
-      // Hardware Info starter and ender char
-      strcat(processingString, "hI_");
-
       //////////////////////////////////////////
       // HU : Hardware UUID
-      strcat(processingString, "hU_");
+      strcat(processingString, "hwUUID:"); // hU_
       strcat(processingString, e2prom_variables.hardware_uuid );
-      strcat(processingString, "_hU");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // PS: Product Series XigCode
-      strcat(processingString, "pS_");
+      strcat(processingString, "productSeries:");   // pS_
       strcat(processingString, software_parameters_fixed.PRODUCT_SERIES );
-      strcat(processingString, "_pS");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // PM: Product Model XigCode
-      strcat(processingString, "pM_");
+      strcat(processingString, "productModel:");   // pM_
       strcat(processingString, software_parameters_fixed.PRODUCT_MODEL );
-      strcat(processingString, "_pM");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // MX: Manufacturer XigCode
-      strcat(processingString, "mX_");
+      strcat(processingString, "manufacturerXC:"); //mX_
       strcat(processingString, e2prom_variables.manufacturer_xc );
-      strcat(processingString, "_mX");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // VX: Vender XigCode
-      strcat(processingString, "vX_");
+      strcat(processingString, "venderXC:");    // vX_
       strcat(processingString, e2prom_variables.vender_xc );
-      strcat(processingString, "_vX");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////
       // BM: Board Model
-      strcat(processingString, "bM_");
+      strcat(processingString, "boardModel:");  // bM_
       strcat(processingString, e2prom_variables.board_model );
-      strcat(processingString, "_bM");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // HWCM: Hardware ChipModel
-      strcat(processingString, "hWCM_");
+      strcat(processingString, "cChipModel:");  // hWCM_
       strcat(processingString, constrcut_mcu_id_fixed.cChipModel );
-      strcat(processingString, "_hWCM");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // HWCR: Hardware ChipRevision
-      strcat(processingString, "hWCR_");
+      strcat(processingString, "cChipRevision:");     // hWCR
       strcat(processingString, constrcut_mcu_id_fixed.cChipRevision );
-      strcat(processingString, "_hWCR");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // HWCC: Hardware ChipCores
-      strcat(processingString, "hWCC_");
+      strcat(processingString, "cChipCores:");    // hWCC
       strcat(processingString, constrcut_mcu_id_fixed.cChipCores );
-      strcat(processingString, "_hWCC");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // HWCI: Hardware ChipId
-      strcat(processingString, "hWCI_");
+      strcat(processingString, "cChipId:");      // hWCI_
       strcat(processingString, constrcut_mcu_id_fixed.cChipId );
-      strcat(processingString, "_hWCI");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // HWAP: Hardware baseMacChrSOFTAP
-      strcat(processingString, "hWAP_");
+      strcat(processingString, "baseMacChrSOFTAP:");      // hWAP_
       strcat(processingString, constrcut_mcu_id_fixed.baseMacChrSOFTAP );
-      strcat(processingString, "_hWAP");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // HWBT: Hardware baseMacChrBT
-      strcat(processingString, "hWBT_");
+      strcat(processingString, "baseMacChrBT:");        // hWBT_
       strcat(processingString, constrcut_mcu_id_fixed.baseMacChrBT );
-      strcat(processingString, "_hWBT");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // HWETH: Hardware baseMacChrETH
-      strcat(processingString, "hWETH_");
+      strcat(processingString, "baseMacChrETH:");             // hWETH_
       strcat(processingString, constrcut_mcu_id_fixed.baseMacChrETH );
-      strcat(processingString, "_hWETH");
+      strcat(processingString, "::");
 
       //////////////////////////////////////////      
       // HWWIFI: Hardware baseMacChrWiFi
-      strcat(processingString, "hWWIFI_");
+      strcat(processingString, "baseMacChrWiFi:");          // hWWIFI_
       strcat(processingString, constrcut_mcu_id_fixed.baseMacChrWiFi );
-      strcat(processingString, "hWETH_");
-
-      //////////////////////////////////////////      
-      // Hardware Info starter and ender char
-      strcat(processingString, "_hI");
+      strcat(processingString, "::");
 
 }
+
+
+
+// Returns status information as a std::string
+// Use case example
+// // append_status_information( sendStr56 );
+// // Prepend status information
+// std::string combined = device_shackle_state() + sendStr56;
+// strcpy(sendStr56, combined.c_str());-
+// Serial.print("sendStr56:22766666222 ");
+inline std::string device_shackle_state() {
+    std::string s;
+    s += "curShackleConf:";
+    s += e2prom_variables.current_shackle_lock_configuration;
+    s += "::";
+    return s;
+}
+
+// Returns config information as a std::string
+inline std::string device_tenant_xigcode() {
+    std::string s;
+    s += "tenantXC:";
+    s += e2prom_variables.tenant_xc;
+    s += "::";
+    s += "deviceXC:";
+    s += e2prom_variables.device_xc;
+    s += "::";
+    return s;
+}
+
+// Returns firmware information as a std::string
+inline std::string device_firmware_information() {
+      std::string s;
+      s += "firmwareVersion:";
+      s += software_parameters_fixed.FIRMWARE_VERSION;
+      s += "::";
+      return s;
+}
+
+// Returns bluetooth session sequence as a std::string
+inline std::string device_bluetooth_session_sequence() {
+
+      // Generate random session sequence and update global variable
+      int randomNumber = random(0, 2147483640);
+      software_parameters_variables.data_transfer_sequence_ble = randomNumber;
+      char charArray[16];
+      sprintf(charArray, "%d", software_parameters_variables.data_transfer_sequence_ble);
+      std::string s;
+      s += "BLESessionSeq:";
+      s += charArray;
+      s += "::";
+      s += "timeStamp:";
+      s += software_parameters_variables.incoming_data_time_stamp;
+      s += "::";
+    return s;
+}
+
+
 #endif
 

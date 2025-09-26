@@ -8,7 +8,7 @@
 #include "BLEServer.h"
 #include "BLEUtils.h"
 #include "BLE2902.h"
-#include "modules/md5.hpp"
+#include "modules/hash_works.hpp"
 #include "modules/data_string_builder.hpp"
 #include "modules/sha_hash.hpp"
 #include "modules/base64_char_masking.hpp"
@@ -73,7 +73,7 @@ void sendingChunkData(char* sending_Chunk){
     
   pCharacteristic->setValue( sending_Chunk );
   pCharacteristic->notify();
-  Serial.println("Senting Data...");
+  // Serial.println("Senting Data...");
   delay(15);
 };
 
@@ -177,7 +177,7 @@ void incomingStringProcessing( char* receivingString ){
     if ( !software_parameters_variables.timeStampSetUsingFristTimeStamp ){
       Serial.println("999999 set first time  >>>  ");
       // Setting time stamp using incoming data time stamp
-      const char* found_ts = find_values_between_substringsV5(receivingString, "tS_", "_tS");
+      const char* found_ts = find_values_between_substringsV5(receivingString, "timeStamp:", "::");
       if (found_ts && strlen(found_ts) > 0) {
           strcpy(software_parameters_variables.incoming_data_time_stamp, found_ts);
           set_esp32_time_from_string(software_parameters_variables.incoming_data_time_stamp);
@@ -201,9 +201,9 @@ void incomingStringProcessing( char* receivingString ){
     // Serial.print("tenantXigCodeLengthCheck  >>>  ");
     // Serial.println(tenantXigCodeLengthCheck);
 
-    // const char* subString = "0x2001tI_GetStatus_tI"; // Replace with the substring you want to find
+    // const char* subString = "request:GetStatus::"; // Replace with the substring you want to find
 
-    // if (findSubstring(receivingString, "0x2001tI_GetStatus_tI")) {
+    // if (findSubstring(receivingString, "request:GetStatus::")) {
     //   Serial.println(">>>>1111   Substring found in the string.");
     // } else {
     //   Serial.println(">>>>1111   Substring not found in the string.");
@@ -217,10 +217,10 @@ void incomingStringProcessing( char* receivingString ){
 
 
     // Selector data processing
-    if (  findSubstring(receivingString, "0x2001tI_GetStatus_tI" ) && 
-          strlen( e2prom_variables.device_xc ) == 0 && 
-          strlen( e2prom_variables.tenant_xc ) == 0) { 
-      Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  ");
+    if (  findSubstring(receivingString, "request:GetStatus::" ) && 
+          strlen( e2prom_variables.device_xc ) < 10 && 
+          strlen( e2prom_variables.tenant_xc ) < 10 ) { 
+      Serial.println("Blank Device matched - :GetStatus::  >>>  ");
 
       //////////////////////////////////////////
       // DR ?(HC: HealthCheck): Device Response
@@ -230,24 +230,35 @@ void incomingStringProcessing( char* receivingString ){
       delete[] tempCache;
       tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
       
-      std::string info = std::string("v01__0x0001") + 
-            "_hwConfigState:" + "unregisteredDevice" +
-            "_md5Hashing:" + "none" +
-            "_encryption:" + "none" + "__v01";
-      strcat(sendStr56, info.c_str());
+      std::string info = std::string("") + 
+            "ver:" + "2" + "::"
+            "code:" + "0x0001" + "::" + 
+            "traffOrigin:" + "hwDevice" + "::" + 
+            "devHashing:" + "none" "::" + 
+            "devEncryption:" + "none" "::" + 
+            "hwConfigState:" + "unregistered" "::" ;             
 
+      strcat(sendStr56, info.c_str());
 
       Serial.print("sendStr56:22222 ");
       Serial.println(sendStr56);
 
-      append_status_information( sendStr56 );
-      append_secret_config_information( sendStr56 );
-      append_config_information( sendStr56 );
-      append_hardware_information( sendStr56 );
-      append_firmware_information( sendStr56 );
-      append_bluetooth_session_sequence( sendStr56 );
+      // Prepend status information
+      std::string combined = device_shackle_state() + sendStr56;
+      strcpy(sendStr56, combined.c_str());
 
-      Serial.println("Blank Device matched - 0x2001tI_GetStatus_tI  >>>  11111 ");
+      append_secret_config_information( sendStr56 );
+
+      std::string combined2 = device_tenant_xigcode() + sendStr56;
+      strcpy(sendStr56, combined2.c_str());
+
+      std::string combined3 = device_firmware_information() + sendStr56;
+      strcpy(sendStr56, combined3.c_str());
+
+      std::string combined4 = device_bluetooth_session_sequence() + sendStr56;
+      strcpy(sendStr56, combined4.c_str());
+
+      Serial.println("Blank Device matched - :GetStatus::  >>>  11111 ");
 
 
       //////////////////////////////////////////      
@@ -270,7 +281,7 @@ void incomingStringProcessing( char* receivingString ){
     //   return;
 
     } else if (
-          findSubstring(receivingString, "0x2001tI_GetStatus_tI" ) && 
+          findSubstring(receivingString, "request:GetStatus::" ) && 
           strlen( e2prom_variables.device_xc ) > 10 && 
           strlen( e2prom_variables.tenant_xc ) > 10 ) {
         //////////////////////////////////////////
@@ -281,24 +292,39 @@ void incomingStringProcessing( char* receivingString ){
         delete[] tempCache;
         tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
 
-        std::string info = std::string("v01__0x0102") + 
-                    "_traffOrigin:" + "hwDevice" +
-                    "_md5Hashing:" + "hwDevice" +
-                    "_encryption:" + "none" +
-                    "_hwConfigState:" + "registeredDevice" + "__v01";
+        std::string info = std::string("") + 
+              "ver:" + "2" + "::" + 
+              "code:" + "0x0102" + "::" + 
+              "traffOrigin:" + "hwDevice" + "::" + 
+              "devHashing:" + "hwDevice01" + "::" + 
+              "devEncryption:" + "none" + "::" + 
+              "hwConfigState:" + "registeredDevice" "::" ;
 
         strcat(sendStr56, info.c_str());
 
         Serial.print("sendStr56:111111 ");
         Serial.println(sendStr56);
 
-        append_status_information( sendStr56 );
-        append_config_information( sendStr56 );
-        // append_hardware_information( sendStr56 );
-        append_firmware_information( sendStr56 );
-        append_bluetooth_session_sequence( sendStr56 );
+        // append_status_information( sendStr56 );
+        // Prepend status information
+        std::string combined = device_shackle_state() + sendStr56;
+        strcpy(sendStr56, combined.c_str());
 
-        Serial.print("sendStr56:333333 ");
+        Serial.print("sendStr56:22766666222 ");
+        Serial.println(sendStr56);
+
+        // append_secret_config_information( sendStr56 );
+        std::string combined2 = device_tenant_xigcode() + sendStr56;
+        strcpy(sendStr56, combined2.c_str());
+        
+        // append_firmware_information( sendStr56 );
+        std::string combined3 = device_firmware_information() + sendStr56;
+        strcpy(sendStr56, combined3.c_str());
+        // append_bluetooth_session_sequence( sendStr56 );
+        std::string combined4 = device_bluetooth_session_sequence() + sendStr56;
+        strcpy(sendStr56, combined4.c_str());
+
+        Serial.print("sendStr56:333zzz333 ");
         Serial.println(sendStr56);
 
         // Build the full response in a std::string
@@ -314,13 +340,13 @@ void incomingStringProcessing( char* receivingString ){
           Serial.println("Failed to allocate memory for plain buffer!");
         } else {
           plain[0] = '\0';
-          strcat(plain, "encKey_");
+          strcat(plain, "encKey:");
           strcat(plain, e2prom_variables.encryptionKey_Internal);
-          strcat(plain, "_encKey-hashKey_");
+          strcat(plain, "::hashKey:");
           strcat(plain, e2prom_variables.hashKey_Internal);
-          strcat(plain, "_hashKey-ts_");
+          strcat(plain, "::timeStamp:");
           strcat(plain, software_parameters_variables.incoming_data_time_stamp);
-          strcat(plain, "_ts");
+          strcat(plain, "::");
 
           Serial.print("Plain: ");
           Serial.println(plain);
@@ -370,9 +396,9 @@ void incomingStringProcessing( char* receivingString ){
         Serial.println(sendStr56);
 
         // Append the encrypted block to the full response
-        fullResponse += "publicKeyEnc_";
+        fullResponse += "publicKeyEnc:";
         if (encrypted) fullResponse += encrypted;
-        fullResponse += "_publicKeyEnc";
+        fullResponse += "::";
         // Copy the result to tx_DataCache
         strncpy(tx_DataCache, fullResponse.c_str(), TRANSFER_ARRAY_SIZE - 1);
         tx_DataCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
@@ -413,7 +439,7 @@ void incomingStringProcessing( char* receivingString ){
       Serial.println( unmasked_data );
 
       // Hardware XigCode validation
-      const char* incomingTXC = find_values_between_substringsV5( unmasked_data, "tXC_" , "_tXC" );
+      const char* incomingTXC = find_values_between_substringsV5( unmasked_data, "tenantXC:" , "::" );
       // Serial.println("incomingTXC   >>_+_+_> ");
       // Serial.println(incomingTXC);
 
@@ -423,7 +449,7 @@ void incomingStringProcessing( char* receivingString ){
       }
 
       // Device XigCode validation
-      const char* incoming_DXC = find_values_between_substringsV5( unmasked_data, "dXC_" , "_dXC" );
+      const char* incoming_DXC = find_values_between_substringsV5( unmasked_data, "deviceXC:" , "::" );
       // Serial.println("incoming_DXC   >>_+_+_> ");
       // Serial.println(incoming_DXC);
 
@@ -431,11 +457,11 @@ void incomingStringProcessing( char* receivingString ){
         Serial.print("  >>>  tenant mis-match  >>>  ");
         return;
       }
-      strcpy( software_parameters_variables.incoming_data_time_stamp , find_values_between_substringsV5( unmasked_data, "tS_" , "_tS" ) );
+      strcpy( software_parameters_variables.incoming_data_time_stamp , find_values_between_substringsV5( unmasked_data, "timeStamp:" , "::" ) );
       // Serial.println("software_parameters_variables.incoming_data_time_stamp: ");
       // Serial.println( software_parameters_variables.incoming_data_time_stamp );
 
-      const char* incoming_action_instruction = find_values_between_substringsV5( unmasked_data, "hWAction_" , "_hWAction" );
+      const char* incoming_action_instruction = find_values_between_substringsV5( unmasked_data, "hWAction:" , "::" );
       Serial.println("incoming_action_instruction: ");
       Serial.println( incoming_action_instruction );
       write_shackle_lock_status( incoming_action_instruction );
@@ -458,6 +484,7 @@ void incomingStringProcessing( char* receivingString ){
       
 
     } else {
+      Serial.println("ELSE matched !   >>> ");
     }
 
     // const char* broadcastOutputAValString = find_values_between_substringsV4( receivingString, broadcast_global_variables.broadcastOutputA_SubStringStart , broadcast_global_variables.broadcastOutputA_SubStringEnd );
@@ -597,6 +624,7 @@ void BluetoothMainProcess() {
         
         // Starting packet
         char starter_block[ sendingChunkSize ] = "100_esp32_000000101";
+        Serial.println("Start - Senting Data...");
         sendingChunkData( starter_block );
 
 
@@ -623,7 +651,7 @@ void BluetoothMainProcess() {
 
 
 
-
+        Serial.println("Mid - Sending Data...");
         for (int i = 0; i < tx_InFlightDataLength; i += sendingChunkSize) {
           char* mySubstring = extractSubstring( tx_InFlightData, i, i + sendingChunkSize ) ;
           
@@ -641,6 +669,7 @@ void BluetoothMainProcess() {
 
         // Finishing packet
         char finisher_block[ sendingChunkSize ] = "900_esp32_000000109";
+        Serial.println("Last - Senting Data...");
         sendingChunkData(finisher_block);
 
         tx_Data_InFlight_InProgress = false;

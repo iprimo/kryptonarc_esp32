@@ -1,17 +1,37 @@
-#ifndef MD5_HPP
-#define MD5_HPP
+//////////////////////////////////////////////////
+//  First, install js-sha3 via npm if needed:
+// // npm install js-sha3
+// const { sha3_256 } = require('js-sha3');
+// // Usage:
+// function generateSHA3_256(input) {
+//   return sha3_256(input); // returns hex string
+// }
+// // Example:
+// console.log(generateSHA3_256("your input string"));
+
+//////////////////////////////////////////////////
+// // First, install js-sha512 via npm if needed:
+// // npm install js-sha512
+// const { sha512 } = require('js-sha512');
+// // Usage:
+// function generateSHA512Hex(input) {
+//   return sha512(input); // returns hex string
+// }
+// // Example:
+// console.log(generateSHA512Hex("your input string"));
+
+
+#ifndef hash_works_HPP
+#define hash_works_HPP
 
 #include "MD5Builder.h"
+
+#include "mbedtls/sha512.h"
 
 // --- SHA3-256 (Keccak) minimal implementation ---
 #include <stdint.h>
 #include <string>
 
-// Tiny Keccak implementation (public domain) - only what is needed for SHA3-256
-extern "C" {
-// Forward declaration for C linkage
-void keccak_256(const uint8_t *in, size_t inlen, uint8_t *md);
-}
 
 // Helper: Convert bytes to hex string
 inline std::string bytesToHex(const uint8_t* bytes, size_t len) {
@@ -23,6 +43,27 @@ inline std::string bytesToHex(const uint8_t* bytes, size_t len) {
     out.push_back(hex[bytes[i] & 0xF]);
   }
   return out;
+}
+
+// Generate SHA-512 hash as hex string
+inline std::string generateSHA512Hex(const char* str) {
+  uint8_t hash[64];
+  mbedtls_sha512_context ctx;
+  mbedtls_sha512_init(&ctx);
+  mbedtls_sha512_starts_ret(&ctx, 0); // 0 = SHA-512, 1 = SHA-384
+  mbedtls_sha512_update_ret(&ctx, reinterpret_cast<const unsigned char*>(str), strlen(str));
+  mbedtls_sha512_finish_ret(&ctx, hash);
+  mbedtls_sha512_free(&ctx);
+  return bytesToHex(hash, 64);
+}
+
+
+
+
+// Tiny Keccak implementation (public domain) - only what is needed for SHA3-256
+extern "C" {
+// Forward declaration for C linkage
+void keccak_256(const uint8_t *in, size_t inlen, uint8_t *md);
 }
 
 // Generate SHA3-256 hash as hex string
@@ -124,4 +165,4 @@ void keccak_256(const uint8_t *in, size_t inlen, uint8_t *md) {
 }
 #endif
 
-#endif // MD5_HPP
+#endif // hash_works_HPP
