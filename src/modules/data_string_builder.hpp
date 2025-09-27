@@ -381,6 +381,36 @@ inline std::string device_bluetooth_session_sequence() {
     return s;
 }
 
+// Returns secret config information as a std::string
+inline std::string device_secret_config_information() {
+    std::string s;
+    s += "hashKeyInternal:";
+    s += "00000_abc123abc1";
+    s += "::";
+    s += "encryptionKeyInternal:";
+    s += "00001_abc123abc1";
+    s += "::";
+    s += "keySmithKeyOnline02Internal:";
+    s += "00002_abc123abc1";
+    s += "::";
+    s += "lastResortKeyOfflineInternal:";
+    s += "00003_abc123abc1";
+    s += "::";
+    s += "hashKeyInternal02:";
+    s += "00004_abc123abc1";
+    s += "::";
+    s += "encryptionKeyInternal02:";
+    s += "00005_abc123abc1";
+    s += "::";
+    s += "keySmithKeyOnline02Internal02:";
+    s += "00006_abc123abc1";
+    s += "::";
+    s += "lastResortKeyOfflineInternal02:";
+    s += "00007_abc123abc1";
+    s += "::";
+    return s;
+}
+
 
 #endif
 

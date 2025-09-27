@@ -233,28 +233,31 @@ void incomingStringProcessing( char* receivingString ){
       std::string info = std::string("") + 
             "ver:" + "2" + "::"
             "code:" + "0x0001" + "::" + 
-            "traffOrigin:" + "hwDevice" + "::" + 
-            "devHashing:" + "none" "::" + 
-            "devEncryption:" + "none" "::" + 
-            "hwConfigState:" + "unregistered" "::" ;             
+            "hwConfigState:" + "unregisteredDevice" + "::" + 
+            "md5Hashing:" + "none" "::" + 
+            "encryption:" + "none" "::" ;
 
       strcat(sendStr56, info.c_str());
 
       Serial.print("sendStr56:22222 ");
       Serial.println(sendStr56);
 
+      // append_status_information( sendStr56 );
       // Prepend status information
       std::string combined = device_shackle_state() + sendStr56;
       strcpy(sendStr56, combined.c_str());
 
       append_secret_config_information( sendStr56 );
-
       std::string combined2 = device_tenant_xigcode() + sendStr56;
       strcpy(sendStr56, combined2.c_str());
 
+
+      // append_firmware_information( sendStr56 );
       std::string combined3 = device_firmware_information() + sendStr56;
       strcpy(sendStr56, combined3.c_str());
 
+
+      // append_bluetooth_session_sequence( sendStr56 );
       std::string combined4 = device_bluetooth_session_sequence() + sendStr56;
       strcpy(sendStr56, combined4.c_str());
 

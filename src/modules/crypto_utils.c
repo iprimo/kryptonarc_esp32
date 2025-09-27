@@ -99,3 +99,87 @@ int decrypt_with_private_key(const char *input, char *output, size_t output_len)
     output[olen] = '\0';
     return 0;
 }
+
+
+
+
+        // //////////////////////////////////////////
+        // // RSA Encryption of encKey, hashKey and timeStamp
+          
+        // char *plain = (char*)malloc(512);
+        // if (!plain) {
+        //   Serial.println("Failed to allocate memory for plain buffer!");
+        // } else {
+        //   plain[0] = '\0';
+        //   strcat(plain, "encKey:");
+        //   strcat(plain, e2prom_variables.encryptionKey_Internal);
+        //   strcat(plain, "::hashKey:");
+        //   strcat(plain, e2prom_variables.hashKey_Internal);
+        //   strcat(plain, "::timeStamp:");
+        //   strcat(plain, software_parameters_variables.incoming_data_time_stamp);
+        //   strcat(plain, "::");
+
+        //   Serial.print("Plain: ");
+        //   Serial.println(plain);
+
+        //   int plain_len = strlen(plain);
+        //   Serial.print("plain_len: ");
+        //   Serial.println(plain_len);
+        // }
+
+        // // RSA encryption
+        // char *encrypted = (char*)malloc(1024);
+        // if (!plain || !encrypted) {
+        //     if (!plain) Serial.println("Failed to allocate memory for plain buffer!");
+        //     if (!encrypted) Serial.println("Failed to allocate memory for encryption buffer!");
+        // } else {
+        //   encrypted[0] = '\0';
+        //   int enc_result = encrypt_with_public_key(plain, encrypted, 1024);
+        //   if (enc_result == 0) {
+        //     Serial.print("Encrypted: ");
+        //     Serial.println(encrypted);
+        //     // // Decrypt for testing
+        //     // char *decrypted = (char*)malloc(1024); // Increased buffer size to match encrypted
+        //     // if (!decrypted) {
+        //     //   Serial.println("Failed to allocate memory for decrypted buffer!");
+        //     // } else {
+        //     //   decrypted[0] = '\0';
+        //     //   int dec_result = decrypt_with_private_key(encrypted, decrypted, 1024);
+        //     //   if (dec_result == 0) {
+        //     //     Serial.print("Decrypted: ");
+        //     //     Serial.println(decrypted);
+        //     //   } else {
+        //     //     Serial.print("Decryption failed! Error code: ");
+        //     //     Serial.println(dec_result);
+        //     //   }
+        //     //   free(decrypted);
+        //     // }
+        //   } else {
+        //     Serial.print("Encryption failed! Error code: ");
+        //     Serial.println(enc_result);
+        //     Serial.print("Encrypted buffer (may be garbage): ");
+        //     Serial.println(encrypted);
+        //   }
+        // }
+
+
+        // Serial.print("sendStr56:555555 ");
+        // Serial.println(sendStr56);
+
+        // // Append the encrypted block to the full response
+        // fullResponse += "publicKeyEnc:";
+        // if (encrypted) fullResponse += encrypted;
+        // fullResponse += "::";
+        // // Copy the result to tx_DataCache
+        // strncpy(tx_DataCache, fullResponse.c_str(), TRANSFER_ARRAY_SIZE - 1);
+        // tx_DataCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
+
+        // if (plain) free(plain);
+        // if (encrypted) free(encrypted);
+
+        
+
+
+
+
+
