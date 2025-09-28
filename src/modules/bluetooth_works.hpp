@@ -22,6 +22,7 @@
 #include "iostream"
 #include "cstring"
 #include "base64.h"
+#include "modules/exec_code.hpp"
 
 
 extern BLEServer *pServer;
@@ -222,197 +223,28 @@ void incomingStringProcessing( char* receivingString ){
           strlen( e2prom_variables.tenant_xc ) < 10 ) { 
       Serial.println("Blank Device matched - :GetStatus::  >>>  ");
 
-      //////////////////////////////////////////
-      // DR ?(HC: HealthCheck): Device Response
-      delete[] sendStr56;
-      sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
-
-      delete[] tempCache;
-      tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
-      
-      std::string info = std::string("") + 
-            "ver:" + "2" + "::"
-            "code:" + "0x0001" + "::" + 
-            "hwConfigState:" + "unregisteredDevice" + "::" + 
-            "md5Hashing:" + "none" "::" + 
-            "encryption:" + "none" "::" ;
-
-      strcat(sendStr56, info.c_str());
-
-      Serial.print("sendStr56:22222 ");
-      Serial.println(sendStr56);
-
-      // append_status_information( sendStr56 );
-      // Prepend status information
-      std::string combined = device_shackle_state() + sendStr56;
-      strcpy(sendStr56, combined.c_str());
-
-      append_secret_config_information( sendStr56 );
-      std::string combined2 = device_tenant_xigcode() + sendStr56;
-      strcpy(sendStr56, combined2.c_str());
-
-
-      // append_firmware_information( sendStr56 );
-      std::string combined3 = device_firmware_information() + sendStr56;
-      strcpy(sendStr56, combined3.c_str());
-
-
-      // append_bluetooth_session_sequence( sendStr56 );
-      std::string combined4 = device_bluetooth_session_sequence() + sendStr56;
-      strcpy(sendStr56, combined4.c_str());
-
-      Serial.println("Blank Device matched - :GetStatus::  >>>  11111 ");
-
-
-      //////////////////////////////////////////      
-      // 
-      // Serial.println("sendStr56>>>>   ");
-      // Serial.println(sendStr56);
-      String encoded = base64::encode( sendStr56 );
-      // Serial.println("encoded>>>>   ");
-      // Serial.println(encoded);
-      
-      // Combined strings
-      strcat( tempCache, "0x0001" );
-      strcat( tempCache, encoded.c_str() );
-      // strcat( tempCache, (base64::encode( sendStr56.c_str() ) ).c_str() );
-
-      strcpy( tx_DataCache , tempCache );
-    // } else if ( pingStringExistanceChk == 0 ) {
-    //   // Device registered - health check
-    //   strcpy( tx_DataCache , "-DR_200!OK!_DR-");
-    //   return;
-
+      char* result = exec_code_0x0001();
+      if (result) {
+        strncpy(tx_DataCache, result, TRANSFER_ARRAY_SIZE - 1);
+        tx_DataCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
+        delete[] result; // or free(result); depending on how exec_code_0x0001 allocates
+      } else {
+        tx_DataCache[0] = '\0';
+      }
     } else if (
           findSubstring(receivingString, "request:GetStatus::" ) && 
           strlen( e2prom_variables.device_xc ) > 10 && 
           strlen( e2prom_variables.tenant_xc ) > 10 ) {
-        //////////////////////////////////////////
-        // DR ?(HC: HealthCheck): Device Response
-        delete[] sendStr56;
-        sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
 
-        delete[] tempCache;
-        tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
-
-        std::string info = std::string("") + 
-              "ver:" + "2" + "::" + 
-              "code:" + "0x0102" + "::" + 
-              "traffOrigin:" + "hwDevice" + "::" + 
-              "devHashing:" + "hwDevice01" + "::" + 
-              "devEncryption:" + "none" + "::" + 
-              "hwConfigState:" + "registeredDevice" "::" ;
-
-        strcat(sendStr56, info.c_str());
-
-        Serial.print("sendStr56:111111 ");
-        Serial.println(sendStr56);
-
-        // append_status_information( sendStr56 );
-        // Prepend status information
-        std::string combined = device_shackle_state() + sendStr56;
-        strcpy(sendStr56, combined.c_str());
-
-        Serial.print("sendStr56:22766666222 ");
-        Serial.println(sendStr56);
-
-        // append_secret_config_information( sendStr56 );
-        std::string combined2 = device_tenant_xigcode() + sendStr56;
-        strcpy(sendStr56, combined2.c_str());
-        
-        // append_firmware_information( sendStr56 );
-        std::string combined3 = device_firmware_information() + sendStr56;
-        strcpy(sendStr56, combined3.c_str());
-        // append_bluetooth_session_sequence( sendStr56 );
-        std::string combined4 = device_bluetooth_session_sequence() + sendStr56;
-        strcpy(sendStr56, combined4.c_str());
-
-        Serial.print("sendStr56:333zzz333 ");
-        Serial.println(sendStr56);
-
-        // Build the full response in a std::string
-        std::string fullResponse = std::string(sendStr56);
-
-        Serial.print("sendStr56:444444 ");
-        Serial.println(sendStr56);
-        //////////////////////////////////////////
-        // RSA Encryption of encKey, hashKey and timeStamp
-          
-        char *plain = (char*)malloc(512);
-        if (!plain) {
-          Serial.println("Failed to allocate memory for plain buffer!");
-        } else {
-          plain[0] = '\0';
-          strcat(plain, "encKey:");
-          strcat(plain, e2prom_variables.encryptionKey_Internal);
-          strcat(plain, "::hashKey:");
-          strcat(plain, e2prom_variables.hashKey_Internal);
-          strcat(plain, "::timeStamp:");
-          strcat(plain, software_parameters_variables.incoming_data_time_stamp);
-          strcat(plain, "::");
-
-          Serial.print("Plain: ");
-          Serial.println(plain);
-
-          int plain_len = strlen(plain);
-          Serial.print("plain_len: ");
-          Serial.println(plain_len);
-        }
-
-        // RSA encryption
-        char *encrypted = (char*)malloc(1024);
-        if (!plain || !encrypted) {
-            if (!plain) Serial.println("Failed to allocate memory for plain buffer!");
-            if (!encrypted) Serial.println("Failed to allocate memory for encryption buffer!");
-        } else {
-          encrypted[0] = '\0';
-          int enc_result = encrypt_with_public_key(plain, encrypted, 1024);
-          if (enc_result == 0) {
-            Serial.print("Encrypted: ");
-            Serial.println(encrypted);
-            // // Decrypt for testing
-            // char *decrypted = (char*)malloc(1024); // Increased buffer size to match encrypted
-            // if (!decrypted) {
-            //   Serial.println("Failed to allocate memory for decrypted buffer!");
-            // } else {
-            //   decrypted[0] = '\0';
-            //   int dec_result = decrypt_with_private_key(encrypted, decrypted, 1024);
-            //   if (dec_result == 0) {
-            //     Serial.print("Decrypted: ");
-            //     Serial.println(decrypted);
-            //   } else {
-            //     Serial.print("Decryption failed! Error code: ");
-            //     Serial.println(dec_result);
-            //   }
-            //   free(decrypted);
-            // }
-          } else {
-            Serial.print("Encryption failed! Error code: ");
-            Serial.println(enc_result);
-            Serial.print("Encrypted buffer (may be garbage): ");
-            Serial.println(encrypted);
-          }
-        }
-
-
-        Serial.print("sendStr56:555555 ");
-        Serial.println(sendStr56);
-
-        // Append the encrypted block to the full response
-        fullResponse += "publicKeyEnc:";
-        if (encrypted) fullResponse += encrypted;
-        fullResponse += "::";
-        // Copy the result to tx_DataCache
-        strncpy(tx_DataCache, fullResponse.c_str(), TRANSFER_ARRAY_SIZE - 1);
+      char* result = exec_code_0x0102();
+      if (result) {
+        strncpy(tx_DataCache, result, TRANSFER_ARRAY_SIZE - 1);
         tx_DataCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
+        delete[] result; // or free(result); depending on how exec_code_0x0102 allocates
+      } else {
+        tx_DataCache[0] = '\0';
+      }
 
-        if (plain) free(plain);
-        if (encrypted) free(encrypted);
-
-        
-
-        Serial.print("tx_DataCache:777777 ");
-        Serial.println(tx_DataCache);
         
     } else if (  findSubstring(receivingString, "0x2002tI_Reboot_tI" ) && 
           strlen( e2prom_variables.device_xc ) == 0 && 
