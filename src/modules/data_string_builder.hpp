@@ -384,30 +384,30 @@ inline std::string device_bluetooth_session_sequence() {
 // Returns secret config information as a std::string
 inline std::string device_secret_config_information() {
     std::string s;
-    s += "hashKeyInternal:";
-    s += "00000_abc123abc1";
+    s += "hashKey:";                                 //hashKeyInternal
+    s += "550e8400-e29b-41d4-a716-446655440000";
     s += "::";
-    s += "encryptionKeyInternal:";
-    s += "00001_abc123abc1";
+    s += "encryptionKey:";                           //encryptionKeyInternal
+    s += "550e8400-e29b-41d4-a716-446655440000";
     s += "::";
-    s += "keySmithKeyOnline02Internal:";
-    s += "00002_abc123abc1";
+    s += "keySmithKeyOnline:";                     //keySmithKeyOnline02Internal
+    s += "550e8400-e29b-41d4-a716-446655440000";
     s += "::";
-    s += "lastResortKeyOfflineInternal:";
-    s += "00003_abc123abc1";
+    s += "lastResortKeyOffline:";                    //lastResortKeyOfflineInternal
+    s += "550e8400-e29b-41d4-a716-446655440000";
     s += "::";
-    s += "hashKeyInternal02:";
-    s += "00004_abc123abc1";
-    s += "::";
-    s += "encryptionKeyInternal02:";
-    s += "00005_abc123abc1";
-    s += "::";
-    s += "keySmithKeyOnline02Internal02:";
-    s += "00006_abc123abc1";
-    s += "::";
-    s += "lastResortKeyOfflineInternal02:";
-    s += "00007_abc123abc1";
-    s += "::";
+//     s += "hashKey02:";                               //hashKeyInternal02
+//     s += "550e8400-e29b-41d4-a716-446655440000";
+//     s += "::";
+//     s += "encryptionKey02:";                         //encryptionKeyInternal02
+//     s += "550e8400-e29b-41d4-a716-446655440000";
+//     s += "::";
+//     s += "keySmithKeyOnline02:";                   //keySmithKeyOnline02Internal02
+//     s += "550e8400-e29b-41d4-a716-446655440000";
+//     s += "::";
+//     s += "lastResortKeyOffline02:";                  //lastResortKeyOfflineInternal02
+//     s += "550e8400-e29b-41d4-a716-446655440000";
+//     s += "::";
     return s;
 }
 

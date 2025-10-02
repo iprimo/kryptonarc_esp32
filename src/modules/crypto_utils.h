@@ -1,3 +1,5 @@
+// For a 2048-bit key (256 bytes) with PKCS#1 v1.5 padding, the max plaintext is 245 bytes.
+
 #ifndef CRYPTO_UTILS_H
 #define CRYPTO_UTILS_H
 
