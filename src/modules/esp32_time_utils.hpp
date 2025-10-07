@@ -1,6 +1,30 @@
 #ifndef ESP32_TIME_UTILS_HPP
 #define ESP32_TIME_UTILS_HPP
 
+
+
+    // if ( !software_parameters_variables.timeStampSetUsingFristTimeStamp ){
+    //   Serial.println("999999 set first time  >>>  ");
+    //   // Setting time stamp using incoming data time stamp
+    //   const char* found_ts = find_values_between_substringsV5(receivingString, "timeStamp:", "::");
+    //   if (found_ts && strlen(found_ts) > 0) {
+    //       strcpy(software_parameters_variables.incoming_data_time_stamp, found_ts);
+    //       set_esp32_time_from_string(software_parameters_variables.incoming_data_time_stamp);
+    //       software_parameters_variables.timeStampSetUsingFristTimeStamp = true;
+    //   } else {
+    //       Serial.println("No valid timestamp found in incoming string!");
+    //   }
+    // }
+    // Serial.println("999999 read time  >>>  ");
+    // char timebuf[32];
+    // get_esp32_time_string(timebuf, sizeof(timebuf));
+    // Serial.println(timebuf); // Prints: 2025-09-10T20:53:19Z
+
+
+
+
+
+
 #include <sys/time.h>
 #include <time.h>
 #include <string.h>

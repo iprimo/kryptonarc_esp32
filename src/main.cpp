@@ -75,20 +75,20 @@ void loop() {
 
     // Validate UUID and integer fields
     bool valid_uuid = isUUIDValid(e2prom_variables.hardware_uuid);
-    int storage_version_int = atoi(e2prom_variables.storage_version);
+    int storage_structure_version_int = atoi(e2prom_variables.storage_structure_version);
     int storage_config_version_int = atoi(e2prom_variables.storage_config_version);
 
     
-  Serial.print(">>>  storage_version_int  :    ");
-  Serial.print( storage_version_int );
+  Serial.print(">>>  storage_structure_version_int  :    ");
+  Serial.print( storage_structure_version_int );
     
   Serial.print(">>>  storage_config_version_int  :    ");
   Serial.print( storage_config_version_int );
 
-    bool valid_storage_version = (storage_version_int > 0);
+    bool valid_storage_structure_version = (storage_structure_version_int > 0);
     bool valid_storage_config_version = (storage_config_version_int > 0);
 
-    if (!valid_uuid || !valid_storage_version || !valid_storage_config_version) {
+    if (!valid_uuid || !valid_storage_structure_version || !valid_storage_config_version) {
         wipeAllAndReissueAllBasics();
           Serial.print(">>>  wipe E2PROM and restarting everything  :    ");
 

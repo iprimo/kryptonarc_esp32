@@ -1,7 +1,10 @@
+
 #ifndef STRING_WORKS_HPP
 #define STRING_WORKS_HPP
 
 #include "system_structs.hpp"
+#include "modules/sha_hash.hpp"
+#include "modules/base64_char_masking.hpp"
 
 const char* find_values_between_substringsV4(char* str, const char* substringA1, const char* substringA2 ) {
     char* p1 = strstr(str, substringA1);
@@ -157,6 +160,100 @@ void removeSubstring(char* original, const char* substringToRemove, char* result
         // If substring not found, copy the original to result
         strcpy(result, original);
     }
+}
+
+// Helper function to parse meta, hash, and data from receivingString
+bool parseMetaHashData(const char* receivingString, char*& meta, char*& hash, char*& data, char*& data_decoded) {
+  meta = nullptr;
+  hash = nullptr;
+  data = nullptr;
+  data_decoded = nullptr;
+  int len = strlen(receivingString);
+  int firstPipe = -1;
+  int lastPipe = -1;
+  const char* delim = "||";
+  const char* firstPtr = strstr(receivingString, delim);
+  const char* lastPtr = nullptr;
+  if (firstPtr) {
+    firstPipe = firstPtr - receivingString;
+    const char* searchPtr = firstPtr + 2;
+    while (true) {
+      const char* nextPtr = strstr(searchPtr, delim);
+      if (nextPtr) {
+        lastPtr = nextPtr;
+        searchPtr = nextPtr + 2;
+      } else {
+        break;
+      }
+    }
+    if (lastPtr) {
+      lastPipe = lastPtr - receivingString;
+    } else {
+      lastPipe = firstPipe;
+    }
+  }
+
+  if (firstPipe != -1 && lastPipe != -1 && firstPipe != lastPipe) {
+    data = new char[firstPipe + 1]();
+    strncpy(data, receivingString, firstPipe);
+    data[firstPipe] = '\0';
+
+    // Decode base64 data
+    data_decoded = new char[1024](); // Adjust size as needed
+    base64_string_decoding(String(data), data_decoded);
+
+    int metaLen = len - lastPipe - 2;
+    meta = new char[metaLen + 1]();
+    strncpy(meta, receivingString + lastPipe + 2, metaLen);
+    meta[metaLen] = '\0';
+
+    int hashLen = lastPipe - firstPipe - 2;
+    hash = new char[hashLen + 1]();
+    strncpy(hash, receivingString + firstPipe + 2, hashLen);
+    hash[hashLen] = '\0';
+
+    // Do NOT clean up output pointers here; caller is responsible for freeing them
+    return true;
+  } else {
+    Serial.println("Failed to parse meta, hash, data from receivingString!");
+    // Clean up only if something was allocated in error case
+    if (data) { delete[] data; data = nullptr; }
+    if (meta) { delete[] meta; meta = nullptr; }
+    if (hash) { delete[] hash; hash = nullptr; }
+    if (data_decoded) { delete[] data_decoded; data_decoded = nullptr; }
+    return false;
+  }
+}
+
+// Helper function to verify hash using meta, hash, and data
+
+    // 0x-0	: global hash and enrypton keys used
+    // 0x-1	: device hash and enrypton keys used
+
+bool verifyTrafficHash(const char* meta, const char* hash, char* data) {
+  char hash256ResultArray[65];
+  const char* thisTrafficHashKey = nullptr;
+  bool result = false;
+  if (meta && strstr(meta, "hash:g1SHA256")) {
+    thisTrafficHashKey = software_parameters_fixed.GLOBAL_SHARED_HASH_KEY;
+  } else if (meta && strstr(meta, "hash:d1SHA256")) {
+    thisTrafficHashKey = e2prom_variables.hashKey_Internal;
+  } else {
+    Serial.println("No valid hash type found in meta!");
+    return false;
+  }
+
+  hashSHA256((const char*)data, thisTrafficHashKey, hash256ResultArray);
+  if (hash && strcmp(hash, hash256ResultArray) == 0) {
+    Serial.println("hash OK!");
+    result = true;
+  } else {
+    Serial.println("hash Error!");
+    result = false;
+  }
+
+  // No dynamic allocations in this function, but if you add any, clean up here
+  return result;
 }
 
 

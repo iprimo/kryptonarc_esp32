@@ -134,7 +134,7 @@ struct SOFTWARE_GLOBAL_PARAMETERS_VAR
 struct E2PROM_STORED_DATA_FIXED
 {
 
-    char storage_version[64] ;
+    char storage_structure_version[64] ;
     char storage_config_version[64] ;
 
     char hardware_uuid[64] ;
@@ -158,9 +158,11 @@ struct E2PROM_STORED_DATA_FIXED
     char encryptionKey02_Internal[64] ;
     char hashKey02_Internal[64] ;
     char current_shackle_lock_configuration[64] ;
-    // char tempName16[64] ;
-    // char tempName17[64] ;
-    // char tempName18[64] ;
+
+    char motor_direction_configuration[64] ;
+    char major_action_counter_tracker[64] ;
+    char minor_action_counter_tracker[64] ;
+
     // char tempName19[64] ;
     // char tempName20[64] ;
     // char tempName21[64] ;

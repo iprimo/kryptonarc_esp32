@@ -10,14 +10,13 @@
 // Source: 
 // https://techtutorialsx.com/2018/01/25/esp32-arduino-applying-the-hmac-sha-256-mechanism/
 
-void hashSHA256( char *payload, const char* key, char* dataHash ) {
+void hashSHA256( const char *payload, const char* key, char* dataHash ) {
 
   byte hmacResult[32];
  
   mbedtls_md_context_t ctx;
   mbedtls_md_type_t md_type = MBEDTLS_MD_SHA256;
  
-  // const size_t payloadLength = strlen(payload);
   const size_t payloadLength = strlen(payload);
   const size_t keyLength = strlen(key);            
  

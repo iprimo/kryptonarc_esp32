@@ -339,6 +339,15 @@ inline std::string device_shackle_state() {
     s += "curShackleConf:";
     s += e2prom_variables.current_shackle_lock_configuration;
     s += "::";
+    s += "motorDirectionConfiguration:";
+    s += e2prom_variables.motor_direction_configuration;
+    s += "::";
+    s += "majorActionCounterTracker:";
+    s += e2prom_variables.major_action_counter_tracker;
+    s += "::";
+    s += "minorActionCounterTracker:";
+    s += e2prom_variables.minor_action_counter_tracker;
+    s += "::";
     return s;
 }
 

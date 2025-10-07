@@ -23,7 +23,7 @@ extern HardwareSerial Serial;
 // DO NOT MOVE THE ORDER OR CHANGE THE ORDER OF THIS ARRAY
 // Total E2PROM block - 4096/64=64
 const char *storage_array_content_index[] = {
-    "storage_version"      ,
+    "storage_structure_version"      ,
     "storage_config_version", 
     "hardware_uuid",
     "board_model",
@@ -45,6 +45,9 @@ const char *storage_array_content_index[] = {
     "hashKey02_Internal"
 
     "current_shackle_lock_configuration",
+    "motor_direction_configuration",
+    "major_action_counter_tracker",
+    "minor_action_counter_tracker",
     
     // "tempName18",
     // "tempName19",
@@ -165,7 +168,7 @@ E2PROM_STORED_DATA_FIXED e2promReadAllWorks( ) {
     
     // Define 
 
-    strcpy( temp_construct.storage_version, e2promReadWorks( "storage_version" )  );
+    strcpy( temp_construct.storage_structure_version, e2promReadWorks( "storage_structure_version" )  );
     
     strcpy( temp_construct.storage_config_version, e2promReadWorks( "storage_config_version" )  );
 
@@ -189,10 +192,12 @@ E2PROM_STORED_DATA_FIXED e2promReadAllWorks( ) {
     strcpy( temp_construct.keySmithKeyOnline02_Internal, e2promReadWorks( "keySmithKeyOnline02_Internal" ) );
 
     strcpy( temp_construct.current_shackle_lock_configuration, e2promReadWorks( "current_shackle_lock_configuration" ) );
+
+    strcpy( temp_construct.motor_direction_configuration, e2promReadWorks( "motor_direction_configuration" ) );
+    strcpy( temp_construct.major_action_counter_tracker, e2promReadWorks( "major_action_counter_tracker" ) );
+    strcpy( temp_construct.minor_action_counter_tracker, e2promReadWorks( "minor_action_counter_tracker" ) );
+
     
-    // strcpy( temp_construct.tempName17, e2promReadWorks( "tempName17" ) );
-    // strcpy( temp_construct.tempName18, e2promReadWorks( "tempName18" ) );
-    // strcpy( temp_construct.tempName19, e2promReadWorks( "tempName19" ) );
     // strcpy( temp_construct.tempName20, e2promReadWorks( "tempName20" ) );
     // strcpy( temp_construct.tempName21, e2promReadWorks( "tempName21" ) );
     // strcpy( temp_construct.tempName22, e2promReadWorks( "tempName22" ) );
@@ -312,8 +317,8 @@ void wipeAllAndReissueAllBasics( ) {
     // const char* board_model_var = "KA_CB_G090V5B";
     // e2promWriteWorks(  "board_model" , board_model_var ) ;
 
-    e2promWriteWorks(  "storage_version" , "2" );
-    e2promWriteWorks(  "storage_config_version" , "1" );
+    e2promWriteWorks(  "storage_structure_version" , "3" );
+    e2promWriteWorks(  "storage_config_version" , "2" );
 
     e2promWriteWorks( "hardware_uuid" , generateUUIDString() ) ;
     e2promWriteWorks( "board_model" , generateUUIDString() ) ;
@@ -334,7 +339,9 @@ void wipeAllAndReissueAllBasics( ) {
     e2promWriteWorks( "hashKey_Internal" , generateUUIDString() ) ;
     e2promWriteWorks( "hashKey02_Internal" , generateUUIDString() ) ;
 
-
+    e2promWriteWorks(  "motor_direction_configuration" ,"0" ) ;
+    e2promWriteWorks(  "major_action_counter_tracker" ,"0" ) ;
+    e2promWriteWorks(  "minor_action_counter_tracker" ,"0" ) ;  
 
     // e2promWriteWorks(  "current_shackle_lock_configuration" ,"na" ) ;
 

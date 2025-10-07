@@ -11,6 +11,7 @@
 #include "modules/hash_works.hpp"
 #include "modules/data_string_builder.hpp"
 #include "modules/sha_hash.hpp"
+#include "modules/e2prom_works.hpp"
 #include "modules/base64_char_masking.hpp"
 #include "modules/string_works.hpp"
 #include "modules/lock_shackle_actions.hpp"
@@ -94,24 +95,6 @@ char* extractSubstring(const char* source, int start, int end) {
   return substring;
 }
 
-// char* extractSubstring(char* input, int startIndex, int endIndex) {
-
-//     int len = strlen(input);
-
-//     char* subStringDivided = new char[ sendingChunkSize ](); // () initializes all elements to null
-
-//     if (startIndex < 0 || startIndex >= len) {
-//         // return NULL; // invalid start index
-//       return subStringDivided ;
-//     }
-//     if (endIndex < 0 || endIndex >= len) {
-//         endIndex = len - 1; // adjust end index to last character of the array
-//     }
-//     int subStrLen = endIndex - startIndex + 1;
-//     strncpy(subStringDivided, input + startIndex, subStrLen); // copy the substring to the newly allocated memory
-//     subStringDivided[subStrLen] = '\0'; // add null terminator to the end of the substring
-//     return subStringDivided;
-// }
 
 
 void incomingStringProcessing( char* receivingString ){
@@ -119,106 +102,67 @@ void incomingStringProcessing( char* receivingString ){
   Serial.print("receivingString>###>>  ");
   Serial.println(receivingString);
 
-  char* dataBefore_data = (char*)malloc(4096);
-  char* dataAfter_hash = (char*)malloc(65);
-  if (!dataBefore_data || !dataAfter_hash) {
-    Serial.println("Failed to allocate memory for incomingStringProcessing buffers!");
-    if (dataBefore_data) free(dataBefore_data);
-    if (dataAfter_hash) free(dataAfter_hash);
+  // Use helper function to extract meta, hash, and data
+  char* meta = nullptr;
+  char* hash = nullptr;
+  char* data_raw = nullptr;
+  char* data_decoded = nullptr;
+  if (!parseMetaHashData(receivingString, meta, hash, data_raw, data_decoded)) {
+    if (data_raw) { delete[] data_raw; data_raw = nullptr; }
+    if (meta) { delete[] meta; meta = nullptr; }
+    if (hash) { delete[] hash; hash = nullptr; }
+    if (data_decoded) { delete[] data_decoded; data_decoded = nullptr; }
     return;
   }
 
-  bool hashExists = splitAtLastDelimiter(receivingString, '|', dataBefore_data, dataAfter_hash);
-  if ( !hashExists ) {
-    free(dataBefore_data);
-    free(dataAfter_hash);
+  Serial.println("meta: ");
+  Serial.println(meta);
+
+  Serial.println("hash: ");
+  Serial.println(hash);
+
+  Serial.println("data_raw: ");
+  Serial.println(data_raw);
+
+  Serial.println("data_decoded: ");
+  Serial.println(data_decoded);
+
+  if (!verifyTrafficHash(meta, hash, data_raw)) {
+    if (data_raw) { delete[] data_raw; data_raw = nullptr; }
+    if (meta) { delete[] meta; meta = nullptr; }
+    if (hash) { delete[] hash; hash = nullptr; }
+    if (data_decoded) { delete[] data_decoded; data_decoded = nullptr; }
     return;
   }
-
-    // Serial.print("dataBefore_data  >>>  ");
-    // Serial.println(dataBefore_data);
-    // Serial.print("dataAfter_hash  >>>  ");
-    // Serial.println(dataAfter_hash);
-   
-    // Serial.println(dataBefore_data[ 3 ]);
-    // Serial.println("dataBefore_data[ 3 ] >>>  ");
-    
-    // Serial.println(dataBefore_data[ 4 ] );
-    // Serial.println("dataBefore_data[ 4 ] >>>  ");
-    
-    // Serial.println("software_parameters_fixed.GLOBAL_SHARED_HASH_KEY  >>>  ");
-    // Serial.println(software_parameters_fixed.GLOBAL_SHARED_HASH_KEY);
-
-    // 0x-0	: global hash and enrypton keys used
-    // 0x-1	: device hash and enrypton keys used
-
-    char hash256ResultArray[ 65 ];
-    if ( dataBefore_data[ 3 ] == '1' ){
-      // this matches device specfic hash
-      hashSHA256( dataBefore_data, e2prom_variables.hashKey_Internal, hash256ResultArray );
-    } else {
-      // Global has used 
-      hashSHA256( dataBefore_data , software_parameters_fixed.GLOBAL_SHARED_HASH_KEY, hash256ResultArray );
-    }
-
-    // Serial.print("hash256ResultArray  >>>  ");
-    // Serial.println(hash256ResultArray);
-    
-    // hash mis-match
-
-    if ( strcmp( dataAfter_hash, hash256ResultArray ) != 0 ) {
-      free(dataBefore_data);
-      free(dataAfter_hash);
-      return;
-    } 
-
-    Serial.print("  >>>  hash OK !  >>>  ");
-
-
-    if ( !software_parameters_variables.timeStampSetUsingFristTimeStamp ){
-      Serial.println("999999 set first time  >>>  ");
-      // Setting time stamp using incoming data time stamp
-      const char* found_ts = find_values_between_substringsV5(receivingString, "timeStamp:", "::");
-      if (found_ts && strlen(found_ts) > 0) {
-          strcpy(software_parameters_variables.incoming_data_time_stamp, found_ts);
-          set_esp32_time_from_string(software_parameters_variables.incoming_data_time_stamp);
-          software_parameters_variables.timeStampSetUsingFristTimeStamp = true;
-      } else {
-          Serial.println("No valid timestamp found in incoming string!");
-      }
-    }
-    Serial.println("999999 read time  >>>  ");
-    char timebuf[32];
-    get_esp32_time_string(timebuf, sizeof(timebuf));
-    Serial.println(timebuf); // Prints: 2025-09-10T20:53:19Z
-
-
-
-
-    // Serial.print("pingStringExistanceChk  >>>  ");
-    // Serial.println(pingStringExistanceChk);
-    // Serial.print("deviceXigCodeLengthCheck  >>>  ");
-    // Serial.println(deviceXigCodeLengthCheck);
-    // Serial.print("tenantXigCodeLengthCheck  >>>  ");
-    // Serial.println(tenantXigCodeLengthCheck);
-
-    // const char* subString = "request:GetStatus::"; // Replace with the substring you want to find
-
-    // if (findSubstring(receivingString, "request:GetStatus::")) {
-    //   Serial.println(">>>>1111   Substring found in the string.");
-    // } else {
-    //   Serial.println(">>>>1111   Substring not found in the string.");
-    // }
-
 
     // LED flash indicator -receiving data from cloud 
-    if ( findSubstring(receivingString, "0x1" )  ) { 
+    if ( findSubstring(data_decoded, "0x1" )  ) { 
       flashing_led_blue( "on" , "very_fast_flashing"  , false, 10 , true);
     }
 
 
     // Selector data processing
-    if (  findSubstring(receivingString, "request:GetStatus::" ) && 
+    if (  findSubstring(data_decoded, "0x2002tI_Reboot_tI" )) {
+      Serial.println("Restarting in 1 seconds");
+      delay(1000);
+      ESP.restart();
+
+
+    } else if (  findSubstring(data_decoded, "111" )) {
+      Serial.println("***** FLUSH *****");
+
+      e2promReadAllWorks();
+      Serial.println("Restarting in 1 seconds");
+      delay(1000);
+      ESP.restart();
+
+
+    } else if (  findSubstring(data_decoded, "0x123456789" )) {
+      Serial.println("Restarting in 1 seconds");
+      delay(1000);
+      ESP.restart();
+
+    } else if (  findSubstring(data_decoded, "request:GetStatus::" ) && 
           strlen( e2prom_variables.device_xc ) < 10 && 
           strlen( e2prom_variables.tenant_xc ) < 10 ) { 
       Serial.println("Blank Device matched - :GetStatus::  >>>  ");
@@ -231,7 +175,7 @@ void incomingStringProcessing( char* receivingString ){
         tx_DataCache[0] = '\0';
       }
     } else if (
-          findSubstring(receivingString, "request:GetStatus::" ) && 
+          findSubstring(data_decoded, "request:GetStatus::" ) && 
           strlen( e2prom_variables.device_xc ) > 10 && 
           strlen( e2prom_variables.tenant_xc ) > 10 ) {
         //////////////////////////////////////////
@@ -296,6 +240,9 @@ void incomingStringProcessing( char* receivingString ){
           strcat(plain, e2prom_variables.hashKey_Internal);
           strcat(plain, "::timeStamp:");
           strcat(plain, software_parameters_variables.incoming_data_time_stamp);
+
+          
+
           strcat(plain, "::");
 
           Serial.print("Plain: ");
@@ -361,25 +308,14 @@ void incomingStringProcessing( char* receivingString ){
         Serial.print("tx_DataCache:777777 ");
         Serial.println(tx_DataCache);
         
-    } else if (  findSubstring(receivingString, "0x2002tI_Reboot_tI" ) && 
-          strlen( e2prom_variables.device_xc ) == 0 && 
-          strlen( e2prom_variables.tenant_xc ) == 0
-          ) {
-      Serial.println("Restarting in 1 seconds");
-      delay(1000);
-      ESP.restart();
-
-    } else if (  findSubstring(receivingString, "0x2002tI_Reboot_tI" ) ) {
-      strcpy( tx_DataCache , "0x0001_Error_Occured" );
-      
-    } else if ( findSubstring(receivingString, "0x1102" )  ) {
+    } else if ( findSubstring(data_decoded, "0x1102" )  ) {
         
       //  0x1102dFhDXzAwMDAxXzAwMDAxXzAwMDAxXzAwMDAxX3RlbmFudGFjY291bnRfdFhDZFhDXzIzOGI1Y19mNjk1NWNfZGY4YThhX2FjMzBhNmExZDgxX2hhcmR3YXJldHdpbl9kWENzSV9iTEVTU0VRX05hTl9iTEVTU0VRdFNfMjAyNC0wMS0xOVQwNToyODoxOS4xMDNaX3RTX3NJaFdBY3Rpb25fdW5sb2NrX2hXQWN0aW9u|413565c688bb4336c0e54d478daedd39f0aa7e321df8abafbbbed545a3e1bde
-      Serial.println("0x1102>444    matched 444>>>   dataBefore_data: ");
-      Serial.println( dataBefore_data );
+  Serial.println("0x1102>444    matched 444>>>   data: ");
+  Serial.println( data_raw );
 
       // extracting masked data
-      char* masked_data = extract_substring( 6 , dataBefore_data ) ;
+  char* masked_data = extract_substring( 6 , data_raw );
       Serial.println("masked_data: ");
       Serial.println( masked_data );
 
@@ -420,14 +356,14 @@ void incomingStringProcessing( char* receivingString ){
     //               strlen( e2prom_variables.hardware_uuid ) == 0 || 
     //               strlen( e2prom_variables.board_model ) == 0 
     //             ) && 
-    //               strcmp(receivingString, "tI_ConditionalWipeAllLicensesAndReissueHWUUID_tI" ) == 0 
+    //               strcmp(data_decoded, "tI_ConditionalWipeAllLicensesAndReissueHWUUID_tI" ) == 0 
     //             ) {
     //   // Reset all settings if device does not have basics
     //   wipeAllAndReissueAllBasics();
     //   return;
       
 
-    // } else if (  strcmp(receivingString, "tI_WipeAllLicensesAndReissueHWUUID_tI" ) == 0 ) {
+    // } else if (  strcmp(data_decoded, "tI_WipeAllLicensesAndReissueHWUUID_tI" ) == 0 ) {
     //   // Reset all settings in any condition
     //   wipeAllAndReissueAllBasics();
     //   return;
@@ -437,7 +373,7 @@ void incomingStringProcessing( char* receivingString ){
       Serial.println("ELSE matched !   >>> ");
     }
 
-    // const char* broadcastOutputAValString = find_values_between_substringsV4( receivingString, broadcast_global_variables.broadcastOutputA_SubStringStart , broadcast_global_variables.broadcastOutputA_SubStringEnd );
+    // const char* broadcastOutputAValString = find_values_between_substringsV4( data_decoded, broadcast_global_variables.broadcastOutputA_SubStringStart , broadcast_global_variables.broadcastOutputA_SubStringEnd );
     // Serial.println("broadcastOutputAValString   >>> ");
     // Serial.println(broadcastOutputAValString);
 
@@ -456,8 +392,10 @@ void incomingStringProcessing( char* receivingString ){
     // led_static_action( "blue", "off" ); // orange
     
 
-  free(dataBefore_data);
-  free(dataAfter_hash);
+  if (data_raw) { delete[] data_raw; data_raw = nullptr; }
+  if (meta) { delete[] meta; meta = nullptr; }
+  if (hash) { delete[] hash; hash = nullptr; }
+  if (data_decoded) { delete[] data_decoded; data_decoded = nullptr; }
   return;
     
 };

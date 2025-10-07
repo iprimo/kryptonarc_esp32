@@ -16,9 +16,16 @@
 extern char* sendStr56;
 extern char* tempCache;
 
+
+
+
+    // 0x-0	: global hash and enrypton keys used
+    // 0x-1	: device hash and enrypton keys used
+
+
 inline char* exec_code_0x0001() {
 
-    // "payload|hash|metaData"
+    // "payload|g-hash|metaData"
 
     if (sendStr56) { delete[] sendStr56; sendStr56 = nullptr; }
     sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
@@ -29,6 +36,7 @@ inline char* exec_code_0x0001() {
     
     //// Clear text
     std::string clear_text = std::string("") ;
+    clear_text += "hwConfigState:unregisteredDevice::";
     clear_text += device_tenant_xigcode();
     clear_text += device_shackle_state();
     clear_text += device_firmware_information();
@@ -60,23 +68,26 @@ inline char* exec_code_0x0001() {
 
     // Data hash 
     // Adding has to the end of sending string
-    strcat(tempCache, "|");
+    strcat(tempCache, "||");
     strcat(tempCache, hash256ResultArray );  // Add the String variable
-    strcat(tempCache, "|");  // Add double quotes
+    strcat(tempCache, "||");  // Add double quotes
     // Data hash 
-
 
     // Meta data
     strcat(tempCache, "v:2::");
     strcat(tempCache, "code:0x0001::");
-    strcat(tempCache, "hwConfigState:unregisteredDevice::");
-    strcat(tempCache, "encryption:g1::");
-    strcat(tempCache, "hash:g1::");
+    strcat(tempCache, "encryption:g1RSA::");
+    strcat(tempCache, "hash:g1SHA256::");
+    strcat(tempCache, "changeTracker:");
+    strcat(tempCache, e2prom_variables.major_action_counter_tracker);
+    strcat(tempCache, "::");
+    strcat(tempCache, "timeStamp:");
+    char timebuf[32] = {0};
+    get_esp32_time_string(timebuf, sizeof(timebuf));
+    strcat(tempCache, timebuf);
+    strcat(tempCache, "::");
+     
     // Meta data
-
-    Serial.print(" tempCache >>> ");
-    Serial.println(tempCache);
-
 
     tempCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
 
