@@ -148,7 +148,7 @@ void incomingStringProcessing( char* receivingString ){
       ESP.restart();
 
 
-    } else if (  findSubstring(data_decoded, "111" )) {
+    } else if (  findSubstring(data_decoded, "request:8" )) {
       Serial.println("***** FLUSH *****");
 
       e2promReadAllWorks();
