@@ -163,63 +163,66 @@ void removeSubstring(char* original, const char* substringToRemove, char* result
 }
 
 // Helper function to parse meta, hash, and data from receivingString
-bool parseMetaHashData(const char* receivingString, char*& meta, char*& hash, char*& data, char*& data_decoded) {
+bool parseMetaHashData(const char* receivingString, char*& meta, char*& device_hash, char*& global_hash, char*& data, char*& data_decoded) {
   meta = nullptr;
-  hash = nullptr;
+  device_hash = nullptr;
+  global_hash = nullptr;
   data = nullptr;
   data_decoded = nullptr;
   int len = strlen(receivingString);
-  int firstPipe = -1;
-  int lastPipe = -1;
   const char* delim = "||";
-  const char* firstPtr = strstr(receivingString, delim);
-  const char* lastPtr = nullptr;
-  if (firstPtr) {
-    firstPipe = firstPtr - receivingString;
-    const char* searchPtr = firstPtr + 2;
-    while (true) {
-      const char* nextPtr = strstr(searchPtr, delim);
-      if (nextPtr) {
-        lastPtr = nextPtr;
-        searchPtr = nextPtr + 2;
-      } else {
-        break;
-      }
-    }
-    if (lastPtr) {
-      lastPipe = lastPtr - receivingString;
+  const char* sectionPtrs[4] = {nullptr, nullptr, nullptr, nullptr};
+  int sectionIdx = 0;
+  const char* searchPtr = receivingString;
+  while (sectionIdx < 4) {
+    const char* nextPtr = strstr(searchPtr, delim);
+    if (nextPtr) {
+      sectionPtrs[sectionIdx++] = nextPtr;
+      searchPtr = nextPtr + 2;
     } else {
-      lastPipe = firstPipe;
+      break;
     }
   }
 
-  if (firstPipe != -1 && lastPipe != -1 && firstPipe != lastPipe) {
-    data = new char[firstPipe + 1]();
-    strncpy(data, receivingString, firstPipe);
-    data[firstPipe] = '\0';
+  // We need 3 delimiters for 4 sections
+  if (sectionIdx == 3) {
+    // Section 0: data (payload)
+    int dataLen = sectionPtrs[0] - receivingString;
+    data = new char[dataLen + 1]();
+    strncpy(data, receivingString, dataLen);
+    data[dataLen] = '\0';
 
     // Decode base64 data
     data_decoded = new char[1024](); // Adjust size as needed
     base64_string_decoding(String(data), data_decoded);
 
-    int metaLen = len - lastPipe - 2;
-    meta = new char[metaLen + 1]();
-    strncpy(meta, receivingString + lastPipe + 2, metaLen);
-    meta[metaLen] = '\0';
+    // Section 1: device_hash
+    int deviceHashLen = sectionPtrs[1] - (sectionPtrs[0] + 2);
+    device_hash = new char[deviceHashLen + 1]();
+    strncpy(device_hash, sectionPtrs[0] + 2, deviceHashLen);
+    device_hash[deviceHashLen] = '\0';
 
-    int hashLen = lastPipe - firstPipe - 2;
-    hash = new char[hashLen + 1]();
-    strncpy(hash, receivingString + firstPipe + 2, hashLen);
-    hash[hashLen] = '\0';
+    // Section 2: global_hash
+    int globalHashLen = sectionPtrs[2] - (sectionPtrs[1] + 2);
+    global_hash = new char[globalHashLen + 1]();
+    strncpy(global_hash, sectionPtrs[1] + 2, globalHashLen);
+    global_hash[globalHashLen] = '\0';
+
+    // Section 3: meta (metadata)
+    int metaLen = len - (sectionPtrs[2] - receivingString) - 2;
+    meta = new char[metaLen + 1]();
+    strncpy(meta, sectionPtrs[2] + 2, metaLen);
+    meta[metaLen] = '\0';
 
     // Do NOT clean up output pointers here; caller is responsible for freeing them
     return true;
   } else {
-    Serial.println("Failed to parse meta, hash, data from receivingString!");
+    Serial.println("Failed to parse meta, device_hash, global_hash, data from receivingString!");
     // Clean up only if something was allocated in error case
     if (data) { delete[] data; data = nullptr; }
     if (meta) { delete[] meta; meta = nullptr; }
-    if (hash) { delete[] hash; hash = nullptr; }
+    if (device_hash) { delete[] device_hash; device_hash = nullptr; }
+    if (global_hash) { delete[] global_hash; global_hash = nullptr; }
     if (data_decoded) { delete[] data_decoded; data_decoded = nullptr; }
     return false;
   }

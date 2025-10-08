@@ -1,3 +1,7 @@
+#include "modules/exec_code.hpp"
+
+// Forward declaration for exec_code_0x0102
+char* exec_code_0x0102();
 #ifndef BLUETOOTH_WORKS_HPP
 #define BLUETOOTH_WORKS_HPP
 
@@ -102,15 +106,17 @@ void incomingStringProcessing( char* receivingString ){
   Serial.print("receivingString>###>>  ");
   Serial.println(receivingString);
 
-  // Use helper function to extract meta, hash, and data
+  // Use helper function to extract meta, global_hash, and data
   char* meta = nullptr;
-  char* hash = nullptr;
+  char* device_hash = nullptr;
+  char* global_hash = nullptr;
   char* data_raw = nullptr;
   char* data_decoded = nullptr;
-  if (!parseMetaHashData(receivingString, meta, hash, data_raw, data_decoded)) {
+  if (!parseMetaHashData(receivingString, meta, device_hash, global_hash, data_raw, data_decoded)) {
     if (data_raw) { delete[] data_raw; data_raw = nullptr; }
     if (meta) { delete[] meta; meta = nullptr; }
-    if (hash) { delete[] hash; hash = nullptr; }
+    if (device_hash) { delete[] device_hash; device_hash = nullptr; } 
+    if (global_hash) { delete[] global_hash; global_hash = nullptr; }
     if (data_decoded) { delete[] data_decoded; data_decoded = nullptr; }
     return;
   }
@@ -118,8 +124,11 @@ void incomingStringProcessing( char* receivingString ){
   Serial.println("meta: ");
   Serial.println(meta);
 
-  Serial.println("hash: ");
-  Serial.println(hash);
+  Serial.println("device_hash: ");
+  Serial.println(device_hash);
+  
+  Serial.println("global_hash: ");
+  Serial.println(global_hash);
 
   Serial.println("data_raw: ");
   Serial.println(data_raw);
@@ -127,10 +136,11 @@ void incomingStringProcessing( char* receivingString ){
   Serial.println("data_decoded: ");
   Serial.println(data_decoded);
 
-  if (!verifyTrafficHash(meta, hash, data_raw)) {
+  if (!verifyTrafficHash(meta, global_hash, data_raw)) {
     if (data_raw) { delete[] data_raw; data_raw = nullptr; }
     if (meta) { delete[] meta; meta = nullptr; }
-    if (hash) { delete[] hash; hash = nullptr; }
+    if (device_hash) { delete[] device_hash; device_hash = nullptr; }
+    if (global_hash) { delete[] global_hash; global_hash = nullptr; }
     if (data_decoded) { delete[] data_decoded; data_decoded = nullptr; }
     return;
   }
@@ -151,7 +161,7 @@ void incomingStringProcessing( char* receivingString ){
     } else if (  findSubstring(data_decoded, "request:8" )) {
       Serial.println("***** FLUSH *****");
 
-      e2promReadAllWorks();
+      wipeAllAndReissueAllBasics();
       Serial.println("Restarting in 1 seconds");
       delay(1000);
       ESP.restart();
@@ -178,135 +188,15 @@ void incomingStringProcessing( char* receivingString ){
           findSubstring(data_decoded, "request:GetStatus::" ) && 
           strlen( e2prom_variables.device_xc ) > 10 && 
           strlen( e2prom_variables.tenant_xc ) > 10 ) {
-        //////////////////////////////////////////
         // DR ?(HC: HealthCheck): Device Response
-        delete[] sendStr56;
-        sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
-
-        delete[] tempCache;
-        tempCache = new char[TRANSFER_ARRAY_SIZE](); // () initializes all elements to null
-
-        std::string info = std::string("") + 
-              "ver:" + "2" + "::" + 
-              "code:" + "0x0102" + "::" + 
-              "traffOrigin:" + "hwDevice" + "::" + 
-              "dEncryption:" + "none" + "::" + 
-              "dHash:" + "hwDevice01" + "::" + 
-              "hwConfigState:" + "registeredDevice" "::" ;
-
-        strcat(sendStr56, info.c_str());
-
-        Serial.print("sendStr56:111111 ");
-        Serial.println(sendStr56);
-
-        // append_status_information( sendStr56 );
-        // Prepend status information
-        std::string combined = device_shackle_state() + sendStr56;
-        strcpy(sendStr56, combined.c_str());
-
-        Serial.print("sendStr56:22766666222 ");
-        Serial.println(sendStr56);
-
-        // append_secret_config_information( sendStr56 );
-        std::string combined2 = device_tenant_xigcode() + sendStr56;
-        strcpy(sendStr56, combined2.c_str());
-        
-        // append_firmware_information( sendStr56 );
-        std::string combined3 = device_firmware_information() + sendStr56;
-        strcpy(sendStr56, combined3.c_str());
-        // append_bluetooth_session_sequence( sendStr56 );
-        std::string combined4 = device_bluetooth_session_sequence() + sendStr56;
-        strcpy(sendStr56, combined4.c_str());
-
-        Serial.print("sendStr56:333zzz333 ");
-        Serial.println(sendStr56);
-
-        // Build the full response in a std::string
-        std::string fullResponse = std::string(sendStr56);
-
-        Serial.print("sendStr56:444444 ");
-        Serial.println(sendStr56);
-        //////////////////////////////////////////
-        // RSA Encryption of encKey, hashKey and timeStamp
-          
-        char *plain = (char*)malloc(512);
-        if (!plain) {
-          Serial.println("Failed to allocate memory for plain buffer!");
+        char* result = exec_code_0x0102();
+        if (result) {
+            strncpy(tx_DataCache, result, TRANSFER_ARRAY_SIZE - 1);
+            tx_DataCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
+            delete[] result;
         } else {
-          plain[0] = '\0';
-          strcat(plain, "encKey:");
-          strcat(plain, e2prom_variables.encryptionKey_Internal);
-          strcat(plain, "::hashKey:");
-          strcat(plain, e2prom_variables.hashKey_Internal);
-          strcat(plain, "::timeStamp:");
-          strcat(plain, software_parameters_variables.incoming_data_time_stamp);
-
-          
-
-          strcat(plain, "::");
-
-          Serial.print("Plain: ");
-          Serial.println(plain);
-
-          int plain_len = strlen(plain);
-          Serial.print("plain_len: ");
-          Serial.println(plain_len);
+            tx_DataCache[0] = '\0';
         }
-
-        // RSA encryption
-        char *encrypted = (char*)malloc(1024);
-        if (!plain || !encrypted) {
-            if (!plain) Serial.println("Failed to allocate memory for plain buffer!");
-            if (!encrypted) Serial.println("Failed to allocate memory for encryption buffer!");
-        } else {
-          encrypted[0] = '\0';
-          int enc_result = encrypt_with_public_key(plain, encrypted, 1024);
-          if (enc_result == 0) {
-            Serial.print("Encrypted: ");
-            Serial.println(encrypted);
-            // // Decrypt for testing
-            // char *decrypted = (char*)malloc(1024); // Increased buffer size to match encrypted
-            // if (!decrypted) {
-            //   Serial.println("Failed to allocate memory for decrypted buffer!");
-            // } else {
-            //   decrypted[0] = '\0';
-            //   int dec_result = decrypt_with_private_key(encrypted, decrypted, 1024);
-            //   if (dec_result == 0) {
-            //     Serial.print("Decrypted: ");
-            //     Serial.println(decrypted);
-            //   } else {
-            //     Serial.print("Decryption failed! Error code: ");
-            //     Serial.println(dec_result);
-            //   }
-            //   free(decrypted);
-            // }
-          } else {
-            Serial.print("Encryption failed! Error code: ");
-            Serial.println(enc_result);
-            Serial.print("Encrypted buffer (may be garbage): ");
-            Serial.println(encrypted);
-          }
-        }
-
-
-        Serial.print("sendStr56:555555 ");
-        Serial.println(sendStr56);
-
-        // Append the encrypted block to the full response
-        fullResponse += "publicKeyEnc:";
-        if (encrypted) fullResponse += encrypted;
-        fullResponse += "::";
-        // Copy the result to tx_DataCache
-        strncpy(tx_DataCache, fullResponse.c_str(), TRANSFER_ARRAY_SIZE - 1);
-        tx_DataCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
-
-        if (plain) free(plain);
-        if (encrypted) free(encrypted);
-
-        
-
-        Serial.print("tx_DataCache:777777 ");
-        Serial.println(tx_DataCache);
         
     } else if ( findSubstring(data_decoded, "0x1102" )  ) {
         
@@ -394,7 +284,8 @@ void incomingStringProcessing( char* receivingString ){
 
   if (data_raw) { delete[] data_raw; data_raw = nullptr; }
   if (meta) { delete[] meta; meta = nullptr; }
-  if (hash) { delete[] hash; hash = nullptr; }
+  if (device_hash) { delete[] device_hash; device_hash = nullptr; }
+  if (global_hash) { delete[] global_hash; global_hash = nullptr; }
   if (data_decoded) { delete[] data_decoded; data_decoded = nullptr; }
   return;
     
@@ -516,7 +407,7 @@ void BluetoothMainProcess() {
         sendingChunkData( starter_block );
 
 
-        // // Creating hash of data - if device is configred used global hash key, if device is configured use device specific hash key
+        // // Creating global_hash of data - if device is configred used global global_hash key, if device is configured use device specific global_hash key
         // // const int deviceXigCodeLengthCheck = strlen( e2prom_variables.device_xc );
         // // const int tenantXigCodeLengthCheck = strlen( e2prom_variables.tenant_xc );
         // char hash256ResultArray[ 65 ];

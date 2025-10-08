@@ -7,6 +7,7 @@
 #include "modules/data_string_builder.hpp"
 #include "modules/system_structs.hpp"
 #include "modules/crypto_utils.h"
+#include "modules/esp32_time_utils.hpp"
 
 // Use macro for buffer size
 #ifndef TRANSFER_ARRAY_SIZE
@@ -25,7 +26,7 @@ extern char* tempCache;
 
 inline char* exec_code_0x0001() {
 
-    // "payload|g-hash|metaData"
+    // "payload|d-hash|g-hash|metaData"
 
     if (sendStr56) { delete[] sendStr56; sendStr56 = nullptr; }
     sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
@@ -68,7 +69,7 @@ inline char* exec_code_0x0001() {
 
     // Data hash 
     // Adding has to the end of sending string
-    strcat(tempCache, "||");
+    strcat(tempCache, "||||");
     strcat(tempCache, hash256ResultArray );  // Add the String variable
     strcat(tempCache, "||");  // Add double quotes
     // Data hash 
@@ -76,6 +77,7 @@ inline char* exec_code_0x0001() {
     // Meta data
     strcat(tempCache, "v:2::");
     strcat(tempCache, "code:0x0001::");
+    strcat(tempCache, "origin:hw::");
     strcat(tempCache, "encryption:g1RSA::");
     strcat(tempCache, "hash:g1SHA256::");
     strcat(tempCache, "changeTracker:");
@@ -94,6 +96,104 @@ inline char* exec_code_0x0001() {
     // Return a new buffer with the result
     char* result = new char[TRANSFER_ARRAY_SIZE]();
     strncpy(result, tempCache, TRANSFER_ARRAY_SIZE - 1);
+    result[TRANSFER_ARRAY_SIZE - 1] = '\0';
+    return result;
+}
+
+
+inline char* exec_code_0x0102() {
+    delete[] sendStr56;
+    sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
+
+    delete[] tempCache;
+    tempCache = new char[TRANSFER_ARRAY_SIZE]();
+
+    std::string info = std::string("") +
+          "ver:" + "2" + "::" +
+          "code:" + "0x0102" + "::" +
+          "hash:" + "d1SHA256" + "::" +
+          "hwConfigState:" + "registeredDevice" "::" ;
+
+    strcat(sendStr56, info.c_str());
+
+    Serial.print("sendStr56:111111 ");
+    Serial.println(sendStr56);
+
+    std::string combined = device_shackle_state() + sendStr56;
+    strcpy(sendStr56, combined.c_str());
+
+    Serial.print("sendStr56:22766666222 ");
+    Serial.println(sendStr56);
+
+    std::string combined2 = device_tenant_xigcode() + sendStr56;
+    strcpy(sendStr56, combined2.c_str());
+
+    std::string combined3 = device_firmware_information() + sendStr56;
+    strcpy(sendStr56, combined3.c_str());
+
+    std::string combined4 = device_bluetooth_session_sequence() + sendStr56;
+    strcpy(sendStr56, combined4.c_str());
+
+    Serial.print("sendStr56:333zzz333 ");
+    Serial.println(sendStr56);
+
+    std::string fullResponse = std::string(sendStr56);
+
+    Serial.print("sendStr56:444444 ");
+    Serial.println(sendStr56);
+
+    char *plain = (char*)malloc(512);
+    if (!plain) {
+      Serial.println("Failed to allocate memory for plain buffer!");
+    } else {
+      plain[0] = '\0';
+      strcat(plain, "encKey:");
+      strcat(plain, e2prom_variables.encryptionKey_Internal);
+      strcat(plain, "::hashKey:");
+      strcat(plain, e2prom_variables.hashKey_Internal);
+      strcat(plain, "::timeStamp:");
+      strcat(plain, software_parameters_variables.incoming_data_time_stamp);
+      strcat(plain, "::");
+      Serial.print("Plain: ");
+      Serial.println(plain);
+      int plain_len = strlen(plain);
+      Serial.print("plain_len: ");
+      Serial.println(plain_len);
+    }
+
+    char *encrypted = (char*)malloc(1024);
+    if (!plain || !encrypted) {
+        if (!plain) Serial.println("Failed to allocate memory for plain buffer!");
+        if (!encrypted) Serial.println("Failed to allocate memory for encryption buffer!");
+    } else {
+      encrypted[0] = '\0';
+      int enc_result = encrypt_with_public_key(plain, encrypted, 1024);
+      if (enc_result == 0) {
+        Serial.print("Encrypted: ");
+        Serial.println(encrypted);
+      } else {
+        Serial.print("Encryption failed! Error code: ");
+        Serial.println(enc_result);
+        Serial.print("Encrypted buffer (may be garbage): ");
+        Serial.println(encrypted);
+      }
+    }
+
+    Serial.print("sendStr56:555555 ");
+    Serial.println(sendStr56);
+
+    fullResponse += "publicKeyEnc:";
+    if (encrypted) fullResponse += encrypted;
+    fullResponse += "::";
+
+    if (plain) free(plain);
+    if (encrypted) free(encrypted);
+
+    Serial.print("tx_DataCache:777777 ");
+    Serial.println(fullResponse.c_str());
+
+    char* result = new char[TRANSFER_ARRAY_SIZE]();
+    strncpy(result, fullResponse.c_str(), TRANSFER_ARRAY_SIZE - 1);
     result[TRANSFER_ARRAY_SIZE - 1] = '\0';
     return result;
 }

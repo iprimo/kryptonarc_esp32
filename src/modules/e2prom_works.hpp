@@ -323,8 +323,8 @@ void wipeAllAndReissueAllBasics( ) {
     e2promWriteWorks( "hardware_uuid" , generateUUIDString() ) ;
     e2promWriteWorks( "board_model" , generateUUIDString() ) ;
     e2promWriteWorks( "vender_xc" , generateUUIDString() ) ;
-    e2promWriteWorks( "device_xc" , generateUUIDString() ) ;
-    e2promWriteWorks( "tenant_xc" , generateUUIDString() ) ;
+    e2promWriteWorks( "device_xc" , "" ) ;
+    e2promWriteWorks( "tenant_xc" , "" ) ;
     e2promWriteWorks( "manufacturer_xc" , generateUUIDString() ) ;
 
     e2promWriteWorks( "lastResortKeyOffline_Internal" , generateUUIDString() ) ;
