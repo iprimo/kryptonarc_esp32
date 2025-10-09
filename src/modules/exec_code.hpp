@@ -78,8 +78,8 @@ inline char* exec_code_0x0001() {
     strcat(tempCache, "v:2::");
     strcat(tempCache, "code:0x0001::");
     strcat(tempCache, "origin:hw::");
-    strcat(tempCache, "encryption:g1RSA::");
-    strcat(tempCache, "hash:g1SHA256::");
+    strcat(tempCache, "gEncryption:g1RSA::");
+    strcat(tempCache, "gHash:g1SHA256::");
     strcat(tempCache, "changeTracker:");
     strcat(tempCache, e2prom_variables.major_action_counter_tracker);
     strcat(tempCache, "::");

@@ -237,10 +237,10 @@ bool verifyTrafficHash(const char* meta, const char* hash, char* data) {
   char hash256ResultArray[65];
   const char* thisTrafficHashKey = nullptr;
   bool result = false;
-  if (meta && strstr(meta, "hash:g1SHA256")) {
-    thisTrafficHashKey = software_parameters_fixed.GLOBAL_SHARED_HASH_KEY;
-  } else if (meta && strstr(meta, "hash:d1SHA256")) {
+  if (meta && strstr(meta, "dHash:d1SHA256")) {
     thisTrafficHashKey = e2prom_variables.hashKey_Internal;
+  } else if (meta && strstr(meta, "gHash:g1SHA256")) {
+    thisTrafficHashKey = software_parameters_fixed.GLOBAL_SHARED_HASH_KEY;
   } else {
     Serial.println("No valid hash type found in meta!");
     return false;
