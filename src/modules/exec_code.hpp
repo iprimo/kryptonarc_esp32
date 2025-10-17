@@ -18,15 +18,15 @@ extern char* sendStr56;
 extern char* tempCache;
 
 
-
+    // 0x - "payload|d-hash|g-hash|metaData"
+    // 0xV00 - "metaData||payload||g-hash||d-hash"
+    //          g-hash = ghash(metaData||payload)
+    //          d-hash = dhash(metaData||payload||g-hash)
 
     // 0x-0	: global hash and enrypton keys used
     // 0x-1	: device hash and enrypton keys used
 
-
-inline char* exec_code_0x0001() {
-
-    // "payload|d-hash|g-hash|metaData"
+inline char* exec_code_v002_0x0001() {
 
     if (sendStr56) { delete[] sendStr56; sendStr56 = nullptr; }
     sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
@@ -34,7 +34,30 @@ inline char* exec_code_0x0001() {
     if (tempCache) { delete[] tempCache; tempCache = nullptr; }
     tempCache = new char[TRANSFER_ARRAY_SIZE]();
     tempCache[0] = '\0';
+
     
+    // Meta data
+    std::string meta_data_text = std::string("") ;
+    meta_data_text += "hwConfigState:unregisteredDevice::";
+
+    meta_data_text += "v:2::";
+    meta_data_text += "code:v002_0x0001::";
+    meta_data_text += "origin:hw::";
+    meta_data_text += "gEncryption:g1RSA::";
+    meta_data_text += "gHash:g1SHA256::";
+    meta_data_text += "changeTracker:";
+    meta_data_text += e2prom_variables.major_action_counter_tracker;
+    meta_data_text += "::";
+    meta_data_text += "timeStamp:";
+
+    char timebuf[32] = {0};
+    get_esp32_time_string(timebuf, sizeof(timebuf));
+    meta_data_text += timebuf;
+    meta_data_text += "::";
+
+     
+    // Meta data
+
     //// Clear text
     std::string clear_text = std::string("") ;
     clear_text += "hwConfigState:unregisteredDevice::";
@@ -63,33 +86,23 @@ inline char* exec_code_0x0001() {
     String encoded = base64::encode(tempCache);
     strncpy(tempCache, encoded.c_str(), TRANSFER_ARRAY_SIZE - 1);
 
-     // Creating hash of data - if device is configred used global hash key, if device is configured use device specific hash key
+    // tempCache = metadata || Payload 
+    std::string tempCacheWithMeta = meta_data_text + "||" + tempCache;
+    strncpy(tempCache, tempCacheWithMeta.c_str(), TRANSFER_ARRAY_SIZE - 1);
+    tempCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
+
+    
+    // Data Global hash 
+    // Creating hash of data - if device is configred used global hash key, if device is configured use device specific hash key
     char hash256ResultArray[ 65 ];
     hashSHA256( tempCache, software_parameters_fixed.GLOBAL_SHARED_HASH_KEY, hash256ResultArray );
-
-    // Data hash 
-    // Adding has to the end of sending string
-    strcat(tempCache, "||||");
+    strcat(tempCache, "||");
     strcat(tempCache, hash256ResultArray );  // Add the String variable
-    strcat(tempCache, "||");  // Add double quotes
-    // Data hash 
 
-    // Meta data
-    strcat(tempCache, "v:2::");
-    strcat(tempCache, "code:0x0001::");
-    strcat(tempCache, "origin:hw::");
-    strcat(tempCache, "gEncryption:g1RSA::");
-    strcat(tempCache, "gHash:g1SHA256::");
-    strcat(tempCache, "changeTracker:");
-    strcat(tempCache, e2prom_variables.major_action_counter_tracker);
-    strcat(tempCache, "::");
-    strcat(tempCache, "timeStamp:");
-    char timebuf[32] = {0};
-    get_esp32_time_string(timebuf, sizeof(timebuf));
-    strcat(tempCache, timebuf);
-    strcat(tempCache, "::");
-     
-    // Meta data
+    // Data Device hash - Place holder
+    strcat(tempCache, "||||");
+
+
 
     tempCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
 
@@ -101,7 +114,7 @@ inline char* exec_code_0x0001() {
 }
 
 
-inline char* exec_code_0x0102() {
+inline char* exec_code_v002_0x0102() {
     delete[] sendStr56;
     sendStr56 = new char[TRANSFER_ARRAY_SIZE]();
 
@@ -110,7 +123,7 @@ inline char* exec_code_0x0102() {
 
     std::string info = std::string("") +
           "ver:" + "2" + "::" +
-          "code:" + "0x0102" + "::" +
+          "code:" + "v002_0x_+_+_+_+_+_+_0102" + "::" +
           "hash:" + "d1SHA256" + "::" +
           "hwConfigState:" + "registeredDevice" "::" ;
 

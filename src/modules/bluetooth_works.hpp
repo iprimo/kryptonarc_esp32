@@ -1,7 +1,3 @@
-#include "modules/exec_code.hpp"
-
-// Forward declaration for exec_code_0x0102
-char* exec_code_0x0102();
 #ifndef BLUETOOTH_WORKS_HPP
 #define BLUETOOTH_WORKS_HPP
 
@@ -146,13 +142,13 @@ void incomingStringProcessing( char* receivingString ){
   }
 
     // LED flash indicator -receiving data from cloud 
-    if ( findSubstring(data_decoded, "0x1" )  ) { 
+    if ( findSubstring(data_decoded, "v002_0x1" )  ) { 
       flashing_led_blue( "on" , "very_fast_flashing"  , false, 10 , true);
     }
 
 
     // Selector data processing
-    if (  findSubstring(data_decoded, "0x2002tI_Reboot_tI" )) {
+    if (  findSubstring(data_decoded, "v002_0x2002tI_Reboot_tI" )) {
       Serial.println("Restarting in 1 seconds");
       delay(1000);
       ESP.restart();
@@ -167,7 +163,7 @@ void incomingStringProcessing( char* receivingString ){
       ESP.restart();
 
 
-    } else if (  findSubstring(data_decoded, "0x123456789" )) {
+    } else if (  findSubstring(data_decoded, "v002_0x123456789" )) {
       Serial.println("Restarting in 1 seconds");
       delay(1000);
       ESP.restart();
@@ -176,11 +172,11 @@ void incomingStringProcessing( char* receivingString ){
           strlen( e2prom_variables.device_xc ) < 10 && 
           strlen( e2prom_variables.tenant_xc ) < 10 ) { 
       Serial.println("Blank Device matched - :GetStatus::  >>>  ");
-      char* result = exec_code_0x0001();
+      char* result = exec_code_v002_0x0001();
       if (result) {
         strncpy(tx_DataCache, result, TRANSFER_ARRAY_SIZE - 1);
         tx_DataCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
-        delete[] result; // or free(result); depending on how exec_code_0x0001 allocates
+        delete[] result; // or free(result); depending on how exec_code_v002_0x0001 allocates
       } else {
         tx_DataCache[0] = '\0';
       }
@@ -189,7 +185,7 @@ void incomingStringProcessing( char* receivingString ){
           strlen( e2prom_variables.device_xc ) > 10 && 
           strlen( e2prom_variables.tenant_xc ) > 10 ) {
         // DR ?(HC: HealthCheck): Device Response
-        char* result = exec_code_0x0102();
+        char* result = exec_code_v002_0x0102();
         if (result) {
             strncpy(tx_DataCache, result, TRANSFER_ARRAY_SIZE - 1);
             tx_DataCache[TRANSFER_ARRAY_SIZE - 1] = '\0';
@@ -198,10 +194,10 @@ void incomingStringProcessing( char* receivingString ){
             tx_DataCache[0] = '\0';
         }
         
-    } else if ( findSubstring(data_decoded, "0x1102" )  ) {
+    } else if ( findSubstring(data_decoded, "v002_0x1102" )  ) {
         
       //  0x1102dFhDXzAwMDAxXzAwMDAxXzAwMDAxXzAwMDAxX3RlbmFudGFjY291bnRfdFhDZFhDXzIzOGI1Y19mNjk1NWNfZGY4YThhX2FjMzBhNmExZDgxX2hhcmR3YXJldHdpbl9kWENzSV9iTEVTU0VRX05hTl9iTEVTU0VRdFNfMjAyNC0wMS0xOVQwNToyODoxOS4xMDNaX3RTX3NJaFdBY3Rpb25fdW5sb2NrX2hXQWN0aW9u|413565c688bb4336c0e54d478daedd39f0aa7e321df8abafbbbed545a3e1bde
-  Serial.println("0x1102>444    matched 444>>>   data: ");
+  Serial.println("v002_0x1102>444    matched 444>>>   data: ");
   Serial.println( data_raw );
 
       // extracting masked data

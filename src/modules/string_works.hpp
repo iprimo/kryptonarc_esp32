@@ -184,35 +184,46 @@ bool parseMetaHashData(const char* receivingString, char*& meta, char*& device_h
     }
   }
 
-  // We need 3 delimiters for 4 sections
-  if (sectionIdx == 3) {
-    // Section 0: data (payload)
-    int dataLen = sectionPtrs[0] - receivingString;
+  // We need at least 3 delimiters for 4 sections. Accept additional trailing delimiter(s) as well.
+  if (sectionIdx >= 3) {
+    // Section 0: metaData
+    int metaLen = sectionPtrs[0] - receivingString;
+    meta = new char[metaLen + 1]();
+    strncpy(meta, receivingString, metaLen);
+    meta[metaLen] = '\0';
+
+    // Section 1: payload
+    int dataLen = sectionPtrs[1] - (sectionPtrs[0] + 2);
     data = new char[dataLen + 1]();
-    strncpy(data, receivingString, dataLen);
+    strncpy(data, sectionPtrs[0] + 2, dataLen);
     data[dataLen] = '\0';
 
-    // Decode base64 data
+    // Decode base64 data (if needed)
     data_decoded = new char[1024](); // Adjust size as needed
     base64_string_decoding(String(data), data_decoded);
 
-    // Section 1: device_hash
-    int deviceHashLen = sectionPtrs[1] - (sectionPtrs[0] + 2);
-    device_hash = new char[deviceHashLen + 1]();
-    strncpy(device_hash, sectionPtrs[0] + 2, deviceHashLen);
-    device_hash[deviceHashLen] = '\0';
-
-    // Section 2: global_hash
+    // Section 2: global_hash (g-hash)
     int globalHashLen = sectionPtrs[2] - (sectionPtrs[1] + 2);
     global_hash = new char[globalHashLen + 1]();
     strncpy(global_hash, sectionPtrs[1] + 2, globalHashLen);
     global_hash[globalHashLen] = '\0';
 
-    // Section 3: meta (metadata)
-    int metaLen = len - (sectionPtrs[2] - receivingString) - 2;
-    meta = new char[metaLen + 1]();
-    strncpy(meta, sectionPtrs[2] + 2, metaLen);
-    meta[metaLen] = '\0';
+    // Section 3: device_hash (d-hash)
+    // If a 4th delimiter was found (sectionPtrs[3]) then the device_hash ends at that delimiter,
+    // otherwise it runs to the end of the string.
+    const char* deviceStart = sectionPtrs[2] + 2;
+    int deviceHashLen = 0;
+    if (sectionIdx >= 4 && sectionPtrs[3] != nullptr) {
+      deviceHashLen = sectionPtrs[3] - deviceStart;
+    } else {
+      deviceHashLen = len - (deviceStart - receivingString);
+    }
+    if (deviceHashLen < 0) deviceHashLen = 0;
+    device_hash = new char[deviceHashLen + 1]();
+    if (deviceHashLen > 0) {
+      strncpy(device_hash, deviceStart, deviceHashLen);
+    }
+    device_hash[deviceHashLen] = '\0';
 
     // Do NOT clean up output pointers here; caller is responsible for freeing them
     return true;
@@ -245,8 +256,38 @@ bool verifyTrafficHash(const char* meta, const char* hash, char* data) {
     Serial.println("No valid hash type found in meta!");
     return false;
   }
+  // Build local-only combined sections for convenience:
+  // meta_payload = "meta||payload"
+  // meta_payload_g_hash = "meta||payload||g-hash" (uses `hash` param)
+  char* meta_payload = nullptr;
+  char* meta_payload_g_hash = nullptr;
+  if (meta && data) {
+    int mlen = strlen(meta);
+    int dlen = strlen(data);
+    meta_payload = new char[mlen + 2 + dlen + 1]();
+    strncpy(meta_payload, meta, mlen);
+    meta_payload[mlen] = '\0';
+    strcat(meta_payload, "||");
+    strcat(meta_payload, data);
+  }
+  if (meta && data && hash) {
+    int mlen = strlen(meta);
+    int dlen = strlen(data);
+    int hlen = strlen(hash);
+    meta_payload_g_hash = new char[mlen + 2 + dlen + 2 + hlen + 1]();
+    strncpy(meta_payload_g_hash, meta, mlen);
+    meta_payload_g_hash[mlen] = '\0';
+    strcat(meta_payload_g_hash, "||");
+    strcat(meta_payload_g_hash, data);
+    strcat(meta_payload_g_hash, "||");
+    strcat(meta_payload_g_hash, hash);
+  }
 
-  hashSHA256((const char*)data, thisTrafficHashKey, hash256ResultArray);
+  // hashSHA256((const char*)data, thisTrafficHashKey, hash256ResultArray);
+
+
+  // Global hash check 
+  hashSHA256(meta_payload, thisTrafficHashKey, hash256ResultArray);
   if (hash && strcmp(hash, hash256ResultArray) == 0) {
     Serial.println("hash OK!");
     result = true;
@@ -256,6 +297,8 @@ bool verifyTrafficHash(const char* meta, const char* hash, char* data) {
   }
 
   // No dynamic allocations in this function, but if you add any, clean up here
+  if (meta_payload) { delete[] meta_payload; meta_payload = nullptr; }
+  if (meta_payload_g_hash) { delete[] meta_payload_g_hash; meta_payload_g_hash = nullptr; }
   return result;
 }
 
